@@ -64,6 +64,8 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `SERVER_PORT` | `8000` | Porta local; deve acompanhar `APP_URL` |
 | `APP_LOGO` | `/images/logo.svg` | Logo da aplicação |
 | `APP_FAVICON` | `/favicon.ico` | Ícone do navegador |
+| `APP_PRIMARY_COLOR` | `#3949ab` | Cor principal da interface, em hexadecimal e entre aspas |
+| `APP_SECONDARY_COLOR` | `#00695c` | Cor secundária da interface, em hexadecimal e entre aspas |
 | `DB_DATABASE` | `template` | Nome do banco |
 | `DB_ENGINE` | `InnoDB` | Motor do MySQL; o padrão MyISAM do WAMP não funciona |
 | `MAIL_MAILER` | `log` | Forma de envio de e-mail |
@@ -119,6 +121,18 @@ apagado:
 ```bash
 php vendor/bin/phpunit -c phpunit.mysql.xml
 ```
+
+### Interface
+
+As telas usam o [Material UI](https://mui.com/material-ui/), em sua versão gratuita. O tema fica em `resources/js/theme.js`;
+uma cor inválida volta ao padrão.
+
+- `ActionIconButton`: ação em ícone com dica de título e breve descrição, por mouse, teclado ou toque longo.
+- `FormDialog`: formulário de criação e edição em diálogo. Ocupa a tela inteira abaixo de 600 px e pede confirmação
+  antes de descartar alterações.
+
+Os formulários têm endereço próprio, como `/admin/users/5/edit?search=ana`, que abre o diálogo sobre a listagem.
+Salvar ou fechar mantém filtros, ordem e página.
 
 ### DataTable
 

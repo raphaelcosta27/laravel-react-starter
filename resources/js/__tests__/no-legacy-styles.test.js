@@ -6,24 +6,6 @@ const ROOT = join(process.cwd(), 'resources/js');
 
 const LEGACY = /className=|@headlessui/;
 
-/** Telas ainda não migradas. A lista DEVE ficar vazia ao fim da spec 003. */
-const PENDING = [
-    'Components/Checkbox.jsx',
-    'Components/DangerButton.jsx',
-    'Components/Dropdown.jsx',
-    'Components/InputError.jsx',
-    'Components/InputLabel.jsx',
-    'Components/Modal.jsx',
-    'Components/NavLink.jsx',
-    'Components/PrimaryButton.jsx',
-    'Components/ResponsiveNavLink.jsx',
-    'Components/SecondaryButton.jsx',
-    'Components/TextInput.jsx',
-    'Pages/Admin/Permissions/Form.jsx',
-    'Pages/Admin/Profiles/Form.jsx',
-    'Pages/Admin/Users/Form.jsx',
-];
-
 const sources = (directory) =>
     readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
         const path = join(directory, entry.name);
@@ -41,12 +23,8 @@ const legacy = sources(ROOT)
     .sort();
 
 describe('estilos anteriores', () => {
-    test('nenhum arquivo fora da lista usa Tailwind ou Headless UI', () => {
-        expect(legacy.filter((path) => !PENDING.includes(path))).toEqual([]);
-    });
-
-    test('a lista só traz arquivos que ainda precisam de migração', () => {
-        expect(PENDING.filter((path) => !legacy.includes(path))).toEqual([]);
+    test('nenhum arquivo usa Tailwind ou Headless UI', () => {
+        expect(legacy).toEqual([]);
     });
 
     test('a aplicação não carrega fonte de serviço externo', () => {

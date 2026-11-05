@@ -69,6 +69,8 @@ Everything that varies between projects lives in `.env`. The main options:
 | `SERVER_PORT` | `8000` | Local port; must match `APP_URL` |
 | `APP_LOGO` | `/images/logo.svg` | Application logo |
 | `APP_FAVICON` | `/favicon.ico` | Browser icon |
+| `APP_PRIMARY_COLOR` | `#3949ab` | Main interface color, hexadecimal and in quotes |
+| `APP_SECONDARY_COLOR` | `#00695c` | Secondary interface color, hexadecimal and in quotes |
 | `DB_DATABASE` | `template` | Database name |
 | `DB_ENGINE` | `InnoDB` | MySQL engine; the WAMP default, MyISAM, does not work |
 | `MAIL_MAILER` | `log` | How emails are delivered |
@@ -123,6 +125,19 @@ fails if `forceDelete`, `detach`, `sync` or `truncate` appears in `app/` or `dat
 ```bash
 php vendor/bin/phpunit -c phpunit.mysql.xml
 ```
+
+### Interface
+
+Screens use [Material UI](https://mui.com/material-ui/), in its free version. The theme is in `resources/js/theme.js`; an
+invalid color falls back to the default.
+
+- `ActionIconButton`: icon action with a tooltip that shows the title and a short description, by mouse, keyboard
+  or long press.
+- `FormDialog`: create and edit form in a dialog. It fills the screen below 600 px and asks for confirmation before
+  discarding changes.
+
+Forms have their own address, such as `/admin/users/5/edit?search=ana`, which opens the dialog over the listing.
+Saving or closing keeps filters, order and page.
 
 ### DataTable
 
