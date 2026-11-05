@@ -7,6 +7,12 @@ expect.extend(toHaveNoViolations);
 
 vi.mock('@inertiajs/react', () => import('./helpers/inertia'));
 
+globalThis.ResizeObserver ??= class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 globalThis.route = (name) =>
     name === undefined ? { current: () => false } : `/${name}`;
 

@@ -1,4 +1,5 @@
 import { forwardRef, useState } from 'react';
+import { vi } from 'vitest';
 
 const defaults = () => ({
     appName: 'Aplicação de Teste',
@@ -10,6 +11,7 @@ const defaults = () => ({
 let pageProps = defaults();
 
 export function resetPageProps() {
+    Object.values(router).forEach((method) => method.mockClear?.());
     pageProps = defaults();
 }
 
@@ -64,4 +66,12 @@ export const Link = forwardRef(function Link(
     );
 });
 
-export const router = { on: () => () => {} };
+export const router = {
+    on: () => () => {},
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    patch: vi.fn(),
+    delete: vi.fn(),
+    visit: vi.fn(),
+};

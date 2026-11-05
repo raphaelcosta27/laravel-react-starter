@@ -2,13 +2,23 @@ import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import StatusAnnouncer from '@/Components/StatusAnnouncer';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { useTranslations } from '@/lib/i18n';
+import { useCan } from '@/lib/permissions';
+
+const panelAreas = [
+    { label: 'Profiles', route: 'admin.profiles', permission: 'visualizar_perfil' },
+    { label: 'Permissions', route: 'admin.permissions', permission: 'visualizar_permissao' },
+    { label: 'Users', route: 'admin.users', permission: 'visualizar_usuario' },
+];
 
 export default function AuthenticatedLayout({ header, children }) {
     const __ = useTranslations();
+    const can = useCan();
     const user = usePage().props.auth.user;
+    const areas = panelAreas.filter((area) => can(area.permission));
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -32,6 +42,16 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     {__('Dashboard')}
                                 </NavLink>
+
+                                {areas.map((area) => (
+                                    <NavLink
+                                        key={area.route}
+                                        href={route(`${area.route}.index`)}
+                                        active={route().current(`${area.route}.*`)}
+                                    >
+                                        {__(area.label)}
+                                    </NavLink>
+                                ))}
                             </div>
                         </div>
 
@@ -137,6 +157,16 @@ export default function AuthenticatedLayout({ header, children }) {
                         >
                             {__('Dashboard')}
                         </ResponsiveNavLink>
+
+                        {areas.map((area) => (
+                            <ResponsiveNavLink
+                                key={area.route}
+                                href={route(`${area.route}.index`)}
+                                active={route().current(`${area.route}.*`)}
+                            >
+                                {__(area.label)}
+                            </ResponsiveNavLink>
+                        ))}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
@@ -172,6 +202,8 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 </header>
             )}
+
+            <StatusAnnouncer />
 
             <main>{children}</main>
         </div>
