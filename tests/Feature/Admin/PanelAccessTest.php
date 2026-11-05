@@ -25,13 +25,19 @@ class PanelAccessTest extends TestCase
         ];
     }
 
-    #[DataProvider('areas')]
+    /** @return array<string, array{0: string}> */
+    public static function urls(): array
+    {
+        return array_map(fn (array $area) => [$area[0]], self::areas());
+    }
+
+    #[DataProvider('urls')]
     public function test_administrator_opens_the_area(string $url): void
     {
         $this->actingAs(User::factory()->administrator()->create())->get($url)->assertOk();
     }
 
-    #[DataProvider('areas')]
+    #[DataProvider('urls')]
     public function test_user_without_permission_is_refused(string $url): void
     {
         $this->actingAs($this->userWith())->get($url)->assertForbidden();
@@ -43,13 +49,13 @@ class PanelAccessTest extends TestCase
         $this->actingAs($this->userWith($code))->get($url)->assertOk();
     }
 
-    #[DataProvider('areas')]
+    #[DataProvider('urls')]
     public function test_guest_is_redirected_to_login(string $url): void
     {
         $this->get($url)->assertRedirect(route('login'));
     }
 
-    #[DataProvider('areas')]
+    #[DataProvider('urls')]
     public function test_unconfirmed_account_is_redirected(string $url): void
     {
         $user = User::factory()->administrator()->unverified()->create();
@@ -57,7 +63,7 @@ class PanelAccessTest extends TestCase
         $this->actingAs($user)->get($url)->assertRedirect(route('verification.notice'));
     }
 
-    #[DataProvider('areas')]
+    #[DataProvider('urls')]
     public function test_account_with_pending_password_change_is_redirected(string $url): void
     {
         $user = User::factory()->administrator()->mustChangePassword()->create();
