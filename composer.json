@@ -15,9 +15,11 @@
         "php": "^8.3",
         "ext-pdo_mysql": "*",
         "ext-pdo_sqlite": "*",
+        "ext-zip": "*",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "openspout/openspout": "5.3",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {

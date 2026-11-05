@@ -29,4 +29,16 @@ return [
         'password' => env('INITIAL_USER_PASSWORD'),
     ],
 
+    /*
+    | Painel de administrador. Os nomes valem somente na criação dos perfis:
+    | depois disso, o sistema os identifica por "system_key".
+    */
+    'admin' => [
+        'admin_profile_name' => env('ADMIN_PROFILE_NAME', 'Administrador'),
+        'default_profile_name' => env('DEFAULT_PROFILE_NAME', 'Usuário'),
+        'email_throttle' => (int) env('ADMIN_EMAIL_THROTTLE', 3),
+        'email_throttle_minutes' => (int) env('ADMIN_EMAIL_THROTTLE_MINUTES', 10),
+        'csv_delimiter' => env('EXPORT_CSV_DELIMITER', ';'),
+    ],
+
 ];
