@@ -7,7 +7,7 @@ da conta por e-mail, troca obrigatória de senha no primeiro acesso e testes aut
 
 ## Pré-requisitos
 
-- PHP 8.3 ou superior, com `pdo_mysql` e `pdo_sqlite`
+- PHP 8.3 ou superior, com `pdo_mysql`, `pdo_sqlite` e `zip`
 - Composer 2
 - Node 22.12 ou superior
 - MySQL 8 em execução (no WAMP, basta iniciar os serviços)
@@ -71,6 +71,11 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `TEMPORARY_PASSWORD_EXPIRE` | `60` | Validade da senha temporária e do link, em minutos |
 | `INITIAL_USER_EMAIL` | `admin@example.com` | E-mail do usuário inicial; vazio não cria o usuário |
 | `INITIAL_USER_PASSWORD` | vazio | Senha temporária; vazia gera uma automaticamente |
+| `ADMIN_PROFILE_NAME` | `Administrador` | Nome do perfil master, usado somente na criação |
+| `DEFAULT_PROFILE_NAME` | `Usuário` | Nome do perfil padrão, usado somente na criação |
+| `ADMIN_EMAIL_THROTTLE` | `3` | E-mails do painel por usuário de destino, por janela |
+| `ADMIN_EMAIL_THROTTLE_MINUTES` | `10` | Duração dessa janela, em minutos |
+| `EXPORT_CSV_DELIMITER` | `;` | Separador de colunas do CSV exportado |
 
 Os textos ficam em `lang/pt_BR.json` e `lang/pt_BR/`. A lista completa de opções está em `.env.example`.
 
@@ -81,6 +86,78 @@ Os textos ficam em `lang/pt_BR.json` e `lang/pt_BR/`. A lista completa de opçõ
   `$user->requirePasswordChange()`.
 - Novas rotas autenticadas devem usar o grupo de middleware `account.ready`. Um teste falha se alguma rota
   ficar de fora.
+
+## Painel de administrador
+
+O painel gerencia perfis, permissões e usuários. A preparação cria o perfil master, o perfil padrão e as 20
+permissões do painel, e o primeiro usuário criado no sistema vira administrador.
+
+**Verificar uma permissão.** A permissão é identificada pelo código, e a mesma verificação vale em todo lugar:
+
+```php
+$user->can('cadastrar_usuario');
+
+Route::get('reports', ReportController::class)->middleware(['account.ready', 'can:gerar_relatorio']);
+```
+
+```jsx
+const can = useCan();
+
+{can('gerar_relatorio') && <Link href="/reports">Relatórios</Link>}
+```
+
+`useCan` só exibe ou oculta elementos: a proteção sempre acontece no servidor. Administradores passam por toda
+verificação, e um código inexistente nega acesso aos demais. Regras que valem também para administradores ficam
+nas Actions, pois `Gate::before` ignora as policies para eles.
+
+**Exclusão de dados.** Nada é apagado de fato. Toda entidade usa exclusão lógica, inclusive vínculos, e um teste
+falha se `forceDelete`, `detach`, `sync` ou `truncate` aparecer em `app/` ou `database/`.
+
+**Testes de bloqueio.** Precisam de bloqueio real de linhas, então rodam em MySQL, em um banco descartável que é
+apagado:
+
+```bash
+php vendor/bin/phpunit -c phpunit.mysql.xml
+```
+
+### DataTable
+
+Toda listagem usa `resources/js/Components/DataTable`. Ordenação, busca, filtros, paginação e exportação rodam no
+servidor, por uma definição em `app/Support/Tables/Definitions`, e só as colunas declaradas chegam à consulta. As
+escolhas do usuário ficam no navegador.
+
+```jsx
+<DataTable
+    tableKey="reports"
+    caption={__('Reports')}
+    columns={columns}
+    rows={rows}
+    query={query}
+    tabs={tabs}
+    rowActions={rowActions}
+    exportRoute="admin.reports.export"
+    canExport={abilities.export}
+    emptyMessage={__('No reports found.')}
+/>
+```
+
+`rowActions` recebe o registro e devolve os botões, cada um com sua função:
+
+```jsx
+const rowActions = () => [
+    {
+        key: 'send',
+        label: __('Send contract'),
+        onClick: (row) => router.post(route('reports.send', row.id)),
+        visible: (row) => row.can.send,
+        confirm: { title: __('Send contract'), message: __('Confirm the sending?') },
+        menu: true,
+    },
+];
+```
+
+O servidor envia `can` em cada registro, combinando autorização e estado do registro. O contrato completo do
+componente está nas props dele e em `TableDefinition`.
 
 ## Iniciar um novo projeto
 

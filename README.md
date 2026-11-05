@@ -11,7 +11,7 @@ in Brazilian Portuguese.
 
 ## Requirements
 
-- PHP 8.3 or later, with `pdo_mysql` and `pdo_sqlite`
+- PHP 8.3 or later, with `pdo_mysql`, `pdo_sqlite` and `zip`
 - Composer 2
 - Node 22.12 or later
 - MySQL 8 running (on WAMP, just start the services)
@@ -76,6 +76,11 @@ Everything that varies between projects lives in `.env`. The main options:
 | `TEMPORARY_PASSWORD_EXPIRE` | `60` | Validity of the temporary password and link, in minutes |
 | `INITIAL_USER_EMAIL` | `admin@example.com` | Initial user's email; empty skips creating the user |
 | `INITIAL_USER_PASSWORD` | empty | Temporary password; empty generates one automatically |
+| `ADMIN_PROFILE_NAME` | `Administrador` | Name of the master profile, used only on creation |
+| `DEFAULT_PROFILE_NAME` | `Usuário` | Name of the default profile, used only on creation |
+| `ADMIN_EMAIL_THROTTLE` | `3` | Panel emails per target user, per window |
+| `ADMIN_EMAIL_THROTTLE_MINUTES` | `10` | Length of that window, in minutes |
+| `EXPORT_CSV_DELIMITER` | `;` | Column separator of exported CSV files |
 
 Interface texts live in `lang/pt_BR.json` and `lang/pt_BR/`. The full list of options is in `.env.example`.
 
@@ -86,6 +91,77 @@ Interface texts live in `lang/pt_BR.json` and `lang/pt_BR/`. The full list of op
   `$user->requirePasswordChange()`.
 - New authenticated routes must use the `account.ready` middleware group. A test fails if any route is left
   out.
+
+## Admin panel
+
+The panel manages profiles, permissions and users. Setup creates the master profile, the default profile and
+the 20 panel permissions, and the first user created in the system becomes an administrator.
+
+**Checking a permission.** A permission is identified by its code, and the same check works everywhere:
+
+```php
+$user->can('cadastrar_usuario');
+
+Route::get('reports', ReportController::class)->middleware(['account.ready', 'can:gerar_relatorio']);
+```
+
+```jsx
+const can = useCan();
+
+{can('gerar_relatorio') && <Link href="/reports">Reports</Link>}
+```
+
+`useCan` only shows or hides elements: protection always happens on the server. Administrators pass every
+check, and a code that does not exist denies everyone else. Rules that also bind administrators belong in
+Actions, because `Gate::before` skips policies for them.
+
+**Deleting data.** Nothing is physically deleted. Every entity uses soft deletes, including links, and a test
+fails if `forceDelete`, `detach`, `sync` or `truncate` appears in `app/` or `database/`.
+
+**Lock tests.** They need real row locks, so they run on MySQL, in a disposable database that is wiped:
+
+```bash
+php vendor/bin/phpunit -c phpunit.mysql.xml
+```
+
+### DataTable
+
+Every listing uses `resources/js/Components/DataTable`. Sorting, search, filters, pagination and export run on
+the server, through a definition in `app/Support/Tables/Definitions`, and only declared columns reach the
+query. The user's choices are kept in the browser.
+
+```jsx
+<DataTable
+    tableKey="reports"
+    caption={__('Reports')}
+    columns={columns}
+    rows={rows}
+    query={query}
+    tabs={tabs}
+    rowActions={rowActions}
+    exportRoute="admin.reports.export"
+    canExport={abilities.export}
+    emptyMessage={__('No reports found.')}
+/>
+```
+
+`rowActions` receives the record and returns its buttons, each one with its own function:
+
+```jsx
+const rowActions = () => [
+    {
+        key: 'send',
+        label: __('Send contract'),
+        onClick: (row) => router.post(route('reports.send', row.id)),
+        visible: (row) => row.can.send,
+        confirm: { title: __('Send contract'), message: __('Confirm the sending?') },
+        menu: true,
+    },
+];
+```
+
+The server sends `can` with each record, combining authorization and the state of the record. The full
+contract of the component is documented in its props and in `TableDefinition`.
 
 ## Starting a new project
 
