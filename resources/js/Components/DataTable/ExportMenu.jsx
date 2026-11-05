@@ -1,11 +1,8 @@
 import { useTranslations } from '@/lib/i18n';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-
-const triggerClass =
-    'rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2';
-
-const itemClass =
-    'block px-4 py-2 text-sm text-gray-800 data-[focus]:bg-gray-100';
+import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useId, useState } from 'react';
 
 function appendParam(search, key, value) {
     if (Array.isArray(value)) {
@@ -31,6 +28,8 @@ function buildUrl(base, params) {
 
 export default function ExportMenu({ exportRoute, columns, query, selectedIds }) {
     const __ = useTranslations();
+    const buttonId = useId();
+    const [anchor, setAnchor] = useState(null);
 
     const url = (format, ids) =>
         buildUrl(route(exportRoute), {
@@ -55,21 +54,35 @@ export default function ExportMenu({ exportRoute, columns, query, selectedIds })
     ];
 
     return (
-        <Menu>
-            <MenuButton className={triggerClass}>{__('Export')}</MenuButton>
+        <>
+            <Button
+                id={buttonId}
+                variant="outlined"
+                size="small"
+                aria-haspopup="menu"
+                aria-expanded={anchor !== null}
+                onClick={(event) => setAnchor(event.currentTarget)}
+            >
+                {__('Export')}
+            </Button>
 
-            <MenuItems
-                anchor="bottom end"
-                className="z-20 min-w-44 rounded-md border border-gray-200 bg-white py-1 shadow-lg focus:outline-none"
+            <Menu
+                anchorEl={anchor}
+                open={anchor !== null}
+                slotProps={{ list: { 'aria-labelledby': buttonId } }}
+                onClose={() => setAnchor(null)}
             >
                 {items.map((item) => (
-                    <MenuItem key={item.label}>
-                        <a href={item.href} className={itemClass}>
-                            {item.label}
-                        </a>
+                    <MenuItem
+                        key={item.label}
+                        component="a"
+                        href={item.href}
+                        onClick={() => setAnchor(null)}
+                    >
+                        {item.label}
                     </MenuItem>
                 ))}
-            </MenuItems>
-        </Menu>
+            </Menu>
+        </>
     );
 }

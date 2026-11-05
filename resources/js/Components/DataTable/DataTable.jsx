@@ -10,7 +10,22 @@ import Toolbar from '@/Components/DataTable/Toolbar';
 import useTablePreferences from '@/Components/DataTable/useTablePreferences';
 import StatusAnnouncer from '@/Components/StatusAnnouncer';
 import { useTranslations } from '@/lib/i18n';
+import { visuallyHidden } from '@/lib/visuallyHidden';
 import { router } from '@inertiajs/react';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Box from '@mui/material/Box';
+import Checkbox from '@mui/material/Checkbox';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableFooter from '@mui/material/TableFooter';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
 import {
     columnFilteringFeature,
     columnOrderingFeature,
@@ -40,17 +55,23 @@ const features = tableFeatures({
     rowSortingFeature,
 });
 
-const ALIGN = { start: 'text-start', center: 'text-center', end: 'text-end' };
-
 const WRAP = {
-    wrap: 'whitespace-normal',
-    nowrap: 'whitespace-nowrap',
-    truncate: 'truncate',
+    wrap: { whiteSpace: 'normal' },
+    nowrap: { whiteSpace: 'nowrap' },
+    truncate: {
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+    },
 };
 
 const INTERNAL_COLUMNS = ['select', 'expand', 'actions'];
 
+const CONTROL_COLUMNS = ['select', 'expand'];
+
 const CONTROL_COLUMN_WIDTH = 56;
+
+const CONTROL_CELL = { px: 0, textAlign: 'center' };
 
 const columnId = (column) => column.id ?? column.accessorKey;
 
@@ -122,8 +143,19 @@ function columnStyle(column, sizing) {
     };
 }
 
-const cellClass = (meta, pinned) =>
-    `px-4 py-3 text-sm text-gray-800 ${ALIGN[meta?.align ?? 'start']} ${WRAP[meta?.wrap ?? 'wrap']} ${pinned ? 'bg-white' : ''}`;
+const controlSx = (column) =>
+    CONTROL_COLUMNS.includes(column.id) ? CONTROL_CELL : {};
+
+const cellSx = (column) => {
+    const { meta } = column.columnDef;
+
+    return {
+        textAlign: meta?.align ?? 'start',
+        ...WRAP[meta?.wrap ?? 'wrap'],
+        ...(column.getIsPinned() ? { bgcolor: 'background.paper' } : {}),
+        ...controlSx(column),
+    };
+};
 
 export default function DataTable({
     tableKey,
@@ -136,7 +168,7 @@ export default function DataTable({
     rowActions,
     bulkActions = [],
     renderDetail,
-    rowClassName,
+    rowSx,
     toolbar,
     emptyMessage,
     exportRoute,
@@ -183,22 +215,26 @@ export default function DataTable({
                 id: 'select',
                 size: CONTROL_COLUMN_WIDTH,
                 header: ({ table }) => (
-                    <input
-                        type="checkbox"
-                        aria-label={__('Select all')}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    <Checkbox
+                        size="small"
                         checked={table.getIsAllPageRowsSelected()}
+                        slotProps={{ input: { 'aria-label': __('Select all') } }}
                         onChange={(event) =>
                             table.toggleAllPageRowsSelected(event.target.checked)
                         }
                     />
                 ),
                 cell: ({ row }) => (
-                    <input
-                        type="checkbox"
-                        aria-label={__('Select :name', { name: rowLabel(row.original) })}
-                        className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    <Checkbox
+                        size="small"
                         checked={row.getIsSelected()}
+                        slotProps={{
+                            input: {
+                                'aria-label': __('Select :name', {
+                                    name: rowLabel(row.original),
+                                }),
+                            },
+                        }}
                         onChange={(event) => row.toggleSelected(event.target.checked)}
                     />
                 ),
@@ -209,19 +245,22 @@ export default function DataTable({
             leading.push({
                 id: 'expand',
                 size: CONTROL_COLUMN_WIDTH,
-                header: () => <span className="sr-only">{__('Details')}</span>,
+                header: () => (
+                    <span style={visuallyHidden}>{__('Details')}</span>
+                ),
                 cell: ({ row }) => (
-                    <button
-                        type="button"
+                    <IconButton
+                        size="small"
                         aria-expanded={row.getIsExpanded()}
                         aria-label={__('Show details of :name', { name: rowLabel(row.original) })}
-                        className="min-h-6 min-w-6 rounded text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         onClick={() => row.toggleExpanded()}
                     >
-                        <span aria-hidden="true">
-                            {row.getIsExpanded() ? '▾' : '▸'}
-                        </span>
-                    </button>
+                        {row.getIsExpanded() ? (
+                            <ExpandMoreIcon fontSize="small" />
+                        ) : (
+                            <ChevronRightIcon fontSize="small" />
+                        )}
+                    </IconButton>
                 ),
             });
         }
@@ -505,41 +544,49 @@ export default function DataTable({
 
             <StatusAnnouncer message={announcement} visuallyHidden />
 
-            <div
+            <TableContainer
+                component={Paper}
+                variant="outlined"
                 role="region"
                 aria-label={caption}
                 tabIndex={0}
-                className="overflow-x-auto rounded-md border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                sx={{
+                    '&:focus-visible': {
+                        outline: '2px solid',
+                        outlineColor: 'primary.main',
+                    },
+                }}
             >
-                <table
-                    className="min-w-full divide-y divide-gray-200"
-                    aria-busy={busy}
-                >
-                    <caption className="sr-only">{caption}</caption>
+                <Table size="small" aria-busy={busy}>
+                    <caption style={visuallyHidden}>{caption}</caption>
 
-                    <thead className="bg-gray-50">
+                    <TableHead>
                         {table.getHeaderGroups().map((group) => (
-                            <tr key={group.id}>
+                            <TableRow key={group.id}>
                                 {group.headers.map((header) => {
                                     const { column } = header;
                                     const { meta } = column.columnDef;
+                                    const direction = sortDirection(column.id);
 
                                     return (
-                                        <th
+                                        <TableCell
                                             key={header.id}
                                             scope="col"
-                                            aria-sort={
-                                                meta?.sortable
-                                                    ? sortDirection(column.id)
-                                                    : undefined
-                                            }
+                                            aria-sort={meta?.sortable ? direction : undefined}
                                             style={columnStyle(column, columnSizing)}
-                                            className={`relative bg-gray-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-700 ${ALIGN[meta?.align ?? 'start']}`}
+                                            sx={{
+                                                bgcolor: 'grey.100',
+                                                fontWeight: 600,
+                                                position: 'relative',
+                                                textAlign: meta?.align ?? 'start',
+                                                ...controlSx(column),
+                                            }}
                                         >
                                             {meta?.sortable ? (
-                                                <button
-                                                    type="button"
-                                                    className="rounded uppercase focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                                <TableSortLabel
+                                                    component="button"
+                                                    active={direction !== 'none'}
+                                                    direction={direction === 'descending' ? 'desc' : 'asc'}
                                                     onClick={(event) =>
                                                         visit({
                                                             sort: serializeSort(
@@ -553,91 +600,103 @@ export default function DataTable({
                                                     }
                                                 >
                                                     <table.FlexRender header={header} />
-                                                </button>
+                                                </TableSortLabel>
                                             ) : (
                                                 <table.FlexRender header={header} />
                                             )}
 
                                             {!INTERNAL_COLUMNS.includes(column.id) && (
-                                                <div
+                                                <Box
                                                     data-resize-handle
                                                     aria-hidden="true"
-                                                    className="absolute end-0 top-0 h-full w-1 cursor-col-resize touch-none select-none hover:bg-indigo-400"
+                                                    sx={{
+                                                        cursor: 'col-resize',
+                                                        height: '100%',
+                                                        insetInlineEnd: 0,
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        touchAction: 'none',
+                                                        userSelect: 'none',
+                                                        width: 4,
+                                                        '&:hover': { bgcolor: 'primary.light' },
+                                                    }}
                                                     onMouseDown={header.getResizeHandler()}
                                                     onTouchStart={header.getResizeHandler()}
                                                 />
                                             )}
-                                        </th>
+                                        </TableCell>
                                     );
                                 })}
-                            </tr>
+                            </TableRow>
                         ))}
-                    </thead>
+                    </TableHead>
 
-                    <tbody className="divide-y divide-gray-200">
+                    <TableBody>
                         {tableRows.length === 0 && (
-                            <tr>
-                                <td
+                            <TableRow>
+                                <TableCell
                                     colSpan={visibleColumns.length}
-                                    className="px-4 py-8 text-center text-sm text-gray-600"
+                                    sx={{ color: 'text.secondary', py: 4, textAlign: 'center' }}
                                 >
                                     {emptyMessage}
-                                </td>
-                            </tr>
+                                </TableCell>
+                            </TableRow>
                         )}
 
                         {tableRows.map((row) => (
                             <Fragment key={row.id}>
-                                <tr className={rowClassName?.(row.original)}>
+                                <TableRow sx={rowSx?.(row.original)}>
                                     {row.getVisibleCells().map((cell) => (
-                                        <td
+                                        <TableCell
                                             key={cell.id}
                                             style={columnStyle(cell.column, columnSizing)}
-                                            className={cellClass(
-                                                cell.column.columnDef.meta,
-                                                cell.column.getIsPinned(),
-                                            )}
+                                            sx={cellSx(cell.column)}
                                         >
                                             {renderCell(cell)}
-                                        </td>
+                                        </TableCell>
                                     ))}
-                                </tr>
+                                </TableRow>
 
                                 {expandable && row.getIsExpanded() && (
-                                    <tr>
-                                        <td
+                                    <TableRow>
+                                        <TableCell
                                             colSpan={visibleColumns.length}
-                                            className="bg-gray-50 px-4 py-3 text-sm text-gray-800"
+                                            sx={{ bgcolor: 'grey.50' }}
                                         >
                                             {renderDetail(row.original)}
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 )}
                             </Fragment>
                         ))}
-                    </tbody>
+                    </TableBody>
 
                     {hasSummaries && (
-                        <tfoot className="bg-gray-50">
-                            <tr>
+                        <TableFooter>
+                            <TableRow>
                                 {visibleColumns.map((column, index) => {
                                     const { meta } = column.columnDef;
                                     const value = summaries[column.id]?.[meta?.summary ?? 'sum'];
 
                                     return (
-                                        <td
+                                        <TableCell
                                             key={column.id}
-                                            className={`px-4 py-3 text-sm font-semibold text-gray-800 ${ALIGN[meta?.align ?? 'start']}`}
+                                            sx={{
+                                                bgcolor: 'grey.100',
+                                                color: 'text.primary',
+                                                fontWeight: 600,
+                                                textAlign: meta?.align ?? 'start',
+                                            }}
                                         >
                                             {value ?? (index === 0 ? __('Total') : '')}
-                                        </td>
+                                        </TableCell>
                                     );
                                 })}
-                            </tr>
-                        </tfoot>
+                            </TableRow>
+                        </TableFooter>
                     )}
-                </table>
-            </div>
+                </Table>
+            </TableContainer>
 
             <Pagination
                 meta={rows.meta}

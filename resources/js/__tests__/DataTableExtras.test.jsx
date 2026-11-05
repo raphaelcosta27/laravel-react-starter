@@ -70,6 +70,8 @@ describe('recursos completos do DataTable', () => {
             ],
         });
 
+        screen.getByRole('tab', { name: 'Todos (5)' }).focus();
+
         fireEvent.keyDown(screen.getByRole('tab', { name: 'Todos (5)' }), {
             key: 'ArrowRight',
         });
@@ -137,7 +139,7 @@ describe('recursos completos do DataTable', () => {
 
         const toggle = screen.getByRole('switch', { name: 'Situação de Ana' });
 
-        expect(toggle.getAttribute('aria-checked')).toBe('true');
+        expect(toggle.checked).toBe(true);
 
         fireEvent.click(toggle);
 
@@ -149,9 +151,7 @@ describe('recursos completos do DataTable', () => {
 
         render(<ToggleCell checked disabled label="Situação" onChange={onChange} />);
 
-        fireEvent.click(screen.getByRole('switch', { name: 'Situação' }));
-
-        expect(onChange).not.toHaveBeenCalled();
+        expect(screen.getByRole('switch', { name: 'Situação' }).disabled).toBe(true);
     });
 
     test('coluna com toggle usa o interruptor', () => {
@@ -235,6 +235,10 @@ describe('recursos completos do DataTable', () => {
 
         expect(select.style.position).toBe('sticky');
         expect(name.style.insetInlineStart).toBe(select.style.width);
+
+        // Sem margem interna, a caixa cabe na largura que desloca a coluna seguinte.
+        expect(getComputedStyle(select).paddingLeft).toBe('0px');
+        expect(getComputedStyle(select).paddingRight).toBe('0px');
     });
 
     test('o arraste da borda fica fora da ordem de tabulação', () => {
@@ -282,8 +286,7 @@ describe('recursos completos do DataTable', () => {
 
         const trigger = screen.getByRole('button', { name: 'Exportar' });
 
-        trigger.focus();
-        fireEvent.keyDown(trigger, { key: 'Enter' });
+        fireEvent.click(trigger);
 
         const href = (await screen.findByRole('menuitem', { name: 'CSV' })).getAttribute('href');
         const params = new URL(href, 'http://localhost').searchParams;
@@ -304,8 +307,7 @@ describe('recursos completos do DataTable', () => {
 
         const trigger = screen.getByRole('button', { name: 'Exportar' });
 
-        trigger.focus();
-        fireEvent.keyDown(trigger, { key: 'Enter' });
+        fireEvent.click(trigger);
 
         const href = (
             await screen.findByRole('menuitem', { name: 'CSV dos selecionados' })

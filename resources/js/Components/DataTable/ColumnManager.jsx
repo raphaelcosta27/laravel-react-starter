@@ -1,15 +1,19 @@
 import { useTranslations } from '@/lib/i18n';
+import AddIcon from '@mui/icons-material/Add';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import RemoveIcon from '@mui/icons-material/Remove';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
 import { useState } from 'react';
 
 const DEFAULT_WIDTH = 150;
 const MIN_WIDTH = 60;
 const STEP = 20;
-
-const triggerClass =
-    'rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2';
-
-const stepClass =
-    'min-h-6 min-w-6 rounded border border-gray-300 px-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50';
 
 /**
  * Botões como alternativa ao arraste, que funcionam pelo teclado (WCAG 2.5.7).
@@ -47,79 +51,97 @@ export default function ColumnManager({
         });
 
     return (
-        <div className="relative">
-            <button
-                type="button"
-                className={triggerClass}
+        <Box sx={{ position: 'relative' }}>
+            <Button
+                variant="outlined"
+                size="small"
                 aria-expanded={open}
                 onClick={() => setOpen((value) => !value)}
             >
                 {__('Columns')}
-            </button>
+            </Button>
 
             {open && (
-                <ul className="absolute end-0 z-20 mt-2 w-80 max-w-[calc(100vw-2rem)] space-y-2 rounded-md border border-gray-200 bg-white p-3 shadow-lg">
+                <Paper
+                    component="ul"
+                    elevation={4}
+                    sx={{
+                        insetInlineEnd: 0,
+                        listStyle: 'none',
+                        m: 0,
+                        maxWidth: 'calc(100vw - 2rem)',
+                        mt: 1,
+                        p: 1.5,
+                        position: 'absolute',
+                        width: 340,
+                        zIndex: 20,
+                    }}
+                >
                     {ordered.map((column) => (
-                        <li
+                        <Box
+                            component="li"
                             key={column.id}
-                            className="flex items-center justify-between gap-2"
+                            sx={{
+                                alignItems: 'center',
+                                display: 'flex',
+                                gap: 1,
+                                justifyContent: 'space-between',
+                            }}
                         >
-                            <label className="flex items-center gap-2 text-sm text-gray-800">
-                                <input
-                                    type="checkbox"
-                                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    checked={visibility[column.id] !== false}
-                                    disabled={column.required}
-                                    onChange={(event) =>
-                                        onVisibilityChange({
-                                            ...visibility,
-                                            [column.id]: event.target.checked,
-                                        })
-                                    }
-                                />
-                                {column.label}
-                            </label>
+                            <FormControlLabel
+                                label={column.label}
+                                slotProps={{ typography: { variant: 'body2' } }}
+                                control={
+                                    <Checkbox
+                                        size="small"
+                                        checked={visibility[column.id] !== false}
+                                        disabled={column.required}
+                                        onChange={(event) =>
+                                            onVisibilityChange({
+                                                ...visibility,
+                                                [column.id]: event.target.checked,
+                                            })
+                                        }
+                                    />
+                                }
+                            />
 
-                            <span className="flex gap-1">
-                                <button
-                                    type="button"
-                                    className={stepClass}
+                            <Box sx={{ display: 'flex', flexShrink: 0 }}>
+                                <IconButton
+                                    size="small"
                                     aria-label={__('Move :column left', { column: column.label })}
                                     disabled={position(column.id) <= 0}
                                     onClick={() => move(column.id, -1)}
                                 >
-                                    ←
-                                </button>
-                                <button
-                                    type="button"
-                                    className={stepClass}
+                                    <ArrowBackIcon fontSize="inherit" />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
                                     aria-label={__('Move :column right', { column: column.label })}
                                     disabled={position(column.id) >= order.length - 1}
                                     onClick={() => move(column.id, 1)}
                                 >
-                                    →
-                                </button>
-                                <button
-                                    type="button"
-                                    className={stepClass}
+                                    <ArrowForwardIcon fontSize="inherit" />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
                                     aria-label={__('Decrease width of :column', { column: column.label })}
                                     onClick={() => resize(column.id, -STEP)}
                                 >
-                                    −
-                                </button>
-                                <button
-                                    type="button"
-                                    className={stepClass}
+                                    <RemoveIcon fontSize="inherit" />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
                                     aria-label={__('Increase width of :column', { column: column.label })}
                                     onClick={() => resize(column.id, STEP)}
                                 >
-                                    +
-                                </button>
-                            </span>
-                        </li>
+                                    <AddIcon fontSize="inherit" />
+                                </IconButton>
+                            </Box>
+                        </Box>
                     ))}
-                </ul>
+                </Paper>
             )}
-        </div>
+        </Box>
     );
 }

@@ -1,9 +1,11 @@
 import ColumnFilter from '@/Components/DataTable/ColumnFilter';
 import { useTranslations } from '@/lib/i18n';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import { useState } from 'react';
-
-const buttonClass =
-    'rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2';
 
 const isEmpty = (value) =>
     value === '' ||
@@ -45,35 +47,41 @@ export default function Toolbar({
     };
 
     return (
-        <div className="space-y-3 py-3">
-            <div className="flex flex-wrap items-center gap-2">
-                <form
+        <Stack spacing={1.5} sx={{ py: 1.5 }}>
+            <Stack
+                direction="row"
+                useFlexGap
+                spacing={1}
+                sx={{ alignItems: 'center', flexWrap: 'wrap' }}
+            >
+                <Stack
+                    component="form"
                     role="search"
-                    className="flex items-center gap-2"
+                    direction="row"
+                    spacing={1}
+                    sx={{ alignItems: 'center' }}
                     onSubmit={(event) => {
                         event.preventDefault();
                         onSearch(term);
                     }}
                 >
-                    <label htmlFor="table-search" className="sr-only">
-                        {__('Search')}
-                    </label>
-                    <input
+                    <TextField
                         id="table-search"
                         type="search"
-                        className="rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        size="small"
+                        label={__('Search')}
                         value={term}
                         onChange={(event) => setTerm(event.target.value)}
                     />
-                    <button type="submit" className={buttonClass}>
+                    <Button type="submit" variant="outlined" size="small">
                         {__('Search')}
-                    </button>
-                </form>
+                    </Button>
+                </Stack>
 
                 {filters.length > 0 && (
-                    <button
-                        type="button"
-                        className={buttonClass}
+                    <Button
+                        variant="outlined"
+                        size="small"
                         aria-expanded={open}
                         aria-controls="table-filters"
                         onClick={() => setOpen((value) => !value)}
@@ -81,35 +89,52 @@ export default function Toolbar({
                         {activeFilters > 0
                             ? __('Filters (:count)', { count: activeFilters })
                             : __('Filters')}
-                    </button>
+                    </Button>
                 )}
 
                 {activeFilters > 0 && (
-                    <button
-                        type="button"
-                        className={buttonClass}
-                        onClick={clearFilters}
-                    >
+                    <Button variant="outlined" size="small" onClick={clearFilters}>
                         {__('Clear filters')}
-                    </button>
+                    </Button>
                 )}
 
-                <button type="button" className={buttonClass} onClick={onRestore}>
+                <Button variant="outlined" size="small" onClick={onRestore}>
                     {__('Restore defaults')}
-                </button>
+                </Button>
 
-                <div className="ms-auto flex flex-wrap items-center gap-2">
+                <Stack
+                    direction="row"
+                    useFlexGap
+                    spacing={1}
+                    sx={{
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        marginInlineStart: 'auto',
+                    }}
+                >
                     {children}
-                </div>
-            </div>
+                </Stack>
+            </Stack>
 
             {open && (
-                <form
+                <Paper
+                    component="form"
                     id="table-filters"
-                    className="rounded-md border border-gray-200 bg-white p-4"
+                    variant="outlined"
+                    sx={{ p: 2 }}
                     onSubmit={applyFilters}
                 >
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <Box
+                        sx={{
+                            display: 'grid',
+                            gap: 2,
+                            gridTemplateColumns: {
+                                xs: '1fr',
+                                sm: 'repeat(2, 1fr)',
+                                lg: 'repeat(3, 1fr)',
+                            },
+                        }}
+                    >
                         {filters.map((filter) => (
                             <ColumnFilter
                                 key={filter.id}
@@ -123,13 +148,18 @@ export default function Toolbar({
                                 }
                             />
                         ))}
-                    </div>
+                    </Box>
 
-                    <button type="submit" className={`${buttonClass} mt-4`}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        size="small"
+                        sx={{ mt: 2 }}
+                    >
                         {__('Apply filters')}
-                    </button>
-                </form>
+                    </Button>
+                </Paper>
             )}
-        </div>
+        </Stack>
     );
 }

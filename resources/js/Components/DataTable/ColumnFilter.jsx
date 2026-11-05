@@ -1,4 +1,10 @@
+import SelectField from '@/Components/SelectField';
 import { useTranslations } from '@/lib/i18n';
+import Box from '@mui/material/Box';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 
 const OPERATORS = {
     contains: 'Contains',
@@ -13,43 +19,39 @@ const OPERATORS = {
 
 const WITHOUT_VALUE = ['is_empty', 'is_not_empty'];
 
-const fieldClass =
-    'block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500';
-
-const labelClass = 'mb-1 block text-sm font-medium text-gray-700';
-
 function Range({ id, label, type, from, to, value, onChange, labels }) {
     const change = (key, text) => onChange({ ...value, [key]: text });
 
     return (
-        <fieldset>
-            <legend className={labelClass}>{label}</legend>
+        <FormControl component="fieldset" fullWidth>
+            <FormLabel component="legend" sx={{ mb: 1, typography: 'body2' }}>
+                {label}
+            </FormLabel>
 
-            <div className="grid grid-cols-2 gap-2">
+            <Box
+                sx={{
+                    display: 'grid',
+                    gap: 1,
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                }}
+            >
                 {[
                     [from, labels[0]],
                     [to, labels[1]],
                 ].map(([key, text]) => (
-                    <div key={key}>
-                        <label
-                            htmlFor={`${id}-${key}`}
-                            className="mb-1 block text-xs text-gray-600"
-                        >
-                            {text}
-                        </label>
-                        <input
-                            id={`${id}-${key}`}
-                            type={type}
-                            className={fieldClass}
-                            value={value?.[key] ?? ''}
-                            onChange={(event) =>
-                                change(key, event.target.value)
-                            }
-                        />
-                    </div>
+                    <TextField
+                        key={key}
+                        id={`${id}-${key}`}
+                        label={text}
+                        type={type}
+                        size="small"
+                        slotProps={{ inputLabel: { shrink: true } }}
+                        value={value?.[key] ?? ''}
+                        onChange={(event) => change(key, event.target.value)}
+                    />
                 ))}
-            </div>
-        </fieldset>
+            </Box>
+        </FormControl>
     );
 }
 
@@ -58,13 +60,10 @@ function TextFilter({ id, label, value, onChange }) {
     const op = value?.op ?? 'contains';
 
     return (
-        <div>
-            <label htmlFor={`${id}-op`} className="mb-1 block text-xs text-gray-600">
-                {__('Operator of :column', { column: label })}
-            </label>
-            <select
+        <Stack spacing={1.5}>
+            <SelectField
                 id={`${id}-op`}
-                className={`${fieldClass} mb-2`}
+                label={__('Operator of :column', { column: label })}
                 value={op}
                 onChange={(event) =>
                     onChange({ ...value, op: event.target.value })
@@ -75,25 +74,21 @@ function TextFilter({ id, label, value, onChange }) {
                         {__(text)}
                     </option>
                 ))}
-            </select>
+            </SelectField>
 
             {!WITHOUT_VALUE.includes(op) && (
-                <>
-                    <label htmlFor={id} className={labelClass}>
-                        {label}
-                    </label>
-                    <input
-                        id={id}
-                        type="text"
-                        className={fieldClass}
-                        value={value?.value ?? ''}
-                        onChange={(event) =>
-                            onChange({ op, value: event.target.value })
-                        }
-                    />
-                </>
+                <TextField
+                    id={id}
+                    label={label}
+                    size="small"
+                    fullWidth
+                    value={value?.value ?? ''}
+                    onChange={(event) =>
+                        onChange({ op, value: event.target.value })
+                    }
+                />
             )}
-        </div>
+        </Stack>
     );
 }
 
@@ -139,30 +134,25 @@ export default function ColumnFilter({ id, label, type, options = [], value, onC
 
     if (type === 'multiselect') {
         return (
-            <div>
-                <label htmlFor={fieldId} className={labelClass}>
-                    {label}
-                </label>
-                <select
-                    id={fieldId}
-                    multiple
-                    className={fieldClass}
-                    value={value ?? []}
-                    onChange={(event) =>
-                        onChange(
-                            [...event.target.selectedOptions].map(
-                                (option) => option.value,
-                            ),
-                        )
-                    }
-                >
-                    {options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <SelectField
+                id={fieldId}
+                label={label}
+                multiple
+                value={value ?? []}
+                onChange={(event) =>
+                    onChange(
+                        [...event.target.selectedOptions].map(
+                            (option) => option.value,
+                        ),
+                    )
+                }
+            >
+                {options.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </SelectField>
         );
     }
 
@@ -175,23 +165,18 @@ export default function ColumnFilter({ id, label, type, options = [], value, onC
             : options;
 
     return (
-        <div>
-            <label htmlFor={fieldId} className={labelClass}>
-                {label}
-            </label>
-            <select
-                id={fieldId}
-                className={fieldClass}
-                value={value ?? ''}
-                onChange={(event) => onChange(event.target.value)}
-            >
-                <option value="">{__('All')}</option>
-                {choices.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </select>
-        </div>
+        <SelectField
+            id={fieldId}
+            label={label}
+            value={value ?? ''}
+            onChange={(event) => onChange(event.target.value)}
+        >
+            <option value="">{__('All')}</option>
+            {choices.map((option) => (
+                <option key={option.value} value={option.value}>
+                    {option.label}
+                </option>
+            ))}
+        </SelectField>
     );
 }

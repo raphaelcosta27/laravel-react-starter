@@ -1,5 +1,8 @@
 import { useTranslations } from '@/lib/i18n';
 import { router } from '@inertiajs/react';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import { useEffect, useId, useRef, useState } from 'react';
 
 export default function EditableCell({ value, field, url, label, announce }) {
@@ -89,13 +92,18 @@ export default function EditableCell({ value, field, url, label, announce }) {
     };
 
     return (
-        <div>
-            <input
-                type="text"
-                aria-label={label}
-                aria-invalid={status === 'error'}
-                aria-describedby={error ? errorId : undefined}
-                className={`w-full min-w-32 rounded border-gray-300 px-2 py-1 text-sm focus:border-indigo-500 focus:ring-indigo-500 ${status === 'error' ? 'border-red-600' : ''}`}
+        <Box>
+            <TextField
+                size="small"
+                fullWidth
+                error={status === 'error'}
+                sx={{ minWidth: 128 }}
+                slotProps={{
+                    htmlInput: {
+                        'aria-label': label,
+                        'aria-describedby': error ? errorId : undefined,
+                    },
+                }}
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 onBlur={save}
@@ -103,22 +111,27 @@ export default function EditableCell({ value, field, url, label, announce }) {
             />
 
             {status === 'saving' && (
-                <span className="mt-1 block text-xs text-gray-600">
+                <Typography variant="caption" display="block">
                     {__('Saving...')}
-                </span>
+                </Typography>
             )}
 
             {status === 'saved' && (
-                <span className="mt-1 block text-xs text-green-800">
+                <Typography variant="caption" display="block" color="success.dark">
                     {__('Saved')}
-                </span>
+                </Typography>
             )}
 
             {error && (
-                <span id={errorId} className="mt-1 block text-xs text-red-700">
+                <Typography
+                    id={errorId}
+                    variant="caption"
+                    display="block"
+                    color="error"
+                >
                     {error}
-                </span>
+                </Typography>
             )}
-        </div>
+        </Box>
     );
 }

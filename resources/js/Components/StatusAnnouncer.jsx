@@ -1,10 +1,9 @@
+import { visuallyHidden as hiddenStyle } from '@/lib/visuallyHidden';
 import { usePage } from '@inertiajs/react';
+import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 
-const styles = {
-    success: 'border-green-300 bg-green-50 text-green-900',
-    warning: 'border-yellow-300 bg-yellow-50 text-yellow-900',
-    error: 'border-red-300 bg-red-50 text-red-900',
-};
+const SEVERITIES = ['success', 'warning', 'error'];
 
 /**
  * Região sempre presente, para que tecnologias assistivas anunciem cada mudança.
@@ -15,20 +14,28 @@ export default function StatusAnnouncer({ message, visuallyHidden = false }) {
     const refusal = errors?.permission ?? errors?.profile ?? errors?.user;
 
     const text = message ?? refusal ?? flash?.message ?? '';
-    const style = styles[refusal ? 'error' : flash?.type] ?? styles.success;
+    const type = refusal ? 'error' : flash?.type;
+    const severity = SEVERITIES.includes(type) ? type : 'success';
+    const visible = text && !visuallyHidden;
 
     return (
-        <div
+        <Box
             role="status"
             aria-live="polite"
             aria-atomic="true"
-            className={
-                text && !visuallyHidden
-                    ? `mx-auto mt-4 max-w-7xl rounded-md border px-4 py-3 text-sm sm:mx-6 lg:mx-auto ${style}`
-                    : 'sr-only'
+            sx={
+                visible
+                    ? { maxWidth: 1280, mx: 'auto', mt: 2, px: { xs: 2, sm: 3 } }
+                    : hiddenStyle
             }
         >
-            {text}
-        </div>
+            {visible ? (
+                <Alert severity={severity} role="none">
+                    {text}
+                </Alert>
+            ) : (
+                text
+            )}
+        </Box>
     );
 }

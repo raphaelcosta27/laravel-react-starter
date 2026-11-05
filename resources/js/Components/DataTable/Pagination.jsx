@@ -1,28 +1,39 @@
+import SelectField from '@/Components/SelectField';
 import { useTranslations } from '@/lib/i18n';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 const PAGE_SIZES = [10, 25, 50, 100];
-
-const buttonClass =
-    'rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
 export default function Pagination({ meta, onPageChange, onPerPageChange }) {
     const __ = useTranslations();
     const { currentPage, lastPage, perPage, total } = meta;
 
     return (
-        <nav
+        <Stack
+            component="nav"
             aria-label={__('Pagination')}
-            className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm text-gray-700"
+            direction="row"
+            useFlexGap
+            spacing={2}
+            sx={{
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                py: 2,
+            }}
         >
-            <div className="flex items-center gap-3">
-                <span>{__(':count records', { count: total })}</span>
+            <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+                <Typography variant="body2">
+                    {__(':count records', { count: total })}
+                </Typography>
 
-                <label htmlFor="per-page" className="sr-only">
-                    {__('Records per page')}
-                </label>
-                <select
+                <SelectField
                     id="per-page"
-                    className="rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    label={__('Records per page')}
+                    fullWidth={false}
+                    sx={{ minWidth: 150 }}
                     value={perPage}
                     onChange={(event) =>
                         onPerPageChange(Number(event.target.value))
@@ -33,35 +44,35 @@ export default function Pagination({ meta, onPageChange, onPerPageChange }) {
                             {size}
                         </option>
                     ))}
-                </select>
-            </div>
+                </SelectField>
+            </Stack>
 
-            <div className="flex items-center gap-2">
-                <button
-                    type="button"
-                    className={buttonClass}
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                <Button
+                    variant="outlined"
+                    size="small"
                     disabled={currentPage <= 1}
                     onClick={() => onPageChange(currentPage - 1)}
                 >
                     {__('Previous page')}
-                </button>
+                </Button>
 
-                <span>
+                <Typography variant="body2">
                     {__('Page :page of :last', {
                         page: currentPage,
                         last: lastPage,
                     })}
-                </span>
+                </Typography>
 
-                <button
-                    type="button"
-                    className={buttonClass}
+                <Button
+                    variant="outlined"
+                    size="small"
                     disabled={currentPage >= lastPage}
                     onClick={() => onPageChange(currentPage + 1)}
                 >
                     {__('Next page')}
-                </button>
-            </div>
-        </nav>
+                </Button>
+            </Stack>
+        </Stack>
     );
 }

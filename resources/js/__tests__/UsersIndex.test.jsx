@@ -109,7 +109,7 @@ describe('ações da listagem de usuários', () => {
 
         const toggle = screen.getByRole('switch', { name: 'Situação de Bia' });
 
-        expect(toggle.getAttribute('aria-checked')).toBe('false');
+        expect(toggle.checked).toBe(false);
     });
 
     test('permissões aparece conforme o can do registro', () => {

@@ -289,29 +289,28 @@ describe('DataTable', () => {
 
     test('aplica a regra de estilo por registro', () => {
         table({
-            rowClassName: (row) => (row.is_active ? '' : 'opacity-50'),
+            rowSx: (row) => (row.is_active ? {} : { opacity: 0.5 }),
         });
 
-        expect(screen.getByRole('row', { name: /Bia/ }).className).toContain(
-            'opacity-50',
-        );
-        expect(screen.getByRole('row', { name: /Ana/ }).className).not.toContain(
-            'opacity-50',
-        );
+        expect(
+            getComputedStyle(screen.getByRole('row', { name: /Bia/ })).opacity,
+        ).toBe('0.5');
+        expect(
+            getComputedStyle(screen.getByRole('row', { name: /Ana/ })).opacity,
+        ).not.toBe('0.5');
     });
 
     test('aplica alinhamento e quebra de texto da coluna', () => {
         table();
 
-        expect(screen.getByRole('cell', { name: 'ana@example.com' }).className).toContain(
-            'text-end',
+        const email = getComputedStyle(
+            screen.getByRole('cell', { name: 'ana@example.com' }),
         );
-        expect(screen.getByRole('cell', { name: 'ana@example.com' }).className).toContain(
-            'whitespace-nowrap',
-        );
-        expect(screen.getByRole('cell', { name: 'Ana' }).className).toContain(
-            'truncate',
-        );
+        const name = getComputedStyle(screen.getByRole('cell', { name: 'Ana' }));
+
+        expect(email.textAlign).toBe('end');
+        expect(email.whiteSpace).toBe('nowrap');
+        expect(name.textOverflow).toBe('ellipsis');
     });
 
     test('aceita botões próprios acima da tabela', () => {
