@@ -160,6 +160,14 @@ const can = useCan();
 check, and a code that does not exist denies everyone else. Rules that also bind administrators belong in
 Actions, because `Gate::before` skips policies for them.
 
+**Granting permissions.** Non-administrators only grant what they hold, whether through an individual adjustment,
+a profile's permissions, a new user or a profile change. What counts is what would become effective: keeping what
+already exists and revoking stay allowed. Screens disable what cannot be granted.
+
+**Adding a restricted function.** Add the code to `lang/pt_BR/permissions.php`, which feeds the seeder, and protect
+the route with `can:`. The seeder only creates missing permissions. `PermissionCoverageTest` fails if a route has
+no permission and is not a listed exception, or if a code in use is missing from the seeder.
+
 **Deleting data.** Nothing is physically deleted. Every entity uses soft deletes, including links, and a test
 fails if `forceDelete`, `detach`, `sync` or `truncate` appears in `app/` or `database/`.
 

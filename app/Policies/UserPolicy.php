@@ -8,12 +8,15 @@ use App\Models\User;
 /**
  * Vale para quem não é administrador: administradores passam por Gate::before.
  * Somente administradores agem sobre um administrador ou atribuem esse perfil.
+ * Ninguém concede o que não possui: conta o que passaria a valer para o alvo.
  */
 class UserPolicy
 {
     public function create(User $actor, Profile $profile): bool
     {
-        return $actor->can('cadastrar_usuario') && ! $profile->isAdministrator();
+        return $actor->can('cadastrar_usuario')
+            && ! $profile->isAdministrator()
+            && $actor->holdsPermissions($profile->permissionCodes());
     }
 
     public function update(User $actor, User $target): bool
@@ -23,7 +26,9 @@ class UserPolicy
 
     public function changeProfile(User $actor, User $target, Profile $profile): bool
     {
-        return ! $profile->isAdministrator() && $actor->id !== $target->id;
+        return ! $profile->isAdministrator()
+            && $actor->id !== $target->id
+            && $actor->holdsPermissions(array_diff($profile->permissionCodes(), $target->effectivePermissions()));
     }
 
     public function changeStatus(User $actor, User $target): bool
@@ -46,6 +51,12 @@ class UserPolicy
         return $actor->can('gerenciar_permissoes_usuario')
             && ! $target->isAdministrator()
             && $actor->id !== $target->id;
+    }
+
+    /** @param array<int, array{permission_id: int|string, effect: string}> $adjustments */
+    public function adjustPermissions(User $actor, User $target, array $adjustments): bool
+    {
+        return $actor->holdsPermissions(array_diff($target->permissionsWith($adjustments), $target->effectivePermissions()));
     }
 
     public function requestPasswordChange(User $actor, User $target): bool

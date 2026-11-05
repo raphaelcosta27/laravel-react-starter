@@ -7,8 +7,13 @@ import translations from '../../../lang/pt_BR.json';
 import { setPageProps } from './helpers/inertia';
 
 const permissions = [
-    { id: 1, title: 'Gerar Relatório', code: 'gerar_relatorio' },
-    { id: 2, title: 'Exportar Dados', code: 'exportar_dados' },
+    { id: 1, title: 'Gerar Relatório', code: 'gerar_relatorio', available: true },
+    { id: 2, title: 'Exportar Dados', code: 'exportar_dados', available: true },
+];
+
+const withUnavailable = [
+    permissions[0],
+    { ...permissions[1], available: false },
 ];
 
 const creating = { mode: 'create', record: null, permissions, selected: [] };
@@ -44,6 +49,37 @@ describe('telas de perfil', () => {
         fireEvent.click(second);
 
         expect(second.checked).toBe(true);
+    });
+
+    test('o que o autor não possui fica indisponível e mantém o estado', async () => {
+        const { container } = render(
+            <ProfileFormDialog
+                form={{
+                    mode: 'create',
+                    record: null,
+                    permissions: withUnavailable,
+                    selected: [2],
+                }}
+            />,
+        );
+
+        const unavailable = screen.getByRole('checkbox', { name: /Exportar Dados/ });
+
+        expect(unavailable.disabled).toBe(true);
+        expect(unavailable.checked).toBe(true);
+        expect(screen.getByRole('checkbox', { name: /Gerar Relatório/ }).disabled).toBe(false);
+        expect(
+            screen.getByText('Permissões que você não possui ficam indisponíveis.'),
+        ).toBeTruthy();
+        expect(await axe(container)).toHaveNoViolations();
+    });
+
+    test('sem itens indisponíveis, o aviso não aparece', () => {
+        render(<ProfileFormDialog form={creating} />);
+
+        expect(
+            screen.queryByText('Permissões que você não possui ficam indisponíveis.'),
+        ).toBeNull();
     });
 
     test('o perfil master não oferece seleção de permissões', () => {

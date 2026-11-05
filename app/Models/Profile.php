@@ -58,6 +58,16 @@ class Profile extends Model
     }
 
     /** @return HasMany<ProfilePermission, $this> */
+    /**
+     * Permissões excluídas e vínculos excluídos não têm efeito.
+     *
+     * @return array<int, string>
+     */
+    public function permissionCodes(): array
+    {
+        return Permission::whereIn('id', $this->profilePermissions()->select('permission_id'))->pluck('code')->all();
+    }
+
     public function profilePermissions(): HasMany
     {
         return $this->hasMany(ProfilePermission::class);

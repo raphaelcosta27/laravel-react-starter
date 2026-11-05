@@ -17,13 +17,13 @@ use Inertia\Response;
 
 class UserPermissionController extends Controller
 {
-    public function edit(User $user): Response
+    public function edit(Request $request, User $user): Response
     {
         Gate::authorize('managePermissions', $user);
 
         return Inertia::render('Admin/Users/Permissions', [
             'user' => $user->only('id', 'name'),
-            'permissions' => $this->permissions($user),
+            'permissions' => $this->permissions($user, $request->user()),
             'canAdjust' => ! $user->isAdministrator(),
         ]);
     }
@@ -38,6 +38,8 @@ class UserPermissionController extends Controller
             'adjustments.*.effect' => ['required', Rule::in([UserPermission::GRANT, UserPermission::REVOKE])],
         ]);
 
+        Gate::authorize('adjustPermissions', [$user, $validated['adjustments']]);
+
         $sync->handle($user, $validated['adjustments']);
 
         return back()->with('flash', ['type' => 'success', 'message' => __('User permissions saved.')]);
@@ -48,13 +50,13 @@ class UserPermissionController extends Controller
      *
      * @return Collection<int, array<string, mixed>>
      */
-    private function permissions(User $user): Collection
+    private function permissions(User $user, User $actor): Collection
     {
         $isAdministrator = $user->isAdministrator();
         $effective = $user->effectivePermissions();
         $adjustments = $user->permissionAdjustments()->pluck('effect', 'permission_id');
 
-        return Permission::orderBy('title')->get()->map(function (Permission $permission) use ($isAdministrator, $effective, $adjustments) {
+        return Permission::orderBy('title')->get()->map(function (Permission $permission) use ($actor, $isAdministrator, $effective, $adjustments) {
             $adjustment = $adjustments->get($permission->id);
             $active = $isAdministrator || in_array($permission->code, $effective, true);
 
@@ -63,6 +65,7 @@ class UserPermissionController extends Controller
                 'active' => $active,
                 'adjustment' => $adjustment,
                 'origin' => $adjustment ?? ($active ? 'profile' : 'none'),
+                'available' => $actor->holdsPermissions([$permission->code]),
             ];
         });
     }

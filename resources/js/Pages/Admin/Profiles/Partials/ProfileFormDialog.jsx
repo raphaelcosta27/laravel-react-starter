@@ -75,6 +75,12 @@ export default function ProfileFormDialog({ form }) {
                 >
                     <FormLabel component="legend">{__('Permissions')}</FormLabel>
 
+                    {permissions.some(({ available }) => !available) && (
+                        <Typography variant="body2">
+                            {__('Permissions you do not have are unavailable.')}
+                        </Typography>
+                    )}
+
                     <Box
                         sx={{
                             display: 'grid',
@@ -87,6 +93,7 @@ export default function ProfileFormDialog({ form }) {
                                 label={permission.title}
                                 control={
                                     <Checkbox
+                                        disabled={!permission.available}
                                         checked={fields.data.permissions.includes(permission.id)}
                                         onChange={(event) =>
                                             toggle(permission.id, event.target.checked)

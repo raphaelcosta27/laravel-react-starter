@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 #[Fillable(['name', 'email', 'password', 'profile_id'])]
 #[Hidden(['password', 'remember_token'])]
@@ -105,13 +106,40 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->effectivePermissions ??= $this->resolveEffectivePermissions();
     }
 
+    /**
+     * Administradores têm tudo, sem depender de vínculos.
+     *
+     * @param  array<int, string>  $codes
+     */
+    public function holdsPermissions(array $codes): bool
+    {
+        return $this->isAdministrator() || array_diff($codes, $this->effectivePermissions()) === [];
+    }
+
+    /**
+     * Como ficariam as permissões efetivas com estes ajustes. Na repetição de
+     * uma permissão, vale o último item, como em SyncUserPermissions.
+     *
+     * @param  array<int, array{permission_id: int|string, effect: string}>  $adjustments
+     * @return array<int, string>
+     */
+    public function permissionsWith(array $adjustments): array
+    {
+        $effects = collect($adjustments)->mapWithKeys(
+            fn (array $adjustment) => [(int) $adjustment['permission_id'] => $adjustment['effect']],
+        );
+
+        $codes = Permission::whereIn('id', $effects->keys())->pluck('code', 'id');
+
+        return $this->combinePermissions(
+            $codes->filter(fn (string $code, int $id) => $effects[$id] === UserPermission::GRANT),
+            $codes->filter(fn (string $code, int $id) => $effects[$id] === UserPermission::REVOKE),
+        );
+    }
+
     /** @return array<int, string> */
     private function resolveEffectivePermissions(): array
     {
-        $fromProfile = $this->profile
-            ? Permission::whereIn('id', $this->profile->profilePermissions()->select('permission_id'))->pluck('code')
-            : collect();
-
         $adjustments = $this->permissionAdjustments()->with('permission')->get()
             ->filter(fn (UserPermission $adjustment) => $adjustment->permission !== null);
 
@@ -119,9 +147,19 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('effect', $effect)
             ->map(fn (UserPermission $adjustment) => $adjustment->permission->code);
 
-        return $fromProfile
-            ->merge($codesWith(UserPermission::GRANT))
-            ->diff($codesWith(UserPermission::REVOKE))
+        return $this->combinePermissions($codesWith(UserPermission::GRANT), $codesWith(UserPermission::REVOKE));
+    }
+
+    /**
+     * @param  Collection<int, string>  $granted
+     * @param  Collection<int, string>  $revoked
+     * @return array<int, string>
+     */
+    private function combinePermissions(Collection $granted, Collection $revoked): array
+    {
+        return collect($this->profile?->permissionCodes() ?? [])
+            ->merge($granted)
+            ->diff($revoked)
             ->unique()
             ->values()
             ->all();

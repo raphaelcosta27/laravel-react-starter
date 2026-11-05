@@ -65,7 +65,7 @@ class UserController extends Controller
         return $this->listing($request, fn () => [
             'mode' => 'edit',
             'record' => $user->only('id', 'name', 'email', 'profile_id'),
-            'profileOptions' => $this->profileOptions($actor),
+            'profileOptions' => $this->profileOptions($actor, $user),
             'canChangeProfile' => $actor->isAdministrator() || $actor->id !== $user->id,
         ]);
     }
@@ -191,10 +191,12 @@ class UserController extends Controller
     }
 
     /** @return Collection<int, array{value: string, label: string}> */
-    private function profileOptions(User $actor): Collection
+    private function profileOptions(User $actor, ?User $target = null): Collection
     {
         return Profile::orderBy('name')->get()
-            ->reject(fn (Profile $profile) => $profile->isAdministrator() && ! $actor->isAdministrator())
+            ->filter(fn (Profile $profile) => $profile->id === $target?->profile_id || ($target === null
+                ? $actor->can('create', [User::class, $profile])
+                : $actor->can('changeProfile', [$target, $profile])))
             ->map(fn (Profile $profile) => ['value' => (string) $profile->id, 'label' => $profile->name])
             ->values();
     }

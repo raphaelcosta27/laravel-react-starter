@@ -7,11 +7,17 @@ import translations from '../../../lang/pt_BR.json';
 import { setPageProps } from './helpers/inertia';
 
 const permissions = [
-    { id: 1, title: 'Do Perfil', code: 'a', active: true, origin: 'profile', adjustment: null },
-    { id: 2, title: 'Concedida', code: 'b', active: true, origin: 'grant', adjustment: 'grant' },
-    { id: 3, title: 'Revogada', code: 'c', active: false, origin: 'revoke', adjustment: 'revoke' },
-    { id: 4, title: 'Sem Vínculo', code: 'd', active: false, origin: 'none', adjustment: null },
+    { id: 1, title: 'Do Perfil', code: 'a', active: true, origin: 'profile', adjustment: null, available: true },
+    { id: 2, title: 'Concedida', code: 'b', active: true, origin: 'grant', adjustment: 'grant', available: true },
+    { id: 3, title: 'Revogada', code: 'c', active: false, origin: 'revoke', adjustment: 'revoke', available: true },
+    { id: 4, title: 'Sem Vínculo', code: 'd', active: false, origin: 'none', adjustment: null, available: true },
 ];
+
+const withUnavailable = permissions.map((permission) =>
+    permission.id === 2 || permission.id === 4
+        ? { ...permission, available: false }
+        : permission,
+);
 
 const page = (props = {}) =>
     render(
@@ -71,8 +77,37 @@ describe('permissões do usuário', () => {
         expect(screen.queryByRole('button', { name: 'Salvar' })).toBeNull();
     });
 
+    test('o que o autor não possui fica indisponível, com aviso em texto', () => {
+        page({ permissions: withUnavailable });
+
+        expect(screen.getByLabelText('Ajuste de Sem Vínculo').disabled).toBe(true);
+        expect(screen.getByLabelText('Ajuste de Do Perfil').disabled).toBe(false);
+        expect(
+            screen.getByText('Permissões que você não possui ficam indisponíveis.'),
+        ).toBeTruthy();
+    });
+
+    test('sem itens indisponíveis, o aviso não aparece', () => {
+        page();
+
+        expect(
+            screen.queryByText('Permissões que você não possui ficam indisponíveis.'),
+        ).toBeNull();
+    });
+
+    test('um ajuste indisponível continua no envio', () => {
+        page({ permissions: withUnavailable });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
+
+        expect(router.put.mock.lastCall[1].adjustments).toContainEqual({
+            permission_id: 2,
+            effect: 'grant',
+        });
+    });
+
     test('não tem violações de acessibilidade', async () => {
-        const { container } = page();
+        const { container } = page({ permissions: withUnavailable });
 
         expect(await axe(container)).toHaveNoViolations();
     });

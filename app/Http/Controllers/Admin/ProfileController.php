@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\StoreProfileRequest;
 use App\Http\Requests\Admin\UpdateProfileRequest;
 use App\Models\Permission;
 use App\Models\Profile;
+use App\Models\User;
 use App\Support\Tables\Definitions\ProfilesTable;
 use App\Support\Tables\Definitions\ProfileUsersTable;
 use App\Support\Tables\TableQuery;
@@ -37,13 +38,15 @@ class ProfileController extends Controller
         return $this->listing($request, fn () => [
             'mode' => 'create',
             'record' => null,
-            'permissions' => $this->permissions(),
+            'permissions' => $this->permissions($request->user()),
             'selected' => [],
         ]);
     }
 
     public function store(StoreProfileRequest $request, SyncProfilePermissions $sync): RedirectResponse
     {
+        Gate::authorize('setPermissions', [new Profile, $request->validated('permissions', [])]);
+
         DB::transaction(function () use ($request, $sync) {
             $profile = Profile::create($request->safe()->only(['name', 'description']));
 
@@ -64,7 +67,7 @@ class ProfileController extends Controller
                 ...$profile->only('id', 'name', 'description'),
                 'is_administrator' => $profile->isAdministrator(),
             ],
-            'permissions' => $this->permissions(),
+            'permissions' => $this->permissions($request->user()),
             'selected' => $profile->profilePermissions()->pluck('permission_id'),
         ]);
     }
@@ -72,6 +75,7 @@ class ProfileController extends Controller
     public function update(UpdateProfileRequest $request, Profile $profile, SyncProfilePermissions $sync): RedirectResponse
     {
         Gate::authorize('update', $profile);
+        Gate::authorize('setPermissions', [$profile, $request->validated('permissions', [])]);
 
         DB::transaction(function () use ($request, $profile, $sync) {
             $profile->update($request->safe()->only(['name', 'description']));
@@ -127,9 +131,12 @@ class ProfileController extends Controller
         ]);
     }
 
-    /** @return Collection<int, Permission> */
-    private function permissions(): Collection
+    /** @return Collection<int, array<string, mixed>> */
+    private function permissions(User $actor): Collection
     {
-        return Permission::orderBy('title')->get(['id', 'title', 'code']);
+        return Permission::orderBy('title')->get()->map(fn (Permission $permission) => [
+            ...$permission->only('id', 'title', 'code'),
+            'available' => $actor->holdsPermissions([$permission->code]),
+        ]);
     }
 }

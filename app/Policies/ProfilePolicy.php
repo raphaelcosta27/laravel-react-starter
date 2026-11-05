@@ -2,11 +2,13 @@
 
 namespace App\Policies;
 
+use App\Models\Permission;
 use App\Models\Profile;
 use App\Models\User;
 
 /**
  * Vale para quem não é administrador: administradores passam por Gate::before.
+ * Ninguém adiciona a um perfil o que não possui, mas pode manter o que já existe.
  */
 class ProfilePolicy
 {
@@ -15,6 +17,15 @@ class ProfilePolicy
         return $actor->can('editar_perfil')
             && ! $profile->isAdministrator()
             && $actor->profile_id !== $profile->id;
+    }
+
+    /** @param array<int, int|string> $permissionIds */
+    public function setPermissions(User $actor, Profile $profile, array $permissionIds): bool
+    {
+        return $actor->holdsPermissions(array_diff(
+            Permission::whereIn('id', $permissionIds)->pluck('code')->all(),
+            $profile->permissionCodes(),
+        ));
     }
 
     public function delete(User $actor, Profile $profile): bool

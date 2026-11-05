@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\ChangeHistory;
 use App\Models\Permission;
 use App\Models\Profile;
 use App\Models\User;
 use Database\Seeders\AdminPanelSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AdminPanelSeederTest extends TestCase
@@ -64,6 +66,34 @@ class AdminPanelSeederTest extends TestCase
         $this->assertSame(20, Permission::count());
         $this->assertSame('Master', Profile::administrator()->name);
         $this->assertSame('Título novo', Permission::firstWhere('code', 'editar_perfil')->title);
+    }
+
+    public function test_a_missing_permission_is_created_and_a_deleted_one_stays_deleted(): void
+    {
+        $this->seed(AdminPanelSeeder::class);
+
+        Permission::firstWhere('code', 'exportar_dados')->delete();
+        DB::table('permissions')->where('code', 'editar_perfil')->delete();
+
+        $this->seed(AdminPanelSeeder::class);
+
+        $this->assertTrue(Permission::where('code', 'editar_perfil')->exists());
+        $this->assertFalse(Permission::where('code', 'exportar_dados')->exists());
+        $this->assertSame(1, Permission::onlyTrashed()->where('code', 'exportar_dados')->count());
+    }
+
+    public function test_repeating_three_times_changes_no_data(): void
+    {
+        $this->seed(AdminPanelSeeder::class);
+
+        $snapshot = fn () => [Permission::get()->toArray(), Profile::get()->toArray(), ChangeHistory::count()];
+        $before = $snapshot();
+
+        foreach (range(1, 3) as $run) {
+            $this->seed(AdminPanelSeeder::class);
+        }
+
+        $this->assertSame($before, $snapshot());
     }
 
     public function test_oldest_user_becomes_administrator_and_the_others_get_the_default_profile(): void

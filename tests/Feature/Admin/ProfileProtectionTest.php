@@ -17,7 +17,7 @@ class ProfileProtectionTest extends TestCase
         $other = Profile::factory()->create();
         $permission = $this->permission('gerar_relatorio');
 
-        $this->actingAs($this->userWith('editar_perfil'))
+        $this->actingAs($this->userWith('editar_perfil', 'gerar_relatorio'))
             ->patch("/admin/profiles/{$other->id}", ['name' => 'Novo', 'permissions' => [$permission->id]])
             ->assertSessionHasNoErrors();
 

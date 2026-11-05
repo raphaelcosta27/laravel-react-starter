@@ -156,6 +156,14 @@ const can = useCan();
 verificação, e um código inexistente nega acesso aos demais. Regras que valem também para administradores ficam
 nas Actions, pois `Gate::before` ignora as policies para eles.
 
+**Conceder permissões.** Quem não é administrador só concede o que possui, seja por ajuste individual, pelas
+permissões de um perfil, pelo cadastro de um usuário ou pela troca de perfil. Conta o que passaria a valer: manter
+o que já existe e revogar continuam liberados. As telas deixam indisponível o que não pode ser concedido.
+
+**Adicionar uma função restrita.** Inclua o código em `lang/pt_BR/permissions.php`, que alimenta o seeder, e
+proteja a rota com `can:`. O seeder cria somente as permissões faltantes. `PermissionCoverageTest` falha se uma
+rota ficar sem permissão e fora da lista de exceções, ou se um código usado não constar no seeder.
+
 **Exclusão de dados.** Nada é apagado de fato. Toda entidade usa exclusão lógica, inclusive vínculos, e um teste
 falha se `forceDelete`, `detach`, `sync` ou `truncate` aparecer em `app/` ou `database/`.
 

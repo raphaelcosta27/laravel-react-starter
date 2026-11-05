@@ -62,6 +62,12 @@ export default function Permissions({ user, permissions, canAdjust }) {
                     </Typography>
                 )}
 
+                {canAdjust && permissions.some(({ available }) => !available) && (
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                        {__('Permissions you do not have are unavailable.')}
+                    </Typography>
+                )}
+
                 <Box component="ul" sx={{ listStyle: 'none', m: 0, p: 0 }}>
                     {permissions.map((permission) => (
                         <Stack
@@ -98,6 +104,7 @@ export default function Permissions({ user, permissions, canAdjust }) {
                                     label={__('Adjustment of :name', {
                                         name: permission.title,
                                     })}
+                                    disabled={!permission.available}
                                     fullWidth={false}
                                     sx={{ minWidth: 260 }}
                                     value={adjustments[permission.id]}

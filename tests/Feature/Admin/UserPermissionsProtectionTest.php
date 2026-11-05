@@ -22,7 +22,7 @@ class UserPermissionsProtectionTest extends TestCase
     {
         $target = $this->userWith();
 
-        $this->actingAs($this->userWith('gerenciar_permissoes_usuario'))
+        $this->actingAs($this->userWith('gerenciar_permissoes_usuario', 'gerar_relatorio'))
             ->put("/admin/users/{$target->id}/permissions", $this->payload())
             ->assertSessionHasNoErrors();
 
