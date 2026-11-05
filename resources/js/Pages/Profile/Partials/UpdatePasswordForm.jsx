@@ -1,45 +1,37 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
-import { useForm } from '@inertiajs/react';
-import { useRef } from 'react';
+import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
+import { useForm } from '@inertiajs/react';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import { useRef } from 'react';
 
-export default function UpdatePasswordForm({ className = '' }) {
+export default function UpdatePasswordForm() {
     const __ = useTranslations();
     const passwordInput = useRef();
     const currentPasswordInput = useRef();
 
-    const {
-        data,
-        setData,
-        errors,
-        put,
-        reset,
-        processing,
-        recentlySuccessful,
-    } = useForm({
+    const form = useForm({
         current_password: '',
         password: '',
         password_confirmation: '',
     });
 
-    const updatePassword = (e) => {
-        e.preventDefault();
+    const updatePassword = (event) => {
+        event.preventDefault();
 
-        put(route('password.update'), {
+        form.put(route('password.update'), {
             preserveScroll: true,
-            onSuccess: () => reset(),
+            onSuccess: () => form.reset(),
             onError: (errors) => {
                 if (errors.password) {
-                    reset('password', 'password_confirmation');
+                    form.reset('password', 'password_confirmation');
                     passwordInput.current.focus();
                 }
 
                 if (errors.current_password) {
-                    reset('current_password');
+                    form.reset('current_password');
                     currentPasswordInput.current.focus();
                 }
             },
@@ -47,97 +39,57 @@ export default function UpdatePasswordForm({ className = '' }) {
     };
 
     return (
-        <section className={className}>
+        <Stack component="section" spacing={3} sx={{ maxWidth: 576 }}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
+                <Typography component="h2" variant="h6">
                     {__('Update Password')}
-                </h2>
+                </Typography>
 
-                <p className="mt-1 text-sm text-gray-600">
+                <Typography variant="body2" color="text.secondary">
                     {__('Ensure your account is using a long, random password to stay secure.')}
-                </p>
+                </Typography>
             </header>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel
-                        htmlFor="current_password"
-                        value={__('Current Password')}
-                    />
+            <Stack component="form" spacing={3} onSubmit={updatePassword}>
+                <TextField
+                    {...fieldProps(form, 'current_password')}
+                    inputRef={currentPasswordInput}
+                    type="password"
+                    label={__('Current Password')}
+                    autoComplete="current-password"
+                />
 
-                    <TextInput
-                        id="current_password"
-                        ref={currentPasswordInput}
-                        value={data.current_password}
-                        onChange={(e) =>
-                            setData('current_password', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="current-password"
-                    />
+                <TextField
+                    {...fieldProps(form, 'password')}
+                    inputRef={passwordInput}
+                    type="password"
+                    label={__('New Password')}
+                    autoComplete="new-password"
+                />
 
-                    <InputError
-                        message={errors.current_password}
-                        className="mt-2"
-                    />
-                </div>
+                <TextField
+                    {...fieldProps(form, 'password_confirmation')}
+                    type="password"
+                    label={__('Confirm Password')}
+                    autoComplete="new-password"
+                />
 
-                <div>
-                    <InputLabel htmlFor="password" value={__('New Password')} />
-
-                    <TextInput
-                        id="password"
-                        ref={passwordInput}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div>
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value={__('Confirm Password')}
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        value={data.password_confirmation}
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        type="password"
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>{__('Save')}</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={form.processing}
                     >
-                        <p className="text-sm text-gray-600">
+                        {__('Save')}
+                    </Button>
+
+                    {form.recentlySuccessful && (
+                        <Typography variant="body2" color="text.secondary">
                             {__('Saved.')}
-                        </p>
-                    </Transition>
-                </div>
-            </form>
-        </section>
+                        </Typography>
+                    )}
+                </Stack>
+            </Stack>
+        </Stack>
     );
 }

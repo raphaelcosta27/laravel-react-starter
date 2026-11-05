@@ -1,62 +1,61 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
+import { Head, useForm } from '@inertiajs/react';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 export default function ForgotPassword({ status }) {
     const __ = useTranslations();
-    const { data, setData, post, processing, errors } = useForm({
-        email: '',
-    });
+    const form = useForm({ email: '' });
 
-    const submit = (e) => {
-        e.preventDefault();
+    const submit = (event) => {
+        event.preventDefault();
 
-        post(route('password.email'));
+        form.post(route('password.email'));
     };
 
     return (
         <GuestLayout>
             <Head title={__('Forgot Password')} />
 
-            <h1 className="mb-4 text-lg font-medium text-gray-900">
-                {__('Forgot Password')}
-            </h1>
+            <Stack spacing={2}>
+                <Typography component="h1" variant="h6">
+                    {__('Forgot Password')}
+                </Typography>
 
-            <div className="mb-4 text-sm text-gray-600">
-                {__('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.')}
-            </div>
+                <Typography variant="body2" color="text.secondary">
+                    {__('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.')}
+                </Typography>
 
-            {status && (
-                <div className="mb-4 text-sm font-medium text-green-700">
-                    {status}
-                </div>
-            )}
+                {status && (
+                    <Alert severity="success" role="status">
+                        {status}
+                    </Alert>
+                )}
 
-            <form onSubmit={submit}>
-                <InputLabel htmlFor="email" value={__('Email')} />
+                <Stack component="form" spacing={2} onSubmit={submit}>
+                    <TextField
+                        {...fieldProps(form, 'email')}
+                        type="email"
+                        label={__('Email')}
+                        autoFocus
+                    />
 
-                <TextInput
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={data.email}
-                    className="mt-1 block w-full"
-                    isFocused={true}
-                    onChange={(e) => setData('email', e.target.value)}
-                />
-
-                <InputError message={errors.email} className="mt-2" />
-
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        {__('Email Password Reset Link')}
-                    </PrimaryButton>
-                </div>
-            </form>
+                    <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={form.processing}
+                        >
+                            {__('Email Password Reset Link')}
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Stack>
         </GuestLayout>
     );
 }

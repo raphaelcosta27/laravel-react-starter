@@ -25,7 +25,7 @@ export default function StatusAnnouncer({ message, visuallyHidden = false }) {
             aria-atomic="true"
             sx={
                 visible
-                    ? { maxWidth: 1280, mx: 'auto', mt: 2, px: { xs: 2, sm: 3 } }
+                    ? { maxWidth: 1536, mx: 'auto', mt: 2, px: { xs: 2, sm: 3 } }
                     : hiddenStyle
             }
         >

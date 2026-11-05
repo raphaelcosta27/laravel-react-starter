@@ -1,73 +1,70 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import TextLink from '@/Components/TextLink';
 import GuestLayout from '@/Layouts/GuestLayout';
+import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 export default function RequestAccess({ status }) {
     const __ = useTranslations();
-    const { data, setData, post, processing, errors } = useForm({ email: '' });
+    const form = useForm({ email: '' });
 
     const submit = (event) => {
         event.preventDefault();
 
-        post(route('access.send'));
+        form.post(route('access.send'));
     };
 
     return (
         <GuestLayout>
             <Head title={__('Request new access')} />
 
-            <h1 className="mb-4 text-lg font-medium text-gray-900">
-                {__('Request new access')}
-            </h1>
+            <Stack spacing={2}>
+                <Typography component="h1" variant="h6">
+                    {__('Request new access')}
+                </Typography>
 
-            <p className="mb-4 text-sm text-gray-700">
-                {__(
-                    'If your temporary password has expired, enter your email to receive a new password and a new link.',
+                <Typography variant="body2" color="text.secondary">
+                    {__(
+                        'If your temporary password has expired, enter your email to receive a new password and a new link.',
+                    )}
+                </Typography>
+
+                {status && (
+                    <Alert severity="success" role="status">
+                        {status}
+                    </Alert>
                 )}
-            </p>
 
-            {status && (
-                <div
-                    role="status"
-                    className="mb-4 text-sm font-medium text-green-700"
-                >
-                    {status}
-                </div>
-            )}
+                <Stack component="form" spacing={2} onSubmit={submit}>
+                    <TextField
+                        {...fieldProps(form, 'email')}
+                        type="email"
+                        label={__('Email')}
+                        autoComplete="username"
+                        autoFocus
+                    />
 
-            <form onSubmit={submit}>
-                <InputLabel htmlFor="email" value={__('Email')} />
-
-                <TextInput
-                    id="email"
-                    type="email"
-                    name="email"
-                    value={data.email}
-                    className="mt-1 block w-full"
-                    autoComplete="username"
-                    isFocused={true}
-                    onChange={(event) => setData('email', event.target.value)}
-                />
-
-                <InputError message={errors.email} className="mt-2" />
-
-                <div className="mt-4 flex items-center justify-between">
-                    <Link
-                        href={route('login')}
-                        className="text-sm text-gray-700 underline"
+                    <Stack
+                        direction="row"
+                        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
                     >
-                        {__('Log in')}
-                    </Link>
+                        <TextLink href={route('login')}>{__('Log in')}</TextLink>
 
-                    <PrimaryButton disabled={processing}>
-                        {__('Send')}
-                    </PrimaryButton>
-                </div>
-            </form>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={form.processing}
+                        >
+                            {__('Send')}
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Stack>
         </GuestLayout>
     );
 }

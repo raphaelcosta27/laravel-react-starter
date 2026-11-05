@@ -1,25 +1,27 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import TextLink from '@/Components/TextLink';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
+import { Head, useForm } from '@inertiajs/react';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 export default function Register() {
     const __ = useTranslations();
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const form = useForm({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
     });
 
-    const submit = (e) => {
-        e.preventDefault();
+    const submit = (event) => {
+        event.preventDefault();
 
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+        form.post(route('register'), {
+            onFinish: () => form.reset('password', 'password_confirmation'),
         });
     };
 
@@ -27,100 +29,61 @@ export default function Register() {
         <GuestLayout>
             <Head title={__('Register')} />
 
-            <h1 className="mb-4 text-lg font-medium text-gray-900">
-                {__('Register')}
-            </h1>
+            <Stack spacing={2}>
+                <Typography component="h1" variant="h6">
+                    {__('Register')}
+                </Typography>
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value={__('Name')} />
-
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
+                <Stack component="form" spacing={2} onSubmit={submit}>
+                    <TextField
+                        {...fieldProps(form, 'name', { required: true })}
+                        label={__('Name')}
                         autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
+                        autoFocus
                     />
 
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value={__('Email')} />
-
-                    <TextInput
-                        id="email"
+                    <TextField
+                        {...fieldProps(form, 'email', { required: true })}
                         type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
+                        label={__('Email')}
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value={__('Password')} />
-
-                    <TextInput
-                        id="password"
+                    <TextField
+                        {...fieldProps(form, 'password', { required: true })}
                         type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
+                        label={__('Password')}
                         autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value={__('Confirm Password')}
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
+                    <TextField
+                        {...fieldProps(form, 'password_confirmation', {
+                            required: true,
+                        })}
                         type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
+                        label={__('Confirm Password')}
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        required
                     />
 
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{ alignItems: 'center', justifyContent: 'flex-end' }}
                     >
-                        {__('Already registered?')}
-                    </Link>
+                        <TextLink href={route('login')}>
+                            {__('Already registered?')}
+                        </TextLink>
 
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        {__('Register')}
-                    </PrimaryButton>
-                </div>
-            </form>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={form.processing}
+                        >
+                            {__('Register')}
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Stack>
         </GuestLayout>
     );
 }

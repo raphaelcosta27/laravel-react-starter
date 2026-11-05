@@ -1,5 +1,10 @@
+import PostLink from '@/Components/PostLink';
+import TextLink from '@/Components/TextLink';
 import { useTranslations } from '@/lib/i18n';
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 const messages = {
     403: ['Access denied', 'You do not have permission to open this page.'],
@@ -24,32 +29,38 @@ export default function Error({ status, message, canLogout = false }) {
         <>
             <Head title={__(title)} />
 
-            <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6 text-center">
-                <p className="text-lg text-gray-700">{status}</p>
-                <h1 className="mt-2 text-2xl font-semibold text-gray-900">
+            <Stack
+                component="main"
+                spacing={1}
+                sx={{
+                    alignItems: 'center',
+                    bgcolor: 'grey.100',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    p: 3,
+                    textAlign: 'center',
+                }}
+            >
+                <Typography variant="h6" component="p" color="text.secondary">
+                    {status}
+                </Typography>
+                <Typography component="h1" variant="h4">
                     {__(title)}
-                </h1>
-                <p className="mt-2 text-gray-700">
+                </Typography>
+                <Typography color="text.secondary">
                     {message ?? __(description)}
-                </p>
+                </Typography>
 
-                <div className="mt-6 flex gap-4">
-                    <Link href="/" className="text-gray-900 underline">
-                        {__('Back to home page')}
-                    </Link>
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center', pt: 2 }}>
+                    <TextLink href="/">{__('Back to home page')}</TextLink>
 
                     {canLogout && (
-                        <Link
-                            as="button"
-                            method="post"
-                            href={route('logout')}
-                            className="text-gray-900 underline"
-                        >
+                        <Button component={PostLink} href={route('logout')}>
                             {__('Log Out')}
-                        </Link>
+                        </Button>
                     )}
-                </div>
-            </main>
+                </Stack>
+            </Stack>
         </>
     );
 }

@@ -18,6 +18,12 @@ const layout = (auth) => {
 
 const menu = () => within(screen.getByRole('navigation'));
 
+/** O menu lateral fechado fica invisível e sem nome acessível: conta pelo texto. */
+const links = (area) =>
+    menu()
+        .getAllByRole('link', { hidden: true })
+        .filter((link) => link.textContent === area);
+
 describe('menu do painel', () => {
     beforeEach(() => setPageProps({ translations }));
 
@@ -25,23 +31,23 @@ describe('menu do painel', () => {
         layout({ isAdministrator: true, permissions: [] });
 
         areas.forEach((area) => {
-            expect(menu().getAllByRole('link', { name: area, hidden: true })).toHaveLength(2);
+            expect(links(area)).toHaveLength(2);
         });
     });
 
     test('usuário vê somente as áreas permitidas', () => {
         layout({ isAdministrator: false, permissions: ['visualizar_usuario'] });
 
-        expect(menu().getAllByRole('link', { name: 'Usuários', hidden: true })).toHaveLength(2);
-        expect(menu().queryByRole('link', { name: 'Perfis', hidden: true })).toBeNull();
-        expect(menu().queryByRole('link', { name: 'Permissões', hidden: true })).toBeNull();
+        expect(links('Usuários')).toHaveLength(2);
+        expect(links('Perfis')).toHaveLength(0);
+        expect(links('Permissões')).toHaveLength(0);
     });
 
     test('usuário sem permissões não vê o painel', () => {
         layout({ isAdministrator: false, permissions: [] });
 
         areas.forEach((area) => {
-            expect(menu().queryByRole('link', { name: area, hidden: true })).toBeNull();
+            expect(links(area)).toHaveLength(0);
         });
     });
 

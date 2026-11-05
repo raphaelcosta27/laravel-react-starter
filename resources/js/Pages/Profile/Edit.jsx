@@ -1,41 +1,35 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { useTranslations } from '@/lib/i18n';
 import { Head } from '@inertiajs/react';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
-import { useTranslations } from '@/lib/i18n';
 
 export default function Edit({ mustVerifyEmail, status }) {
     const __ = useTranslations();
+
     return (
-        <AuthenticatedLayout
-            header={
-                <h1 className="text-xl font-semibold leading-tight text-gray-800">
-                    {__('Profile')}
-                </h1>
-            }
-        >
+        <AuthenticatedLayout title={__('Profile')}>
             <Head title={__('Profile')} />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
-                            status={status}
-                            className="max-w-xl"
-                        />
-                    </div>
+            <Stack spacing={3}>
+                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                    <UpdateProfileInformationForm
+                        mustVerifyEmail={mustVerifyEmail}
+                        status={status}
+                    />
+                </Paper>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <UpdatePasswordForm className="max-w-xl" />
-                    </div>
+                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                    <UpdatePasswordForm />
+                </Paper>
 
-                    <div className="bg-white p-4 shadow sm:rounded-lg sm:p-8">
-                        <DeleteUserForm className="max-w-xl" />
-                    </div>
-                </div>
-            </div>
+                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                    <DeleteUserForm />
+                </Paper>
+            </Stack>
         </AuthenticatedLayout>
     );
 }

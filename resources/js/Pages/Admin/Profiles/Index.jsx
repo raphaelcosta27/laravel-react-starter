@@ -1,6 +1,9 @@
 import DataTable from '@/Components/DataTable/DataTable';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Chip from '@mui/material/Chip';
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo } from 'react';
 
@@ -96,31 +99,25 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
 
     const renderDetail = (profile) =>
         profile.permissions.length > 0 ? (
-            <ul className="flex flex-wrap gap-2">
+            <Box
+                component="ul"
+                sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, listStyle: 'none', m: 0, p: 0 }}
+            >
                 {profile.permissions.map((permission) => (
-                    <li
-                        key={permission.id}
-                        className="rounded bg-white px-2 py-1 text-sm text-gray-800 shadow-sm"
-                    >
-                        {permission.title}
+                    <li key={permission.id}>
+                        <Chip label={permission.title} size="small" variant="outlined" />
                     </li>
                 ))}
-            </ul>
+            </Box>
         ) : (
             <p>{__('No permissions in this profile.')}</p>
         );
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h1 className="text-xl font-semibold leading-tight text-gray-800">
-                    {__('Profiles')}
-                </h1>
-            }
-        >
+        <AuthenticatedLayout title={__('Profiles')}>
             <Head title={__('Profiles')} />
 
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <>
                 <DataTable
                     tableKey="profiles"
                     caption={__('Profiles')}
@@ -136,16 +133,18 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
                     emptyMessage={__('No profiles found.')}
                     toolbar={
                         abilities?.create && (
-                            <Link
+                            <Button
+                                component={Link}
                                 href={route('admin.profiles.create')}
-                                className="rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                variant="contained"
+                                size="small"
                             >
                                 {__('New profile')}
-                            </Link>
+                            </Button>
                         )
                     }
                 />
-            </div>
+            </>
         </AuthenticatedLayout>
     );
 }

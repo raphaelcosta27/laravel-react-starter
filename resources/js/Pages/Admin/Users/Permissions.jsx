@@ -1,7 +1,13 @@
-import PrimaryButton from '@/Components/PrimaryButton';
+import SelectField from '@/Components/SelectField';
+import TextLink from '@/Components/TextLink';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
 const ORIGINS = {
@@ -42,88 +48,91 @@ export default function Permissions({ user, permissions, canAdjust }) {
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h1 className="text-xl font-semibold leading-tight text-gray-800">
-                    {title}
-                </h1>
-            }
-        >
+        <AuthenticatedLayout title={title}>
             <Head title={title} />
 
-            <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-                <form
-                    onSubmit={submit}
-                    className="rounded-md bg-white p-6 shadow-sm"
+            <Paper
+                component="form"
+                sx={{ maxWidth: 896, mx: 'auto', p: 3 }}
+                onSubmit={submit}
+            >
+                {!canAdjust && (
+                    <Typography variant="body2" sx={{ mb: 2 }}>
+                        {__('This profile has full access to the system.')}
+                    </Typography>
+                )}
+
+                <Box component="ul" sx={{ listStyle: 'none', m: 0, p: 0 }}>
+                    {permissions.map((permission) => (
+                        <Stack
+                            component="li"
+                            key={permission.id}
+                            direction="row"
+                            useFlexGap
+                            spacing={2}
+                            sx={{
+                                alignItems: 'center',
+                                borderBottom: 1,
+                                borderColor: 'divider',
+                                flexWrap: 'wrap',
+                                justifyContent: 'space-between',
+                                py: 1.5,
+                            }}
+                        >
+                            <div>
+                                <Typography variant="subtitle2" component="p">
+                                    {permission.title}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {permission.active
+                                        ? __('Active')
+                                        : __('Inactive')}
+                                    {' · '}
+                                    <span>{__(ORIGINS[permission.origin])}</span>
+                                </Typography>
+                            </div>
+
+                            {canAdjust && (
+                                <SelectField
+                                    id={`adjustment-${permission.id}`}
+                                    label={__('Adjustment of :name', {
+                                        name: permission.title,
+                                    })}
+                                    fullWidth={false}
+                                    sx={{ minWidth: 260 }}
+                                    value={adjustments[permission.id]}
+                                    onChange={(event) =>
+                                        setAdjustments((current) => ({
+                                            ...current,
+                                            [permission.id]: event.target.value,
+                                        }))
+                                    }
+                                >
+                                    <option value="">{__('Follow the profile')}</option>
+                                    <option value="grant">{__('Grant')}</option>
+                                    <option value="revoke">{__('Revoke')}</option>
+                                </SelectField>
+                            )}
+                        </Stack>
+                    ))}
+                </Box>
+
+                <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{ alignItems: 'center', mt: 3 }}
                 >
-                    {!canAdjust && (
-                        <p className="mb-4 text-sm text-gray-700">
-                            {__('This profile has full access to the system.')}
-                        </p>
+                    {canAdjust && (
+                        <Button type="submit" variant="contained">
+                            {__('Save')}
+                        </Button>
                     )}
 
-                    <ul className="divide-y divide-gray-200">
-                        {permissions.map((permission) => (
-                            <li
-                                key={permission.id}
-                                className="flex flex-wrap items-center justify-between gap-3 py-3"
-                            >
-                                <div>
-                                    <p className="text-sm font-medium text-gray-900">
-                                        {permission.title}
-                                    </p>
-                                    <p className="text-sm text-gray-600">
-                                        {permission.active
-                                            ? __('Active')
-                                            : __('Inactive')}
-                                        {' · '}
-                                        <span>{__(ORIGINS[permission.origin])}</span>
-                                    </p>
-                                </div>
-
-                                {canAdjust && (
-                                    <div>
-                                        <label
-                                            htmlFor={`adjustment-${permission.id}`}
-                                            className="sr-only"
-                                        >
-                                            {__('Adjustment of :name', {
-                                                name: permission.title,
-                                            })}
-                                        </label>
-                                        <select
-                                            id={`adjustment-${permission.id}`}
-                                            className="rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            value={adjustments[permission.id]}
-                                            onChange={(event) =>
-                                                setAdjustments((current) => ({
-                                                    ...current,
-                                                    [permission.id]: event.target.value,
-                                                }))
-                                            }
-                                        >
-                                            <option value="">{__('Follow the profile')}</option>
-                                            <option value="grant">{__('Grant')}</option>
-                                            <option value="revoke">{__('Revoke')}</option>
-                                        </select>
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-
-                    <div className="mt-6 flex items-center gap-4">
-                        {canAdjust && <PrimaryButton>{__('Save')}</PrimaryButton>}
-
-                        <Link
-                            href={route('admin.users.index')}
-                            className="rounded text-sm text-gray-700 underline focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        >
-                            {__('Back to list')}
-                        </Link>
-                    </div>
-                </form>
-            </div>
+                    <TextLink href={route('admin.users.index')}>
+                        {__('Back to list')}
+                    </TextLink>
+                </Stack>
+            </Paper>
         </AuthenticatedLayout>
     );
 }

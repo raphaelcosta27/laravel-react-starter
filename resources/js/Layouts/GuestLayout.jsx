@@ -1,18 +1,31 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link } from '@inertiajs/react';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
-            <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
-                </Link>
-            </div>
+        <Box
+            sx={{
+                alignItems: 'center',
+                bgcolor: 'grey.100',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: { sm: 'center' },
+                minHeight: '100vh',
+                pt: { xs: 3, sm: 0 },
+            }}
+        >
+            <Link href="/">
+                <ApplicationLogo style={{ height: 80, width: 80 }} />
+            </Link>
 
-            <main className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
+            <Paper
+                component="main"
+                sx={{ maxWidth: { sm: 448 }, mt: 3, px: 3, py: 2, width: '100%' }}
+            >
                 {children}
-            </main>
-        </div>
+            </Paper>
+        </Box>
     );
 }

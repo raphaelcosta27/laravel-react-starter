@@ -1,25 +1,26 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
+import { Head, useForm } from '@inertiajs/react';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 export default function ResetPassword({ token, email }) {
     const __ = useTranslations();
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const form = useForm({
         token: token,
         email: email,
         password: '',
         password_confirmation: '',
     });
 
-    const submit = (e) => {
-        e.preventDefault();
+    const submit = (event) => {
+        event.preventDefault();
 
-        post(route('password.store'), {
-            onFinish: () => reset('password', 'password_confirmation'),
+        form.post(route('password.store'), {
+            onFinish: () => form.reset('password', 'password_confirmation'),
         });
     };
 
@@ -27,74 +28,45 @@ export default function ResetPassword({ token, email }) {
         <GuestLayout>
             <Head title={__('Reset Password')} />
 
-            <h1 className="mb-4 text-lg font-medium text-gray-900">
-                {__('Reset Password')}
-            </h1>
+            <Stack spacing={2}>
+                <Typography component="h1" variant="h6">
+                    {__('Reset Password')}
+                </Typography>
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value={__('Email')} />
-
-                    <TextInput
-                        id="email"
+                <Stack component="form" spacing={2} onSubmit={submit}>
+                    <TextField
+                        {...fieldProps(form, 'email')}
                         type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
+                        label={__('Email')}
                         autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
                     />
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value={__('Password')} />
-
-                    <TextInput
-                        id="password"
+                    <TextField
+                        {...fieldProps(form, 'password')}
                         type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
+                        label={__('Password')}
                         autoComplete="new-password"
-                        isFocused={true}
-                        onChange={(e) => setData('password', e.target.value)}
+                        autoFocus
                     />
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value={__('Confirm Password')}
-                    />
-
-                    <TextInput
+                    <TextField
+                        {...fieldProps(form, 'password_confirmation')}
                         type="password"
-                        id="password_confirmation"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
+                        label={__('Confirm Password')}
                         autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
                     />
 
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        {__('Reset Password')}
-                    </PrimaryButton>
-                </div>
-            </form>
+                    <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={form.processing}
+                        >
+                            {__('Reset Password')}
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Stack>
         </GuestLayout>
     );
 }

@@ -1,114 +1,93 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
-import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import PostLink from '@/Components/PostLink';
+import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
+import { useForm, usePage } from '@inertiajs/react';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
-export default function UpdateProfileInformation({
-    mustVerifyEmail,
-    status,
-    className = '',
-}) {
+export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
     const __ = useTranslations();
     const user = usePage().props.auth.user;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email,
-        });
+    const form = useForm({
+        name: user.name,
+        email: user.email,
+    });
 
-    const submit = (e) => {
-        e.preventDefault();
+    const submit = (event) => {
+        event.preventDefault();
 
-        patch(route('profile.update'));
+        form.patch(route('profile.update'));
     };
 
     return (
-        <section className={className}>
+        <Stack component="section" spacing={3} sx={{ maxWidth: 576 }}>
             <header>
-                <h2 className="text-lg font-medium text-gray-900">
+                <Typography component="h2" variant="h6">
                     {__('Profile Information')}
-                </h2>
+                </Typography>
 
-                <p className="mt-1 text-sm text-gray-600">
+                <Typography variant="body2" color="text.secondary">
                     {__("Update your account's profile information and email address.")}
-                </p>
+                </Typography>
             </header>
 
-            <form onSubmit={submit} className="mt-6 space-y-6">
-                <div>
-                    <InputLabel htmlFor="name" value={__('Name')} />
+            <Stack component="form" spacing={3} onSubmit={submit}>
+                <TextField
+                    {...fieldProps(form, 'name', { required: true })}
+                    label={__('Name')}
+                    autoComplete="name"
+                    autoFocus
+                />
 
-                    <TextInput
-                        id="name"
-                        className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                        isFocused
-                        autoComplete="name"
-                    />
-
-                    <InputError className="mt-2" message={errors.name} />
-                </div>
-
-                <div>
-                    <InputLabel htmlFor="email" value={__('Email')} />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                        autoComplete="username"
-                    />
-
-                    <InputError className="mt-2" message={errors.email} />
-                </div>
+                <TextField
+                    {...fieldProps(form, 'email', { required: true })}
+                    type="email"
+                    label={__('Email')}
+                    autoComplete="username"
+                />
 
                 {mustVerifyEmail && user.email_verified_at === null && (
-                    <div>
-                        <p className="mt-2 text-sm text-gray-800">
+                    <Stack spacing={1} sx={{ alignItems: 'flex-start' }}>
+                        <Typography variant="body2">
                             {__('Your email address is unverified.')}
-                            <Link
-                                href={route('verification.send')}
-                                method="post"
-                                as="button"
-                                className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            >
-                                {__('Click here to re-send the verification email.')}
-                            </Link>
-                        </p>
+                        </Typography>
+
+                        <Button
+                            component={PostLink}
+                            href={route('verification.send')}
+                            size="small"
+                        >
+                            {__('Click here to re-send the verification email.')}
+                        </Button>
 
                         {status === 'verification-link-sent' && (
-                            <div className="mt-2 text-sm font-medium text-green-700">
+                            <Alert severity="success" role="status">
                                 {__('A new verification link has been sent to your email address.')}
-                            </div>
+                            </Alert>
                         )}
-                    </div>
+                    </Stack>
                 )}
 
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>{__('Save')}</PrimaryButton>
-
-                    <Transition
-                        show={recentlySuccessful}
-                        enter="transition ease-in-out"
-                        enterFrom="opacity-0"
-                        leave="transition ease-in-out"
-                        leaveTo="opacity-0"
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        disabled={form.processing}
                     >
-                        <p className="text-sm text-gray-600">
+                        {__('Save')}
+                    </Button>
+
+                    {form.recentlySuccessful && (
+                        <Typography variant="body2" color="text.secondary">
                             {__('Saved.')}
-                        </p>
-                    </Transition>
-                </div>
-            </form>
-        </section>
+                        </Typography>
+                    )}
+                </Stack>
+            </Stack>
+        </Stack>
     );
 }

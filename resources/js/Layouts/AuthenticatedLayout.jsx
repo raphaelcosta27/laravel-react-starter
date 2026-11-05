@@ -1,12 +1,28 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import PostLink from '@/Components/PostLink';
 import StatusAnnouncer from '@/Components/StatusAnnouncer';
-import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
 import { useTranslations } from '@/lib/i18n';
 import { useCan } from '@/lib/permissions';
+import { Link, usePage } from '@inertiajs/react';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import MenuIcon from '@mui/icons-material/Menu';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import { useId, useState } from 'react';
 
 const panelAreas = [
     { label: 'Profiles', route: 'admin.profiles', permission: 'visualizar_perfil' },
@@ -14,198 +30,178 @@ const panelAreas = [
     { label: 'Users', route: 'admin.users', permission: 'visualizar_usuario' },
 ];
 
-export default function AuthenticatedLayout({ header, children }) {
+export default function AuthenticatedLayout({ title, children }) {
     const __ = useTranslations();
     const can = useCan();
     const user = usePage().props.auth.user;
-    const areas = panelAreas.filter((area) => can(area.permission));
+    const accountId = useId();
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [accountAnchor, setAccountAnchor] = useState(null);
+
+    const links = [
+        {
+            key: 'dashboard',
+            label: __('Dashboard'),
+            href: route('dashboard'),
+            active: route().current('dashboard'),
+        },
+        ...panelAreas
+            .filter((area) => can(area.permission))
+            .map((area) => ({
+                key: area.route,
+                label: __(area.label),
+                href: route(`${area.route}.index`),
+                active: route().current(`${area.route}.*`),
+            })),
+    ];
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
+        <Box sx={{ bgcolor: 'grey.100', minHeight: '100vh' }}>
+            <AppBar component="nav" position="static" color="inherit" elevation={1}>
+                <Toolbar sx={{ gap: 1 }}>
+                    <IconButton
+                        edge="start"
+                        aria-label={__('Navigation menu')}
+                        aria-expanded={drawerOpen}
+                        sx={{ display: { sm: 'none' } }}
+                        onClick={() => setDrawerOpen(true)}
+                    >
+                        <MenuIcon />
+                    </IconButton>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
-                                    {__('Dashboard')}
-                                </NavLink>
+                    <Link href="/">
+                        <ApplicationLogo
+                            style={{ display: 'block', height: 36, width: 'auto' }}
+                        />
+                    </Link>
 
-                                {areas.map((area) => (
-                                    <NavLink
-                                        key={area.route}
-                                        href={route(`${area.route}.index`)}
-                                        active={route().current(`${area.route}.*`)}
-                                    >
-                                        {__(area.label)}
-                                    </NavLink>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            {__('Profile')}
-                                        </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
-                                        >
-                                            {__('Log Out')}
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                aria-label={__('Navigation menu')}
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                    <Box
+                        sx={{
+                            display: { xs: 'none', sm: 'flex' },
+                            gap: 1,
+                            marginInlineStart: 2,
+                        }}
+                    >
+                        {links.map((link) => (
+                            <Button
+                                key={link.key}
+                                component={Link}
+                                href={link.href}
+                                color={link.active ? 'primary' : 'inherit'}
+                                aria-current={link.active ? 'page' : undefined}
+                                sx={{ textTransform: 'none' }}
                             >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            {__('Dashboard')}
-                        </ResponsiveNavLink>
-
-                        {areas.map((area) => (
-                            <ResponsiveNavLink
-                                key={area.route}
-                                href={route(`${area.route}.index`)}
-                                active={route().current(`${area.route}.*`)}
-                            >
-                                {__(area.label)}
-                            </ResponsiveNavLink>
+                                {link.label}
+                            </Button>
                         ))}
-                    </div>
+                    </Box>
 
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
-                        </div>
+                    <Box
+                        sx={{
+                            display: { xs: 'none', sm: 'block' },
+                            marginInlineStart: 'auto',
+                        }}
+                    >
+                        <Button
+                            id={accountId}
+                            color="inherit"
+                            aria-haspopup="menu"
+                            aria-expanded={accountAnchor !== null}
+                            endIcon={<ArrowDropDownIcon />}
+                            sx={{ textTransform: 'none' }}
+                            onClick={(event) => setAccountAnchor(event.currentTarget)}
+                        >
+                            {user.name}
+                        </Button>
 
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
+                        <Menu
+                            anchorEl={accountAnchor}
+                            open={accountAnchor !== null}
+                            slotProps={{ list: { 'aria-labelledby': accountId } }}
+                            onClose={() => setAccountAnchor(null)}
+                        >
+                            <MenuItem component={Link} href={route('profile.edit')}>
                                 {__('Profile')}
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
+                            </MenuItem>
+                            <MenuItem component={PostLink} href={route('logout')}>
                                 {__('Log Out')}
-                            </ResponsiveNavLink>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+                            </MenuItem>
+                        </Menu>
+                    </Box>
+                </Toolbar>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
-                    </div>
-                </header>
+                <Drawer
+                    open={drawerOpen}
+                    ModalProps={{ disablePortal: true, keepMounted: true }}
+                    slotProps={{
+                        paper: { 'aria-label': __('Navigation menu') },
+                    }}
+                    onClose={() => setDrawerOpen(false)}
+                >
+                    <Box sx={{ width: 280 }}>
+                        <List>
+                            {links.map((link) => (
+                                <ListItem key={link.key} disablePadding>
+                                    <ListItemButton
+                                        component={Link}
+                                        href={link.href}
+                                        selected={Boolean(link.active)}
+                                        aria-current={link.active ? 'page' : undefined}
+                                    >
+                                        <ListItemText primary={link.label} />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+
+                        <Divider />
+
+                        <Box sx={{ px: 2, py: 1.5 }}>
+                            <Typography>{user.name}</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {user.email}
+                            </Typography>
+                        </Box>
+
+                        <List>
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    component={Link}
+                                    href={route('profile.edit')}
+                                >
+                                    <ListItemText primary={__('Profile')} />
+                                </ListItemButton>
+                            </ListItem>
+                            <ListItem disablePadding>
+                                <ListItemButton
+                                    component={PostLink}
+                                    href={route('logout')}
+                                    sx={{ width: '100%' }}
+                                >
+                                    <ListItemText primary={__('Log Out')} />
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
+                    </Box>
+                </Drawer>
+            </AppBar>
+
+            {title && (
+                <Paper component="header" square elevation={0}>
+                    <Container maxWidth="xl" sx={{ py: 2.5 }}>
+                        <Typography component="h1" variant="h5">
+                            {title}
+                        </Typography>
+                    </Container>
+                </Paper>
             )}
 
             <StatusAnnouncer />
 
-            <main>{children}</main>
-        </div>
+            <Container component="main" maxWidth="xl" sx={{ py: 3 }}>
+                {children}
+            </Container>
+        </Box>
     );
 }

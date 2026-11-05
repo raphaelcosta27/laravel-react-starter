@@ -1,35 +1,16 @@
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import PostLink from '@/Components/PostLink';
 import GuestLayout from '@/Layouts/GuestLayout';
+import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
-import { Head, Link, useForm } from '@inertiajs/react';
-
-function PasswordField({ id, label, value, error, onChange, autoComplete }) {
-    return (
-        <div className="mt-4">
-            <InputLabel htmlFor={id} value={label} />
-
-            <TextInput
-                id={id}
-                type="password"
-                value={value}
-                className="mt-1 block w-full"
-                autoComplete={autoComplete}
-                aria-invalid={error ? 'true' : undefined}
-                aria-describedby={error ? `${id}-error` : undefined}
-                onChange={(event) => onChange(event.target.value)}
-            />
-
-            <InputError id={`${id}-error`} message={error} className="mt-2" />
-        </div>
-    );
-}
+import { Head, useForm } from '@inertiajs/react';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 
 export default function ChangePassword() {
     const __ = useTranslations();
-    const { data, setData, put, processing, errors, reset } = useForm({
+    const form = useForm({
         current_password: '',
         password: '',
         password_confirmation: '',
@@ -38,68 +19,64 @@ export default function ChangePassword() {
     const submit = (event) => {
         event.preventDefault();
 
-        put(route('password.update'), { onError: () => reset() });
+        form.put(route('password.update'), { onError: () => form.reset() });
     };
 
     return (
         <GuestLayout>
             <Head title={__('Change your password')} />
 
-            <h1 className="text-lg font-medium text-gray-900">
-                {__('Change your password')}
-            </h1>
+            <Stack spacing={2}>
+                <Typography component="h1" variant="h6">
+                    {__('Change your password')}
+                </Typography>
 
-            <p className="mt-2 text-sm text-gray-700">
-                {__(
-                    'For your security, you need to set a new password before continuing.',
-                )}
-            </p>
+                <Typography variant="body2" color="text.secondary">
+                    {__(
+                        'For your security, you need to set a new password before continuing.',
+                    )}
+                </Typography>
 
-            <form onSubmit={submit}>
-                <PasswordField
-                    id="current_password"
-                    label={__('Current Password')}
-                    value={data.current_password}
-                    error={errors.current_password}
-                    autoComplete="current-password"
-                    onChange={(value) => setData('current_password', value)}
-                />
+                <Stack component="form" spacing={2} onSubmit={submit}>
+                    <TextField
+                        {...fieldProps(form, 'current_password')}
+                        type="password"
+                        label={__('Current Password')}
+                        autoComplete="current-password"
+                    />
 
-                <PasswordField
-                    id="password"
-                    label={__('New Password')}
-                    value={data.password}
-                    error={errors.password}
-                    autoComplete="new-password"
-                    onChange={(value) => setData('password', value)}
-                />
+                    <TextField
+                        {...fieldProps(form, 'password')}
+                        type="password"
+                        label={__('New Password')}
+                        autoComplete="new-password"
+                    />
 
-                <PasswordField
-                    id="password_confirmation"
-                    label={__('Confirm Password')}
-                    value={data.password_confirmation}
-                    error={errors.password_confirmation}
-                    autoComplete="new-password"
-                    onChange={(value) =>
-                        setData('password_confirmation', value)
-                    }
-                />
+                    <TextField
+                        {...fieldProps(form, 'password_confirmation')}
+                        type="password"
+                        label={__('Confirm Password')}
+                        autoComplete="new-password"
+                    />
 
-                <div className="mt-4 flex items-center justify-between">
-                    <Link
-                        as="button"
-                        method="post"
-                        href={route('logout')}
-                        className="text-sm text-gray-700 underline"
+                    <Stack
+                        direction="row"
+                        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
                     >
-                        {__('Log Out')}
-                    </Link>
+                        <Button component={PostLink} href={route('logout')}>
+                            {__('Log Out')}
+                        </Button>
 
-                    <PrimaryButton disabled={processing}>
-                        {__('Save')}
-                    </PrimaryButton>
-                </div>
-            </form>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            disabled={form.processing}
+                        >
+                            {__('Save')}
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Stack>
         </GuestLayout>
     );
 }

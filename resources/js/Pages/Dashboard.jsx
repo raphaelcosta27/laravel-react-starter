@@ -1,28 +1,19 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
 import { useTranslations } from '@/lib/i18n';
+import { Head } from '@inertiajs/react';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
 export default function Dashboard() {
     const __ = useTranslations();
+
     return (
-        <AuthenticatedLayout
-            header={
-                <h1 className="text-xl font-semibold leading-tight text-gray-800">
-                    {__('Dashboard')}
-                </h1>
-            }
-        >
+        <AuthenticatedLayout title={__('Dashboard')}>
             <Head title={__('Dashboard')} />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            {__("You're logged in!")}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Paper sx={{ p: 3 }}>
+                <Typography>{__("You're logged in!")}</Typography>
+            </Paper>
         </AuthenticatedLayout>
     );
 }

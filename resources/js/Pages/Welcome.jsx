@@ -1,6 +1,10 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import TextLink from '@/Components/TextLink';
 import { useTranslations } from '@/lib/i18n';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 export default function Welcome({ canLogin, canRegister, status }) {
     const __ = useTranslations();
@@ -13,66 +17,75 @@ export default function Welcome({ canLogin, canRegister, status }) {
         <>
             <Head title={appName} />
 
-            <main className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-6 text-center">
-                <ApplicationLogo className="h-20 w-20" />
+            <Stack
+                component="main"
+                spacing={3}
+                sx={{
+                    alignItems: 'center',
+                    bgcolor: 'grey.100',
+                    justifyContent: 'center',
+                    minHeight: '100vh',
+                    p: 3,
+                    textAlign: 'center',
+                }}
+            >
+                <ApplicationLogo style={{ height: 80, width: 80 }} />
 
-                <h1 className="mt-6 text-3xl font-semibold text-gray-900">
+                <Typography component="h1" variant="h4">
                     {appName}
-                </h1>
+                </Typography>
 
-                <section
+                <Paper
+                    component="section"
                     aria-labelledby="application-status"
-                    className="mt-6 rounded-lg bg-white px-6 py-4 shadow"
+                    sx={{ px: 3, py: 2 }}
                 >
-                    <h2
+                    <Typography
                         id="application-status"
-                        className="font-medium text-gray-900"
+                        component="h2"
+                        variant="subtitle1"
                     >
                         {__('Application status')}
-                    </h2>
-                    <p className="mt-2 text-gray-700">
+                    </Typography>
+                    <Typography color="text.secondary">
                         {__(
                             status.database
                                 ? 'Database connected'
                                 : 'Database unavailable',
                         )}
-                    </p>
-                    <p className="mt-1 text-sm text-gray-700">
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
                         {__('Checked at')}{' '}
                         <time dateTime={status.checkedAt}>{checkedAt}</time>
-                    </p>
-                </section>
+                    </Typography>
+                </Paper>
 
-                <nav aria-label={appName} className="mt-6 flex gap-4">
+                <Stack
+                    component="nav"
+                    aria-label={appName}
+                    direction="row"
+                    spacing={2}
+                >
                     {auth.user ? (
-                        <Link
-                            href={route('dashboard')}
-                            className="text-gray-900 underline"
-                        >
+                        <TextLink href={route('dashboard')}>
                             {__('Dashboard')}
-                        </Link>
+                        </TextLink>
                     ) : (
                         <>
                             {canLogin && (
-                                <Link
-                                    href={route('login')}
-                                    className="text-gray-900 underline"
-                                >
+                                <TextLink href={route('login')}>
                                     {__('Log in')}
-                                </Link>
+                                </TextLink>
                             )}
                             {canRegister && (
-                                <Link
-                                    href={route('register')}
-                                    className="text-gray-900 underline"
-                                >
+                                <TextLink href={route('register')}>
                                     {__('Register')}
-                                </Link>
+                                </TextLink>
                             )}
                         </>
                     )}
-                </nav>
-            </main>
+                </Stack>
+            </Stack>
         </>
     );
 }

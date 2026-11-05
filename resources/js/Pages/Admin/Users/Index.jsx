@@ -1,7 +1,9 @@
 import ConfirmDialog from '@/Components/ConfirmDialog';
 import DataTable from '@/Components/DataTable/DataTable';
+import SelectField from '@/Components/SelectField';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
+import Button from '@mui/material/Button';
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
@@ -198,16 +200,10 @@ export default function Index({
     };
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h1 className="text-xl font-semibold leading-tight text-gray-800">
-                    {__('Users')}
-                </h1>
-            }
-        >
+        <AuthenticatedLayout title={__('Users')}>
             <Head title={__('Users')} />
 
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <>
                 <DataTable
                     tableKey="users"
                     caption={__('Users')}
@@ -223,12 +219,14 @@ export default function Index({
                     emptyMessage={__('No users found.')}
                     toolbar={
                         abilities?.create && (
-                            <Link
+                            <Button
+                                component={Link}
                                 href={route('admin.users.create')}
-                                className="rounded-md bg-gray-800 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                variant="contained"
+                                size="small"
                             >
                                 {__('New user')}
-                            </Link>
+                            </Button>
                         )
                     }
                 />
@@ -257,33 +255,25 @@ export default function Index({
                     onClose={() => setRestoring(null)}
                 >
                     {restoring?.profile_deleted && (
-                        <div className="mt-4">
-                            <label
-                                htmlFor="restore-profile"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                {__('New profile of the user')}
-                            </label>
-                            <select
-                                id="restore-profile"
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                value={restoreProfile}
-                                required
-                                onChange={(event) =>
-                                    setRestoreProfile(event.target.value)
-                                }
-                            >
-                                <option value="">{__('Select')}</option>
-                                {profiles.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        <SelectField
+                            id="restore-profile"
+                            label={__('New profile of the user')}
+                            sx={{ mt: 2 }}
+                            value={restoreProfile}
+                            onChange={(event) =>
+                                setRestoreProfile(event.target.value)
+                            }
+                        >
+                            <option value="">{__('Select')}</option>
+                            {profiles.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </SelectField>
                     )}
                 </ConfirmDialog>
-            </div>
+            </>
         </AuthenticatedLayout>
     );
 }
