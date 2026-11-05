@@ -33,10 +33,27 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'appName' => config('app.name'),
             'branding' => ['logo' => config('template.branding.logo')],
-            'auth' => [
-                'user' => rescue(fn () => $request->user(), null, false),
-            ],
+            'auth' => $this->auth($request),
+            'flash' => $request->hasSession() ? $request->session()->get('flash') : null,
             'translations' => app('translator')->getLoader()->load(app()->getLocale(), '*', '*'),
+        ];
+    }
+
+    /**
+     * Administradores recebem a lista vazia, pois têm acesso a qualquer código.
+     * Estas props servem somente para exibir ou ocultar elementos.
+     *
+     * @return array<string, mixed>
+     */
+    private function auth(Request $request): array
+    {
+        $user = rescue(fn () => $request->user(), null, false);
+        $isAdministrator = rescue(fn () => $user?->isAdministrator() ?? false, false, false);
+
+        return [
+            'user' => $user,
+            'isAdministrator' => $isAdministrator,
+            'permissions' => $isAdministrator ? [] : rescue(fn () => $user?->effectivePermissions() ?? [], [], false),
         ];
     }
 }

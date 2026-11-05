@@ -84,6 +84,32 @@ class CreateUserTest extends TestCase
         Notification::assertNothingSent();
     }
 
+    public function test_send_failure_is_informed_to_the_caller(): void
+    {
+        Exceptions::fake();
+        Notification::shouldReceive('send')->andThrow(new RuntimeException('Falha no servidor de e-mail'));
+
+        $this->assertTrue($this->create()->emailFailed);
+    }
+
+    public function test_successful_send_is_not_flagged(): void
+    {
+        Notification::fake();
+
+        $this->assertFalse($this->create()->emailFailed);
+    }
+
+    public function test_email_of_a_deleted_account_is_informed_as_reactivation(): void
+    {
+        Notification::fake();
+        User::factory()->create(['email' => 'ana@example.com'])->delete();
+
+        $user = $this->create();
+
+        $this->assertTrue($user->wasReactivated);
+        $this->assertSame(1, User::withTrashed()->count());
+    }
+
     public function test_send_failure_keeps_the_user_and_is_reported(): void
     {
         Exceptions::fake();

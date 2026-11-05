@@ -7,6 +7,7 @@ use App\Models\User;
 use Closure;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class AppCreateUser extends Command
@@ -26,8 +27,17 @@ class AppCreateUser extends Command
         $name = $this->askUntilValid(fn () => $this->ask(__('Name')), 'name', ['required', 'string', 'max:255']);
 
         $email = $this->askUntilValid(fn () => $this->ask(__('Email')), 'email', [
-            'required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class,
+            'required', 'string', 'lowercase', 'email', 'max:255',
+            Rule::unique(User::class)->whereNull('deleted_at'),
         ]);
+
+        if (User::onlyTrashed()->where('email', $email)->exists()) {
+            $createUser->handle($name, $email);
+
+            $this->info(__('The deleted account of :email was reactivated. Check the access email.', ['email' => $email]));
+
+            return self::SUCCESS;
+        }
 
         $createUser->verified($name, $email, $this->askPassword());
 

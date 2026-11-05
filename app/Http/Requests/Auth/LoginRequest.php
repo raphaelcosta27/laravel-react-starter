@@ -42,14 +42,24 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $expired = false;
+        $refusal = 'auth.failed';
 
         $authenticated = Auth::attemptWhen(
             $this->only('email', 'password'),
-            function ($user) use (&$expired) {
-                $expired = $user->temporaryPasswordExpired();
+            function ($user) use (&$refusal) {
+                if (! $user->is_active) {
+                    $refusal = 'auth.inactive';
 
-                return ! $expired;
+                    return false;
+                }
+
+                if ($user->temporaryPasswordExpired()) {
+                    $refusal = 'auth.temporary_password_expired';
+
+                    return false;
+                }
+
+                return true;
             },
             $this->boolean('remember'),
         );
@@ -57,9 +67,7 @@ class LoginRequest extends FormRequest
         if (! $authenticated) {
             RateLimiter::hit($this->throttleKey());
 
-            throw ValidationException::withMessages([
-                'email' => trans($expired ? 'auth.temporary_password_expired' : 'auth.failed'),
-            ]);
+            throw ValidationException::withMessages(['email' => trans($refusal)]);
         }
 
         RateLimiter::clear($this->throttleKey());

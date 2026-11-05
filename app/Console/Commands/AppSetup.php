@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Actions\CreateUser;
 use App\Models\User;
+use Database\Seeders\AdminPanelSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Database\QueryException;
 use Throwable;
@@ -39,6 +40,8 @@ class AppSetup extends Command
             return self::FAILURE;
         }
 
+        $this->callSilently('db:seed', ['--class' => AdminPanelSeeder::class, '--force' => true]);
+
         $this->info(__('Database ready.'));
 
         $this->createInitialUser($createUser);
@@ -56,7 +59,7 @@ class AppSetup extends Command
             return;
         }
 
-        if (User::where('email', $email)->exists()) {
+        if (User::withTrashed()->where('email', $email)->exists()) {
             $this->info(__('Initial user already exists and was kept.'));
 
             return;

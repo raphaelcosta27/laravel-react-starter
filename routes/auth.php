@@ -45,7 +45,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
-Route::middleware(['auth', 'auth.session', 'temporary.password'])->group(function () {
+Route::middleware(['auth', 'auth.session', 'account.active', 'temporary.password'])->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');
 
@@ -62,7 +62,7 @@ Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-Route::middleware(['auth', 'auth.session', 'temporary.password', 'verified'])->group(function () {
+Route::middleware(['auth', 'auth.session', 'account.active', 'temporary.password', 'verified'])->group(function () {
     Route::get('password/change', [PasswordController::class, 'edit'])
         ->name('password.change');
 

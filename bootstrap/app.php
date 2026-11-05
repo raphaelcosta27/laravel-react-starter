@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureApplicationIsConfigured;
 use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\EnsureRegistrationEnabled;
 use App\Http\Middleware\EnsureTemporaryPasswordValid;
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'account.active' => EnsureUserIsActive::class,
             'password.changed' => EnsurePasswordChanged::class,
             'registration.enabled' => EnsureRegistrationEnabled::class,
             'temporary.password' => EnsureTemporaryPasswordValid::class,
@@ -37,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->group('account.ready', [
             'auth',
             'auth.session',
+            'account.active',
             'temporary.password',
             'verified',
             'password.changed',

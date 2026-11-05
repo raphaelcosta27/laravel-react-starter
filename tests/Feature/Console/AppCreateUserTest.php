@@ -39,6 +39,25 @@ class AppCreateUserTest extends TestCase
         return $this->answer($command, 'Confirm Password', 'senha-segura');
     }
 
+    public function test_reactivates_a_deleted_account_without_asking_for_a_password(): void
+    {
+        $user = User::factory()->create(['email' => 'ana@example.com']);
+        $user->delete();
+
+        $command = $this->command();
+        $this->answer($command, 'Name', 'Ana Nova');
+        $this->answer($command, 'Email', 'ana@example.com');
+
+        $command->expectsOutputToContain('ana@example.com')->assertSuccessful();
+        $command->run();
+
+        $fresh = User::find($user->id);
+
+        $this->assertSame('Ana Nova', $fresh->name);
+        $this->assertNull($fresh->email_verified_at);
+        $this->assertSame(1, User::withTrashed()->count());
+    }
+
     public function test_creates_user_with_verified_email(): void
     {
         $this->freezeSecond();

@@ -40,6 +40,34 @@ class RouteCoverageTest extends TestCase
         }
     }
 
+    public function test_panel_routes_require_a_released_account_and_a_permission(): void
+    {
+        $routes = collect(Route::getRoutes())->filter(
+            fn ($route) => str_starts_with((string) $route->getName(), 'admin.'),
+        );
+
+        $this->assertNotEmpty($routes);
+
+        foreach ($routes as $route) {
+            $middleware = $route->gatherMiddleware();
+
+            $this->assertContains('account.ready', $middleware, $route->getName());
+            $this->assertNotEmpty(
+                array_filter($middleware, fn ($item) => is_string($item) && str_starts_with($item, 'can:')),
+                "A rota [{$route->getName()}] deve exigir uma permissão.",
+            );
+        }
+    }
+
+    public function test_inactive_accounts_are_checked(): void
+    {
+        foreach (['verification.notice', 'verification.verify', 'verification.send', 'password.change', 'password.update'] as $name) {
+            $this->assertContains('account.active', Route::getRoutes()->getByName($name)->gatherMiddleware(), $name);
+        }
+
+        $this->assertContains('account.active', app(Kernel::class)->getMiddlewareGroups()['account.ready']);
+    }
+
     public function test_temporary_password_validity_is_checked(): void
     {
         foreach (['verification.notice', 'verification.verify', 'verification.send', 'password.change', 'password.update'] as $name) {

@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\Setup;
 
+use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -53,6 +55,33 @@ class AppSetupTest extends TestCase
 
         $this->assertSame(1, User::count());
         $this->assertTrue(User::first()->is($user));
+    }
+
+    public function test_runs_the_seeder_before_the_initial_user(): void
+    {
+        Notification::fake();
+        config(['template.initial_user.email' => 'admin@example.com']);
+
+        $this->artisan('app:setup')->assertSuccessful();
+
+        $this->assertSame(20, Permission::count());
+        $this->assertTrue(User::firstWhere('email', 'admin@example.com')->isAdministrator());
+    }
+
+    public function test_repeating_does_not_recreate_a_deleted_initial_user(): void
+    {
+        Notification::fake();
+        config(['template.initial_user.email' => 'admin@example.com']);
+
+        $this->artisan('app:setup')->assertSuccessful();
+
+        $user = User::firstWhere('email', 'admin@example.com');
+        $user->delete();
+
+        $this->artisan('app:setup')->assertSuccessful();
+
+        $this->assertSoftDeleted($user);
+        $this->assertSame(1, User::withTrashed()->count());
     }
 
     public function test_generates_key_when_empty(): void

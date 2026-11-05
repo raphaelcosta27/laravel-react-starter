@@ -30,7 +30,7 @@ class AccessRequestController extends Controller
 
         $user = User::firstWhere('email', $request->email);
 
-        if ($user?->temporaryPasswordExpired()) {
+        if ($user?->is_active && $user->temporaryPasswordExpired()) {
             $issueTemporaryPassword->handle($user);
         }
 

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -41,6 +42,36 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'must_change_password' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the user is inactive.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
+    }
+
+    /**
+     * Indicate that the user has the master profile.
+     */
+    public function administrator(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'profile_id' => Profile::administrator()->id,
+        ]);
+    }
+
+    /**
+     * Indicate the profile of the user.
+     */
+    public function withProfile(Profile $profile): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'profile_id' => $profile->id,
         ]);
     }
 
