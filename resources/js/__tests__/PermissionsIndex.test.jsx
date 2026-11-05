@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { axe } from 'jest-axe';
 import { beforeEach, describe, expect, test } from 'vitest';
 import translations from '../../../lang/pt_BR.json';
+import { expectDescribedActions } from './helpers/actions';
 import { setPageProps } from './helpers/inertia';
 
 const meta = { currentPage: 1, lastPage: 1, perPage: 25, total: 1 };
@@ -49,6 +50,12 @@ describe('ações da listagem de permissões', () => {
         page({});
 
         expect(screen.queryByRole('link', { name: 'Nova permissão' })).toBeNull();
+    });
+
+    test('toda ação tem ícone e descrição', () => {
+        page({ update: true, delete: true, restore: true });
+
+        expectDescribedActions();
     });
 
     test('exibe editar e excluir conforme o can do registro', () => {

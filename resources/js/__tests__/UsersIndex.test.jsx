@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { axe } from 'jest-axe';
 import { beforeEach, describe, expect, test } from 'vitest';
 import translations from '../../../lang/pt_BR.json';
+import { expectDescribedActions } from './helpers/actions';
 import { setPageProps } from './helpers/inertia';
 
 const meta = { currentPage: 1, lastPage: 1, perPage: 25, total: 1 };
@@ -73,6 +74,12 @@ describe('ações da listagem de usuários', () => {
         expect(screen.queryByRole('link', { name: 'Novo usuário' })).toBeNull();
     });
 
+    test('toda ação tem ícone e descrição', () => {
+        page({ update: true, permissions: true, passwordChange: true, authenticationEmail: true, delete: true, restore: true });
+
+        expectDescribedActions();
+    });
+
     test('editar aparece conforme o can do registro', () => {
         page({ update: true });
 
@@ -126,8 +133,7 @@ describe('ações da listagem de usuários', () => {
     const openMenu = () => {
         const trigger = screen.getByRole('button', { name: 'Mais ações' });
 
-        trigger.focus();
-        fireEvent.keyDown(trigger, { key: 'Enter' });
+        fireEvent.click(trigger);
     };
 
     test('solicitar troca de senha pede confirmação', async () => {

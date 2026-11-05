@@ -3,6 +3,12 @@ import DataTable from '@/Components/DataTable/DataTable';
 import SelectField from '@/Components/SelectField';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import KeyIcon from '@mui/icons-material/Key';
+import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
+import PasswordIcon from '@mui/icons-material/Password';
+import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import Button from '@mui/material/Button';
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
@@ -90,18 +96,24 @@ export default function Index({
             {
                 key: 'edit',
                 label: __('Edit'),
+                description: __('Opens the form to change this user.'),
+                icon: EditIcon,
                 href: (row) => route('admin.users.edit', row.id),
                 visible: (row) => row.can.update,
             },
             {
                 key: 'permissions',
                 label: __('Permissions'),
+                description: __('Manages the individual permissions of this user.'),
+                icon: KeyIcon,
                 href: (row) => route('admin.users.permissions', row.id),
                 visible: (row) => row.can.permissions,
             },
             {
                 key: 'password-change',
                 label: __('Request password change'),
+                description: __('Sends a temporary password and requires a new one.'),
+                icon: PasswordIcon,
                 menu: true,
                 visible: (row) => row.can.passwordChange,
                 confirm: (row) => ({
@@ -118,6 +130,8 @@ export default function Index({
             {
                 key: 'authentication-email',
                 label: __('Send authentication email'),
+                description: __('Sends a new temporary password and confirmation link.'),
+                icon: MailOutlinedIcon,
                 menu: true,
                 visible: (row) => row.can.authenticationEmail,
                 confirm: (row) => ({
@@ -134,6 +148,8 @@ export default function Index({
             {
                 key: 'delete',
                 label: __('Delete'),
+                description: __('Moves this user to the deleted records.'),
+                icon: DeleteOutlinedIcon,
                 variant: 'danger',
                 visible: (row) => row.can.delete,
                 confirm: (row) => ({
@@ -148,6 +164,8 @@ export default function Index({
             {
                 key: 'restore',
                 label: __('Restore'),
+                description: __('Brings this user back from the deleted records.'),
+                icon: RestoreFromTrashIcon,
                 visible: (row) => row.can.restore,
                 onClick: (row) => {
                     setRestoreProfile('');

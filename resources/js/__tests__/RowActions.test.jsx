@@ -1,5 +1,6 @@
 import RowActions from '@/Components/DataTable/RowActions';
-import { fireEvent, render, screen } from '@testing-library/react';
+import EditIcon from '@mui/icons-material/Edit';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { axe } from 'jest-axe';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import translations from '../../../lang/pt_BR.json';
@@ -7,8 +8,21 @@ import { setPageProps } from './helpers/inertia';
 
 const row = { id: 1, name: 'Ana' };
 
-const actions = (props = {}) =>
-    render(<RowActions row={row} label="Ações de Ana" {...props} />);
+const complete = (action) => ({
+    icon: EditIcon,
+    description: `Descrição de ${action.label}`,
+    ...action,
+});
+
+const actions = ({ actions: list = [], ...props } = {}) =>
+    render(
+        <RowActions
+            row={row}
+            label="Ações de Ana"
+            actions={list.map(complete)}
+            {...props}
+        />,
+    );
 
 describe('RowActions', () => {
     beforeEach(() => setPageProps({ translations }));
@@ -96,7 +110,7 @@ describe('RowActions', () => {
         });
 
         expect(screen.getByRole('button', { name: 'Excluir' }).className).toContain(
-            'text-red',
+            'MuiIconButton-colorError',
         );
     });
 
@@ -114,8 +128,7 @@ describe('RowActions', () => {
 
         const trigger = screen.getByRole('button', { name: 'Mais ações' });
 
-        trigger.focus();
-        fireEvent.keyDown(trigger, { key: 'Enter' });
+        fireEvent.click(trigger);
 
         const item = await screen.findByRole('menuitem', { name: 'Reenviar' });
 
@@ -139,8 +152,7 @@ describe('RowActions', () => {
 
         const trigger = screen.getByRole('button', { name: 'Mais ações' });
 
-        trigger.focus();
-        fireEvent.keyDown(trigger, { key: 'Enter' });
+        fireEvent.click(trigger);
         fireEvent.click(await screen.findByRole('menuitem', { name: 'Reenviar' }));
 
         const dialog = await screen.findByRole('dialog');
@@ -148,6 +160,74 @@ describe('RowActions', () => {
         await new Promise((resolve) => setTimeout(resolve, 150));
 
         expect(dialog.contains(document.activeElement)).toBe(true);
+    });
+
+    test('as ações em linha são ícones com descrição', () => {
+        actions({ actions: [{ key: 'a', label: 'Editar', onClick: () => {} }] });
+
+        const button = screen.getByRole('button', { name: 'Editar' });
+
+        expect(button.querySelector('svg')).toBeTruthy();
+        expect(button.textContent).toBe('');
+        expect(
+            document.getElementById(button.getAttribute('aria-describedby'))
+                .textContent,
+        ).toBe('Descrição de Editar');
+    });
+
+    test('os itens do menu trazem ícone, título e descrição', async () => {
+        actions({
+            actions: [
+                { key: 'a', label: 'Reenviar', onClick: () => {}, menu: true },
+            ],
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Mais ações' }));
+
+        const item = await screen.findByRole('menuitem', { name: 'Reenviar' });
+
+        expect(item.querySelector('svg')).toBeTruthy();
+        expect(within(item).getByText('Descrição de Reenviar')).toBeTruthy();
+        expect(
+            document.getElementById(item.getAttribute('aria-describedby'))
+                .textContent,
+        ).toBe('Descrição de Reenviar');
+    });
+
+    test('"Mais ações" é um ícone que informa o menu', () => {
+        actions({
+            actions: [
+                { key: 'a', label: 'Reenviar', onClick: () => {}, menu: true },
+            ],
+        });
+
+        const trigger = screen.getByRole('button', { name: 'Mais ações' });
+
+        expect(trigger.querySelector('svg')).toBeTruthy();
+        expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+        expect(trigger.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    test('item desabilitado do menu não executa', async () => {
+        const onClick = vi.fn();
+
+        actions({
+            actions: [
+                {
+                    key: 'a',
+                    label: 'Reenviar',
+                    onClick,
+                    menu: true,
+                    disabled: () => true,
+                },
+            ],
+        });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Mais ações' }));
+
+        const item = await screen.findByRole('menuitem', { name: 'Reenviar' });
+
+        expect(item.getAttribute('aria-disabled')).toBe('true');
     });
 
     test('sem ações visíveis nada é exibido', () => {

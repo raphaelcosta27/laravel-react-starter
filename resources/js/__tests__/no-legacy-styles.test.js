@@ -10,7 +10,6 @@ const LEGACY = /className=|@headlessui/;
 const PENDING = [
     'Components/Checkbox.jsx',
     'Components/DangerButton.jsx',
-    'Components/DataTable/RowActions.jsx',
     'Components/Dropdown.jsx',
     'Components/InputError.jsx',
     'Components/InputLabel.jsx',

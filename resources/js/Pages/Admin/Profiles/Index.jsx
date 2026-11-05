@@ -1,6 +1,10 @@
 import DataTable from '@/Components/DataTable/DataTable';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import GroupIcon from '@mui/icons-material/Group';
+import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -54,18 +58,24 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
             {
                 key: 'users',
                 label: __('View Users'),
+                description: __('Lists the users of this profile.'),
+                icon: GroupIcon,
                 href: (row) => route('admin.profiles.users', row.id),
                 visible: (row) => row.can.users,
             },
             {
                 key: 'edit',
                 label: __('Edit'),
+                description: __('Opens the form to change this profile.'),
+                icon: EditIcon,
                 href: (row) => route('admin.profiles.edit', row.id),
                 visible: (row) => row.can.update,
             },
             {
                 key: 'delete',
                 label: __('Delete'),
+                description: __('Moves this profile to the deleted records.'),
+                icon: DeleteOutlinedIcon,
                 variant: 'danger',
                 visible: (row) => row.can.delete,
                 confirm: (row) => ({
@@ -80,6 +90,8 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
             {
                 key: 'restore',
                 label: __('Restore'),
+                description: __('Brings this profile back from the deleted records.'),
+                icon: RestoreFromTrashIcon,
                 visible: (row) => row.can.restore,
                 confirm: (row) => ({
                     title: __('Restore profile'),

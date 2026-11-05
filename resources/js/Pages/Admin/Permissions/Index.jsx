@@ -1,6 +1,9 @@
 import DataTable from '@/Components/DataTable/DataTable';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import EditIcon from '@mui/icons-material/Edit';
+import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import Button from '@mui/material/Button';
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo } from 'react';
@@ -47,12 +50,16 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
             {
                 key: 'edit',
                 label: __('Edit'),
+                description: __('Opens the form to change this permission.'),
+                icon: EditIcon,
                 href: (row) => route('admin.permissions.edit', row.id),
                 visible: (row) => row.can.update,
             },
             {
                 key: 'delete',
                 label: __('Delete'),
+                description: __('Moves this permission to the deleted records.'),
+                icon: DeleteOutlinedIcon,
                 variant: 'danger',
                 visible: (row) => row.can.delete,
                 confirm: (row) => ({
@@ -67,6 +74,8 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
             {
                 key: 'restore',
                 label: __('Restore'),
+                description: __('Brings this permission back from the deleted records.'),
+                icon: RestoreFromTrashIcon,
                 visible: (row) => row.can.restore,
                 confirm: (row) => ({
                     title: __('Restore permission'),

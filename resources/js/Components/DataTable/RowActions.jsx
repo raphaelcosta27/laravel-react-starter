@@ -1,26 +1,25 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import ConfirmDialog from '@/Components/ConfirmDialog';
 import { useTranslations } from '@/lib/i18n';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { Link } from '@inertiajs/react';
-import { useState } from 'react';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Box from '@mui/material/Box';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useId, useState } from 'react';
 
-const baseClass =
-    'rounded px-2 py-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50';
-
-const variants = {
-    default: 'text-indigo-700 hover:text-indigo-900',
-    danger: 'text-red-700 hover:text-red-900',
-};
-
-const menuItemClass =
-    'block w-full px-4 py-2 text-start text-sm data-[focus]:bg-gray-100 data-[disabled]:opacity-50';
+const COLORS = { default: 'default', danger: 'error' };
 
 const resolve = (value, row) =>
     typeof value === 'function' ? value(row) : value;
 
 export default function RowActions({ row, actions = [], label }) {
     const __ = useTranslations();
+    const menuId = useId();
     const [pending, setPending] = useState(null);
+    const [anchor, setAnchor] = useState(null);
 
     const visible = actions.filter((action) => action.visible?.(row) ?? true);
 
@@ -29,6 +28,8 @@ export default function RowActions({ row, actions = [], label }) {
     }
 
     const run = (action) => {
+        setAnchor(null);
+
         if (action.confirm) {
             setPending(action);
 
@@ -43,72 +44,77 @@ export default function RowActions({ row, actions = [], label }) {
         setPending(null);
     };
 
-    const className = (action) =>
-        `${baseClass} ${variants[action.variant ?? 'default']}`;
-
+    const color = (action) => COLORS[action.variant ?? 'default'];
     const inline = visible.filter((action) => !action.menu);
     const grouped = visible.filter((action) => action.menu);
     const details = pending ? resolve(pending.confirm, row) : null;
 
     return (
-        <div role="group" aria-label={label} className="flex items-center gap-1">
-            {inline.map((action) =>
-                action.href ? (
-                    <Link
-                        key={action.key}
-                        href={action.href(row)}
-                        className={className(action)}
-                    >
-                        {action.label}
-                    </Link>
-                ) : (
-                    <button
-                        key={action.key}
-                        type="button"
-                        className={className(action)}
-                        disabled={action.disabled?.(row) ?? false}
-                        onClick={() => run(action)}
-                    >
-                        {action.label}
-                    </button>
-                ),
-            )}
+        <Box
+            role="group"
+            aria-label={label}
+            sx={{ alignItems: 'center', display: 'flex', gap: 0.5 }}
+        >
+            {inline.map((action) => (
+                <ActionIconButton
+                    key={action.key}
+                    icon={action.icon}
+                    label={action.label}
+                    description={action.description}
+                    color={color(action)}
+                    disabled={action.disabled?.(row) ?? false}
+                    {...(action.href
+                        ? { href: action.href(row) }
+                        : { onClick: () => run(action) })}
+                />
+            ))}
 
             {grouped.length > 0 && (
-                <Menu>
-                    <MenuButton className={`${baseClass} ${variants.default}`}>
-                        {__('More actions')}
-                    </MenuButton>
+                <>
+                    <ActionIconButton
+                        icon={MoreVertIcon}
+                        label={__('More actions')}
+                        description={__('Shows the other actions of this record.')}
+                        aria-haspopup="menu"
+                        aria-expanded={anchor !== null}
+                        onClick={(event) => setAnchor(event.currentTarget)}
+                    />
 
-                    <MenuItems
-                        anchor="bottom end"
-                        className="z-20 min-w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg focus:outline-none"
+                    <Menu
+                        anchorEl={anchor}
+                        open={anchor !== null}
+                        onClose={() => setAnchor(null)}
                     >
-                        {grouped.map((action) => (
-                            <MenuItem
-                                key={action.key}
-                                disabled={action.disabled?.(row) ?? false}
-                            >
-                                {action.href ? (
-                                    <Link
-                                        href={action.href(row)}
-                                        className={menuItemClass}
-                                    >
-                                        {action.label}
-                                    </Link>
-                                ) : (
-                                    <button
-                                        type="button"
-                                        className={`${menuItemClass} ${variants[action.variant ?? 'default']}`}
-                                        onClick={() => run(action)}
-                                    >
-                                        {action.label}
-                                    </button>
-                                )}
-                            </MenuItem>
-                        ))}
-                    </MenuItems>
-                </Menu>
+                        {grouped.map((action) => {
+                            const Icon = action.icon;
+                            const descriptionId = `${menuId}-${action.key}`;
+
+                            return (
+                                <MenuItem
+                                    key={action.key}
+                                    disabled={action.disabled?.(row) ?? false}
+                                    aria-label={action.label}
+                                    aria-describedby={descriptionId}
+                                    {...(action.href
+                                        ? { component: Link, href: action.href(row) }
+                                        : { onClick: () => run(action) })}
+                                >
+                                    <ListItemIcon>
+                                        <Icon fontSize="small" color={color(action) === 'error' ? 'error' : 'inherit'} />
+                                    </ListItemIcon>
+
+                                    <ListItemText
+                                        primary={action.label}
+                                        secondary={action.description}
+                                        slotProps={{
+                                            secondary: { id: descriptionId },
+                                        }}
+                                    />
+                                </MenuItem>
+                            );
+                        })}
+                    </Menu>
+                </>
             )}
 
             <ConfirmDialog
@@ -119,6 +125,6 @@ export default function RowActions({ row, actions = [], label }) {
                 onConfirm={confirm}
                 onClose={() => setPending(null)}
             />
-        </div>
+        </Box>
     );
 }

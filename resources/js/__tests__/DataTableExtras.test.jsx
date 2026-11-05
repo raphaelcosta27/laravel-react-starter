@@ -1,6 +1,7 @@
 import DataTable from '@/Components/DataTable/DataTable';
 import ToggleCell from '@/Components/DataTable/ToggleCell';
 import { router } from '@inertiajs/react';
+import EditIcon from '@mui/icons-material/Edit';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { axe } from 'jest-axe';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
@@ -214,7 +215,7 @@ describe('recursos completos do DataTable', () => {
         table({
             bulkActions: [{ key: 'a', label: 'Agir', onClick: () => {} }],
             renderDetail: (row) => <p>{row.name}</p>,
-            rowActions: () => [{ key: 'x', label: 'Ver', onClick: () => {} }],
+            rowActions: () => [{ key: 'x', label: 'Ver', icon: EditIcon, onClick: () => {} }],
         });
 
         const headers = screen.getAllByRole('columnheader');
