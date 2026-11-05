@@ -1,5 +1,6 @@
 {
     ":column of :name": ":column de :name",
+    ":count log file(s) deleted. Retention: :days days.": ":count arquivo(s) de log apagado(s). Prazo: :days dias.",
     ":count records": ":count registros",
     ":count selected": ":count selecionado(s)",
     "A new temporary password and link will be sent to :name.": "Uma nova senha temporária e um novo link serão enviados a :name.",
@@ -49,6 +50,7 @@
     "Contains": "Contém",
     "Copy .env.example to .env and run composer setup.": "Copie .env.example para .env e execute composer setup.",
     "Could not apply the migrations: :message": "Não foi possível aplicar as migrações: :message",
+    "Could not delete :file.": "Não foi possível apagar :file.",
     "Could not reach the database. Check if MySQL is running and review DB_HOST, DB_PORT, DB_USERNAME and DB_PASSWORD in .env.": "Não foi possível acessar o banco de dados. Verifique se o MySQL está em execução e confira DB_HOST, DB_PORT, DB_USERNAME e DB_PASSWORD no .env.",
     "Could not reach the server. Check your connection and try again.": "Não foi possível acessar o servidor. Verifique sua conexão e tente novamente.",
     "Could not save. Try again.": "Não foi possível salvar. Tente novamente.",
@@ -115,6 +117,7 @@
     "Initial user already exists and was kept.": "O usuário inicial já existe e foi mantido.",
     "Initial user created. Check the email sent to :email.": "Usuário inicial criado. Confira o e-mail enviado para :email.",
     "Initial user not created: set INITIAL_USER_EMAIL in .env.": "Usuário inicial não criado: defina INITIAL_USER_EMAIL no .env.",
+    "Invalid LOG_DAILY_DAYS value. Using the default retention.": "Valor inválido em LOG_DAILY_DAYS. Usando o prazo padrão.",
     "Is": "É igual a",
     "Is empty": "Está vazio",
     "Is not": "É diferente de",

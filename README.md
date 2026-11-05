@@ -29,7 +29,7 @@ the initial user. It can be run again without losing data. `composer dev` serves
 
 ## First access
 
-By default, emails are not sent. They are written to `storage/logs/laravel.log`.
+By default, emails are not sent. They are written to the log file of the day, such as `storage/logs/laravel-2026-11-05.log`.
 
 1. Open the log and copy the temporary password and the link from the welcome email for `admin@example.com`.
 2. Open the link and sign in with the temporary password.
@@ -83,8 +83,29 @@ Everything that varies between projects lives in `.env`. The main options:
 | `ADMIN_EMAIL_THROTTLE` | `3` | Panel emails per target user, per window |
 | `ADMIN_EMAIL_THROTTLE_MINUTES` | `10` | Length of that window, in minutes |
 | `EXPORT_CSV_DELIMITER` | `;` | Column separator of exported CSV files |
+| `LOG_DAILY_DAYS` | `14` | Days log files are kept |
 
 Interface texts live in `lang/pt_BR.json` and `lang/pt_BR/`. The full list of options is in `.env.example`.
+
+## Logs
+
+Each day has its own file in `storage/logs`, named `laravel-YYYY-MM-DD.log`. The day follows the timezone in
+`config/app.php`, which is UTC by default. `php artisan app:clean-logs` deletes the files older than
+`LOG_DAILY_DAYS`. Only files with that exact name are deleted.
+
+The command runs every day through the Laravel scheduler, which must be active on the server. Run it with the
+same user as the web server: otherwise, the site may lose permission to write to the file of the day.
+
+On Linux, add this line to the crontab of that user:
+
+```bash
+* * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+On Windows, create a Task Scheduler task that runs `php artisan schedule:run` every minute, in the project folder.
+
+Existing installations must change `LOG_STACK=single` to `LOG_STACK=daily` in their `.env`. A previous
+`laravel.log` is neither moved nor deleted.
 
 ## Account rules
 

@@ -25,7 +25,7 @@ inicial. Ele pode ser repetido sem perder dados. O `composer dev` sobe a aplica�
 
 ## Primeiro acesso
 
-Por padrão, os e-mails não são enviados: eles ficam em `storage/logs/laravel.log`.
+Por padrão, os e-mails não são enviados: eles ficam no arquivo de log do dia, como `storage/logs/laravel-2026-11-05.log`.
 
 1. Abra o log e copie a senha temporária e o link do e-mail de boas-vindas de `admin@example.com`.
 2. Abra o link e entre com a senha temporária.
@@ -78,8 +78,30 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `ADMIN_EMAIL_THROTTLE` | `3` | E-mails do painel por usuário de destino, por janela |
 | `ADMIN_EMAIL_THROTTLE_MINUTES` | `10` | Duração dessa janela, em minutos |
 | `EXPORT_CSV_DELIMITER` | `;` | Separador de colunas do CSV exportado |
+| `LOG_DAILY_DAYS` | `14` | Dias de guarda dos arquivos de log |
 
 Os textos ficam em `lang/pt_BR.json` e `lang/pt_BR/`. A lista completa de opções está em `.env.example`.
+
+## Logs
+
+Cada dia tem um arquivo próprio em `storage/logs`, com o nome `laravel-AAAA-MM-DD.log`. O dia segue o fuso de
+`config/app.php`, que é UTC por padrão. O comando `php artisan app:clean-logs` apaga os arquivos com mais de
+`LOG_DAILY_DAYS` dias. Somente arquivos com esse nome exato são apagados.
+
+O comando roda todo dia pelo agendador do Laravel, que precisa estar ativo no servidor. Use o mesmo usuário do
+servidor web: caso contrário, o site pode perder a permissão de escrita no arquivo do dia.
+
+No Linux, adicione esta linha ao crontab desse usuário:
+
+```bash
+* * * * * cd /caminho/do/projeto && php artisan schedule:run >> /dev/null 2>&1
+```
+
+No Windows, crie uma tarefa no Agendador de Tarefas que rode `php artisan schedule:run` a cada minuto, na pasta
+do projeto.
+
+Instalações existentes precisam trocar `LOG_STACK=single` por `LOG_STACK=daily` no próprio `.env`. Um
+`laravel.log` anterior não é movido nem apagado.
 
 ## Regras de contas
 

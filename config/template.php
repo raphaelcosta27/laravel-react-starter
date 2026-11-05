@@ -23,6 +23,13 @@ return [
     ],
 
     /*
+    | Dias de guarda dos arquivos de log. Vazio ou inválido usa 14 dias.
+    */
+    'logs' => [
+        'retention_days' => env('LOG_DAILY_DAYS'),
+    ],
+
+    /*
     | Usuário criado por "php artisan app:setup".
     */
     'initial_user' => [
