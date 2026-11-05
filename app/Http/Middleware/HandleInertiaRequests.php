@@ -32,7 +32,11 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'appName' => config('app.name'),
-            'branding' => ['logo' => config('template.branding.logo')],
+            'branding' => [
+                'logo' => config('template.branding.logo'),
+                'primaryColor' => $this->color(config('template.branding.primary_color')),
+                'secondaryColor' => $this->color(config('template.branding.secondary_color')),
+            ],
             'auth' => $this->auth($request),
             'flash' => $request->hasSession() ? $request->session()->get('flash') : null,
             'translations' => app('translator')->getLoader()->load(app()->getLocale(), '*', '*'),
@@ -55,5 +59,13 @@ class HandleInertiaRequests extends Middleware
             'isAdministrator' => $isAdministrator,
             'permissions' => $isAdministrator ? [] : rescue(fn () => $user?->effectivePermissions() ?? [], [], false),
         ];
+    }
+
+    /**
+     * Sem uma cor hexadecimal válida, o tema usa o próprio padrão.
+     */
+    private function color(mixed $value): ?string
+    {
+        return is_string($value) && preg_match('/^#[0-9a-fA-F]{6}$/', $value) === 1 ? $value : null;
     }
 }

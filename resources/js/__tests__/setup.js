@@ -7,6 +7,8 @@ expect.extend(toHaveNoViolations);
 
 vi.mock('@inertiajs/react', () => import('./helpers/inertia'));
 
+document.hasFocus = () => true;
+
 globalThis.ResizeObserver ??= class {
     observe() {}
     unobserve() {}

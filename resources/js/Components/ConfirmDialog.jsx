@@ -1,9 +1,11 @@
-import DangerButton from '@/Components/DangerButton';
-import Modal from '@/Components/Modal';
-import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
 import { useTranslations } from '@/lib/i18n';
-import { useEffect, useRef } from 'react';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { useId } from 'react';
 
 export default function ConfirmDialog({
     show,
@@ -17,59 +19,42 @@ export default function ConfirmDialog({
     children,
 }) {
     const __ = useTranslations();
-    const panel = useRef(null);
-    const ConfirmButton = danger ? DangerButton : PrimaryButton;
-
-    /**
-     * Um menu que acabou de fechar devolve o foco ao próprio botão depois que o
-     * diálogo abriu. Quem usa o teclado precisa continuar dentro do diálogo.
-     */
-    useEffect(() => {
-        if (!show) {
-            return undefined;
-        }
-
-        const keepFocusInside = () => {
-            if (panel.current && !panel.current.contains(document.activeElement)) {
-                panel.current.querySelector('button')?.focus();
-            }
-        };
-
-        const timer = setTimeout(keepFocusInside, 100);
-
-        document.addEventListener('focusin', keepFocusInside);
-
-        return () => {
-            clearTimeout(timer);
-            document.removeEventListener('focusin', keepFocusInside);
-        };
-    }, [show]);
+    const titleId = useId();
 
     return (
-        <Modal show={show} label={title} maxWidth="md" onClose={onClose}>
-            <div ref={panel} className="p-6">
-                <h2 className="text-lg font-medium text-gray-900">{title}</h2>
+        <Dialog
+            open={show}
+            onClose={onClose}
+            aria-labelledby={titleId}
+            maxWidth="sm"
+            fullWidth
+        >
+            <DialogTitle id={titleId}>{title}</DialogTitle>
 
-                {message && (
-                    <p className="mt-2 text-sm text-gray-600">{message}</p>
-                )}
+            {(message || children) && (
+                <DialogContent>
+                    {message && (
+                        <DialogContentText>{message}</DialogContentText>
+                    )}
 
-                {children}
+                    {children}
+                </DialogContent>
+            )}
 
-                <div className="mt-6 flex justify-end gap-3">
-                    <SecondaryButton onClick={onClose}>
-                        {__('Cancel')}
-                    </SecondaryButton>
+            <DialogActions>
+                <Button autoFocus onClick={onClose}>
+                    {__('Cancel')}
+                </Button>
 
-                    <ConfirmButton
-                        type="button"
-                        disabled={processing}
-                        onClick={onConfirm}
-                    >
-                        {confirmLabel ?? __('Confirm')}
-                    </ConfirmButton>
-                </div>
-            </div>
-        </Modal>
+                <Button
+                    variant="contained"
+                    color={danger ? 'error' : 'primary'}
+                    disabled={processing}
+                    onClick={onConfirm}
+                >
+                    {confirmLabel ?? __('Confirm')}
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 }

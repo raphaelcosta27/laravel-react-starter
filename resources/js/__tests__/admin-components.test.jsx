@@ -1,7 +1,14 @@
 import ConfirmDialog from '@/Components/ConfirmDialog';
 import StatusAnnouncer from '@/Components/StatusAnnouncer';
 import { useCan } from '@/lib/permissions';
-import { fireEvent, render, renderHook, screen } from '@testing-library/react';
+import Dialog from '@mui/material/Dialog';
+import {
+    fireEvent,
+    render,
+    renderHook,
+    screen,
+    waitFor,
+} from '@testing-library/react';
 import { axe } from 'jest-axe';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import translations from '../../../lang/pt_BR.json';
@@ -47,6 +54,63 @@ describe('ConfirmDialog', () => {
         expect(onClose).toHaveBeenCalledOnce();
     });
 
+    test('sobre outro diálogo, o foco fica no diálogo de cima', async () => {
+        render(
+            <Dialog open aria-label="Formulário">
+                <button type="button">Dentro do formulário</button>
+                <ConfirmDialog
+                    show
+                    title="Descartar alterações"
+                    onConfirm={() => {}}
+                    onClose={() => {}}
+                />
+            </Dialog>,
+        );
+
+        const top = await screen.findByRole('dialog', {
+            name: 'Descartar alterações',
+        });
+
+        await waitFor(() =>
+            expect(top.contains(document.activeElement)).toBe(true),
+        );
+
+        screen.getByText('Dentro do formulário').focus();
+
+        await waitFor(() =>
+            expect(
+                top
+                    .closest('[role="presentation"]')
+                    .contains(document.activeElement),
+            ).toBe(true),
+        );
+    });
+
+    test('Esc fecha somente o diálogo de confirmação', async () => {
+        const onClose = vi.fn();
+        const onOuterClose = vi.fn();
+
+        render(
+            <Dialog open aria-label="Formulário" onClose={onOuterClose}>
+                <ConfirmDialog
+                    show
+                    title="Descartar alterações"
+                    onConfirm={() => {}}
+                    onClose={onClose}
+                />
+            </Dialog>,
+        );
+
+        const top = await screen.findByRole('dialog', {
+            name: 'Descartar alterações',
+        });
+
+        fireEvent.keyDown(top, { key: 'Escape' });
+
+        expect(onClose).toHaveBeenCalledOnce();
+        expect(onOuterClose).not.toHaveBeenCalled();
+    });
+
     test('o foco vai para dentro do diálogo', async () => {
         dialog();
 
@@ -72,7 +136,11 @@ describe('ConfirmDialog', () => {
         outside.focus();
 
         await vi.waitFor(() =>
-            expect(element.contains(document.activeElement)).toBe(true),
+            expect(
+                element
+                    .closest('[role="presentation"]')
+                    .contains(document.activeElement),
+            ).toBe(true),
         );
 
         outside.remove();

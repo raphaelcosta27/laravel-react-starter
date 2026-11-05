@@ -70,6 +70,44 @@ class SharedPropsTest extends TestCase
             ->etc());
     }
 
+    public function test_pages_receive_the_configured_colors(): void
+    {
+        config([
+            'template.branding.primary_color' => '#00695c',
+            'template.branding.secondary_color' => '#6A1B9A',
+        ]);
+
+        $this->get('/login')->assertInertia(fn (Assert $page) => $page
+            ->where('branding.primaryColor', '#00695c')
+            ->where('branding.secondaryColor', '#6A1B9A')
+            ->etc());
+    }
+
+    public function test_colors_outside_the_hexadecimal_format_are_not_shared(): void
+    {
+        config([
+            'template.branding.primary_color' => 'azul',
+            'template.branding.secondary_color' => '#12',
+        ]);
+
+        $this->get('/login')->assertInertia(fn (Assert $page) => $page
+            ->where('branding.primaryColor', null)
+            ->where('branding.secondaryColor', null)
+            ->etc());
+    }
+
+    public function test_colors_are_empty_by_default(): void
+    {
+        config([
+            'template.branding.primary_color' => null,
+            'template.branding.secondary_color' => null,
+        ]);
+
+        $this->get('/login')->assertInertia(fn (Assert $page) => $page
+            ->where('branding.primaryColor', null)
+            ->etc());
+    }
+
     public function test_pages_receive_translations_of_the_active_locale(): void
     {
         app()->setLocale('pt_BR');
