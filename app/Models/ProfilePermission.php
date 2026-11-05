@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsChanges;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Table('profile_permission')]
 class ProfilePermission extends Model
 {
-    use SoftDeletes;
+    use RecordsChanges, SoftDeletes;
 
     /** @return BelongsTo<Profile, $this> */
     public function profile(): BelongsTo

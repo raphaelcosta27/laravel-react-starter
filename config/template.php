@@ -30,6 +30,15 @@ return [
     ],
 
     /*
+    | Histórico de alterações. Os campos mascarados somam-se aos $hidden de cada
+    | modelo. Nomes de campo separados por vírgula.
+    */
+    'history' => [
+        'masked_fields' => array_filter(array_map('trim', explode(',', (string) env('HISTORY_MASKED_FIELDS', 'password,remember_token')))),
+        'ignored_fields' => array_filter(array_map('trim', explode(',', (string) env('HISTORY_IGNORED_FIELDS', '')))),
+    ],
+
+    /*
     | Usuário criado por "php artisan app:setup".
     */
     'initial_user' => [

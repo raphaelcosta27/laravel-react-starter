@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsChanges;
 use Database\Factories\ProfileFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Profile extends Model
 {
     /** @use HasFactory<ProfileFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, RecordsChanges, SoftDeletes;
 
     public const ADMINISTRATOR = 'administrator';
 

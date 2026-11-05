@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsChanges;
 use Database\Factories\PermissionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -16,7 +17,7 @@ use LogicException;
 class Permission extends Model
 {
     /** @use HasFactory<PermissionFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, RecordsChanges, SoftDeletes;
 
     /**
      * O código é usado dentro do sistema e não muda depois de criado.

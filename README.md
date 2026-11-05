@@ -107,6 +107,28 @@ On Windows, create a Task Scheduler task that runs `php artisan schedule:run` ev
 Existing installations must change `LOG_STACK=single` to `LOG_STACK=daily` in their `.env`. A previous
 `laravel.log` is neither moved nor deleted.
 
+## Change history
+
+The `change_history` table keeps one item per changed field, with the operation, table, record, field, old and
+new values, date and responsible user. Without a logged user, the source is `system`. There is no screen: query
+it through the `App\Models\ChangeHistory` model. Items cannot be changed or deleted by the application.
+
+```php
+ChangeHistory::of($user)->where('field', 'email')->latest('id')->first()->actor;
+```
+
+A new entity adopts it with one declaration, and a test fails if an entity is left out:
+
+```php
+use RecordsChanges, SoftDeletes;
+```
+
+- `HISTORY_MASKED_FIELDS` lists the fields shown as `********`, added to the `$hidden` fields of each model.
+- `HISTORY_IGNORED_FIELDS` lists the fields left out. By default, everything is recorded.
+- Mass `update()`, `delete()` and `restore()` save each row, so they are recorded row by row.
+- `insert()`, `upsert()`, `increment()`, `decrement()`, `truncate()`, `DB::table()`, `withoutEvents()` and the
+  `Quietly` methods skip the history. A test fails if the application or the seeders use them.
+
 ## Account rules
 
 - Every user is created through `App\Actions\CreateUser`.

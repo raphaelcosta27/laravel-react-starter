@@ -103,6 +103,28 @@ do projeto.
 Instalações existentes precisam trocar `LOG_STACK=single` por `LOG_STACK=daily` no próprio `.env`. Um
 `laravel.log` anterior não é movido nem apagado.
 
+## Histórico de alterações
+
+A tabela `change_history` guarda um item por campo alterado, com a operação, a tabela, o registro, o campo, os
+valores original e novo, a data e o usuário responsável. Sem usuário logado, a origem é `system`. Não há tela: a
+consulta é feita pelo modelo `App\Models\ChangeHistory`. A aplicação não pode alterar nem excluir os itens.
+
+```php
+ChangeHistory::of($user)->where('field', 'email')->latest('id')->first()->actor;
+```
+
+Uma entidade nova adota o histórico com uma declaração, e um teste falha se alguma ficar de fora:
+
+```php
+use RecordsChanges, SoftDeletes;
+```
+
+- `HISTORY_MASKED_FIELDS` lista os campos exibidos como `********`, somados aos `$hidden` de cada modelo.
+- `HISTORY_IGNORED_FIELDS` lista os campos fora do histórico. Por padrão, tudo é registrado.
+- `update()`, `delete()` e `restore()` em massa salvam cada registro e ficam no histórico.
+- `insert()`, `upsert()`, `increment()`, `decrement()`, `truncate()`, `DB::table()`, `withoutEvents()` e os métodos
+  `Quietly` não passam pelo histórico. Um teste falha se a aplicação ou os seeders os usarem.
+
 ## Regras de contas
 
 - Toda criação de usuário passa por `App\Actions\CreateUser`.
