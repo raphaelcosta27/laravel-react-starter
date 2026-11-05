@@ -48,7 +48,7 @@ export function Head() {
 }
 
 export const Link = forwardRef(function Link(
-    { as, children, href, method, ...props },
+    { as, children, href, method, only, preserveScroll, preserveState, ...props },
     ref,
 ) {
     if (as === 'button') {

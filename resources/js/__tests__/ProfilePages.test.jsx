@@ -1,4 +1,4 @@
-import Form from '@/Pages/Admin/Profiles/Form';
+import ProfileFormDialog from '@/Pages/Admin/Profiles/Partials/ProfileFormDialog';
 import Users from '@/Pages/Admin/Profiles/Users';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { axe } from 'jest-axe';
@@ -10,6 +10,8 @@ const permissions = [
     { id: 1, title: 'Gerar Relatório', code: 'gerar_relatorio' },
     { id: 2, title: 'Exportar Dados', code: 'exportar_dados' },
 ];
+
+const creating = { mode: 'create', record: null, permissions, selected: [] };
 
 const meta = { currentPage: 1, lastPage: 1, perPage: 25, total: 1 };
 const query = { sort: 'name', search: '', filter: {}, tab: null, per_page: 25 };
@@ -27,7 +29,11 @@ describe('telas de perfil', () => {
     );
 
     test('a seleção de permissões usa caixas nativas, operáveis pelo teclado', () => {
-        render(<Form profile={null} permissions={permissions} selected={[1]} />);
+        render(
+            <ProfileFormDialog
+                form={{ mode: 'create', record: null, permissions, selected: [1] }}
+            />,
+        );
 
         const first = screen.getByRole('checkbox', { name: /Gerar Relatório/ });
         const second = screen.getByRole('checkbox', { name: /Exportar Dados/ });
@@ -42,10 +48,13 @@ describe('telas de perfil', () => {
 
     test('o perfil master não oferece seleção de permissões', () => {
         render(
-            <Form
-                profile={{ id: 1, name: 'Administrador', is_administrator: true }}
-                permissions={permissions}
-                selected={[]}
+            <ProfileFormDialog
+                form={{
+                    mode: 'edit',
+                    record: { id: 1, name: 'Administrador', is_administrator: true },
+                    permissions,
+                    selected: [],
+                }}
             />,
         );
 
@@ -56,17 +65,15 @@ describe('telas de perfil', () => {
     test('exibe erros por campo', () => {
         setPageProps({ errors: { name: 'Nome já usado' } });
 
-        render(<Form profile={null} permissions={permissions} selected={[]} />);
+        render(<ProfileFormDialog form={creating} />);
 
         expect(screen.getByText('Nome já usado')).toBeTruthy();
     });
 
     test('o formulário não tem violações de acessibilidade', async () => {
-        const { container } = render(
-            <Form profile={null} permissions={permissions} selected={[]} />,
-        );
+        const { baseElement } = render(<ProfileFormDialog form={creating} />);
 
-        expect(await axe(container)).toHaveNoViolations();
+        expect(await axe(baseElement)).toHaveNoViolations();
     });
 
     test('Usuários do perfil usa o DataTable', async () => {

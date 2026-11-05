@@ -3,6 +3,8 @@ import DataTable from '@/Components/DataTable/DataTable';
 import SelectField from '@/Components/SelectField';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
+import { FORM_VISIT, withListingQuery } from '@/lib/listing';
+import UserFormDialog from '@/Pages/Admin/Users/Partials/UserFormDialog';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyIcon from '@mui/icons-material/Key';
@@ -26,6 +28,7 @@ export default function Index({
     summaries,
     abilities,
     profiles = [],
+    form = null,
 }) {
     const __ = useTranslations();
     const [statusChange, setStatusChange] = useState(null);
@@ -98,7 +101,8 @@ export default function Index({
                 label: __('Edit'),
                 description: __('Opens the form to change this user.'),
                 icon: EditIcon,
-                href: (row) => route('admin.users.edit', row.id),
+                href: (row) => withListingQuery(route('admin.users.edit', row.id)),
+                visit: FORM_VISIT,
                 visible: (row) => row.can.update,
             },
             {
@@ -239,7 +243,8 @@ export default function Index({
                         abilities?.create && (
                             <Button
                                 component={Link}
-                                href={route('admin.users.create')}
+                                href={withListingQuery(route('admin.users.create'))}
+                                {...FORM_VISIT}
                                 variant="contained"
                                 size="small"
                             >
@@ -291,6 +296,8 @@ export default function Index({
                         </SelectField>
                     )}
                 </ConfirmDialog>
+
+                {form && <UserFormDialog key={form.record?.id ?? 'new'} form={form} />}
             </>
         </AuthenticatedLayout>
     );

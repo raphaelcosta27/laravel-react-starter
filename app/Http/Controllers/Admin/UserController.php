@@ -9,6 +9,7 @@ use App\Actions\Admin\RestoreUser;
 use App\Actions\Admin\SendAuthenticationEmail;
 use App\Actions\Admin\UpdateUser;
 use App\Actions\CreateUser;
+use App\Http\Controllers\Admin\Concerns\RedirectsToListing;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
@@ -16,6 +17,7 @@ use App\Models\Profile;
 use App\Models\User;
 use App\Support\Tables\Definitions\UsersTable;
 use App\Support\Tables\TableQuery;
+use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -26,29 +28,18 @@ use Inertia\Response;
 
 class UserController extends Controller
 {
+    use RedirectsToListing;
+
     public function index(Request $request): Response
     {
-        $actor = $request->user();
-
-        return Inertia::render('Admin/Users/Index', [
-            ...(new TableQuery(new UsersTable($actor), $request->query()))->response($actor),
-            'abilities' => [
-                'create' => $actor->can('cadastrar_usuario'),
-                'export' => $actor->can('exportar_dados'),
-                'bulk' => [
-                    ...($actor->can('alterar_situacao_usuario') ? ['activate', 'deactivate'] : []),
-                    ...($actor->can('excluir_usuario') ? ['delete'] : []),
-                ],
-            ],
-            'profiles' => Profile::orderBy('name')->get(['id', 'name'])
-                ->map(fn (Profile $profile) => ['value' => (string) $profile->id, 'label' => $profile->name]),
-        ]);
+        return $this->listing($request);
     }
 
     public function create(Request $request): Response
     {
-        return Inertia::render('Admin/Users/Form', [
-            'user' => null,
+        return $this->listing($request, fn () => [
+            'mode' => 'create',
+            'record' => null,
             'profileOptions' => $this->profileOptions($request->user()),
             'canChangeProfile' => true,
         ]);
@@ -62,7 +53,7 @@ class UserController extends Controller
 
         $user = $createUser->handle($request->validated('name'), $request->validated('email'), profile: $profile);
 
-        return redirect()->route('admin.users.index')->with('flash', $this->creationMessage($user));
+        return $this->redirectToListing($request, 'admin.users.index')->with('flash', $this->creationMessage($user));
     }
 
     public function edit(Request $request, User $user): Response
@@ -71,8 +62,9 @@ class UserController extends Controller
 
         $actor = $request->user();
 
-        return Inertia::render('Admin/Users/Form', [
-            'user' => $user->only('id', 'name', 'email', 'profile_id'),
+        return $this->listing($request, fn () => [
+            'mode' => 'edit',
+            'record' => $user->only('id', 'name', 'email', 'profile_id'),
             'profileOptions' => $this->profileOptions($actor),
             'canChangeProfile' => $actor->isAdministrator() || $actor->id !== $user->id,
         ]);
@@ -90,7 +82,7 @@ class UserController extends Controller
 
         $updateUser->handle($user, $request->validated());
 
-        return back()->with('flash', $user->emailFailed
+        return $this->redirectToListing($request, 'admin.users.index')->with('flash', $user->emailFailed
             ? ['type' => 'warning', 'message' => __('The user was saved, but the email could not be sent. Try again.')]
             : ['type' => 'success', 'message' => __('User saved.')]);
     }
@@ -154,6 +146,26 @@ class UserController extends Controller
             $sendAuthenticationEmail->handle($user),
             __('Authentication email sent.'),
         ));
+    }
+
+    private function listing(Request $request, ?Closure $form = null): Response
+    {
+        $actor = $request->user();
+
+        return Inertia::render('Admin/Users/Index', [
+            ...(new TableQuery(new UsersTable($actor), $request->query()))->lazyResponse($actor),
+            'abilities' => fn () => [
+                'create' => $actor->can('cadastrar_usuario'),
+                'export' => $actor->can('exportar_dados'),
+                'bulk' => [
+                    ...($actor->can('alterar_situacao_usuario') ? ['activate', 'deactivate'] : []),
+                    ...($actor->can('excluir_usuario') ? ['delete'] : []),
+                ],
+            ],
+            'profiles' => fn () => Profile::orderBy('name')->get(['id', 'name'])
+                ->map(fn (Profile $profile) => ['value' => (string) $profile->id, 'label' => $profile->name]),
+            'form' => $form,
+        ]);
     }
 
     /** @return array{type: string, message: string} */

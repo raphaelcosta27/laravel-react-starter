@@ -18,7 +18,7 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->name('profiles.export');
 
     Route::get('profiles/create', [ProfileController::class, 'create'])
-        ->middleware('can:cadastrar_perfil')
+        ->middleware(['can:visualizar_perfil', 'can:cadastrar_perfil'])
         ->name('profiles.create');
 
     Route::post('profiles', [ProfileController::class, 'store'])
@@ -26,7 +26,7 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->name('profiles.store');
 
     Route::get('profiles/{profile}/edit', [ProfileController::class, 'edit'])
-        ->middleware('can:editar_perfil')
+        ->middleware(['can:visualizar_perfil', 'can:editar_perfil'])
         ->name('profiles.edit');
 
     Route::patch('profiles/{profile}', [ProfileController::class, 'update'])
@@ -55,7 +55,7 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->name('permissions.export');
 
     Route::get('permissions/create', [PermissionController::class, 'create'])
-        ->middleware('can:cadastrar_permissao')
+        ->middleware(['can:visualizar_permissao', 'can:cadastrar_permissao'])
         ->name('permissions.create');
 
     Route::post('permissions', [PermissionController::class, 'store'])
@@ -63,7 +63,7 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->name('permissions.store');
 
     Route::get('permissions/{permission}/edit', [PermissionController::class, 'edit'])
-        ->middleware('can:editar_permissao')
+        ->middleware(['can:visualizar_permissao', 'can:editar_permissao'])
         ->name('permissions.edit');
 
     Route::patch('permissions/{permission}', [PermissionController::class, 'update'])
@@ -92,7 +92,7 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->name('users.bulk');
 
     Route::get('users/create', [UserController::class, 'create'])
-        ->middleware('can:cadastrar_usuario')
+        ->middleware(['can:visualizar_usuario', 'can:cadastrar_usuario'])
         ->name('users.create');
 
     Route::post('users', [UserController::class, 'store'])
@@ -100,7 +100,7 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->name('users.store');
 
     Route::get('users/{user}/edit', [UserController::class, 'edit'])
-        ->middleware('can:editar_usuario')
+        ->middleware(['can:visualizar_usuario', 'can:editar_usuario'])
         ->name('users.edit');
 
     Route::patch('users/{user}', [UserController::class, 'update'])

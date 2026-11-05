@@ -64,7 +64,7 @@ export default function RowActions({ row, actions = [], label }) {
                     color={color(action)}
                     disabled={action.disabled?.(row) ?? false}
                     {...(action.href
-                        ? { href: action.href(row) }
+                        ? { href: action.href(row), ...action.visit }
                         : { onClick: () => run(action) })}
                 />
             ))}
@@ -96,7 +96,7 @@ export default function RowActions({ row, actions = [], label }) {
                                     aria-label={action.label}
                                     aria-describedby={descriptionId}
                                     {...(action.href
-                                        ? { component: Link, href: action.href(row) }
+                                        ? { component: Link, href: action.href(row), ...action.visit }
                                         : { onClick: () => run(action) })}
                                 >
                                     <ListItemIcon>

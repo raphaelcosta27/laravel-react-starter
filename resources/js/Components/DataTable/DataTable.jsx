@@ -207,7 +207,9 @@ export default function DataTable({
     const selectable = bulkActions.length > 0;
     const expandable = renderDetail !== undefined;
 
-    const allColumns = useMemo(() => {
+    // As colunas de controle mantêm a identidade quando os dados recarregam.
+    // Uma célula recriada perderia o foco do botão que abriu um formulário.
+    const leadingColumns = useMemo(() => {
         const leading = [];
 
         if (selectable) {
@@ -265,25 +267,35 @@ export default function DataTable({
             });
         }
 
-        const trailing = rowActions
-            ? [
-                  {
-                      id: 'actions',
-                      header: __('Actions'),
-                      cell: ({ row }) => (
-                          <RowActions
-                              row={row.original}
-                              actions={rowActions(row.original)}
-                              label={__('Actions')}
-                          />
-                      ),
-                  },
-              ]
-            : [];
-
-        return [...leading, ...columns, ...trailing];
+        return leading;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [columns, rowActions, selectable, expandable]);
+    }, [selectable, expandable]);
+
+    const trailingColumns = useMemo(
+        () =>
+            rowActions
+                ? [
+                      {
+                          id: 'actions',
+                          header: __('Actions'),
+                          cell: ({ row }) => (
+                              <RowActions
+                                  row={row.original}
+                                  actions={rowActions(row.original)}
+                                  label={__('Actions')}
+                              />
+                          ),
+                      },
+                  ]
+                : [],
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [rowActions],
+    );
+
+    const allColumns = useMemo(
+        () => [...leadingColumns, ...columns, ...trailingColumns],
+        [leadingColumns, columns, trailingColumns],
+    );
 
     const columnOrder = useMemo(
         () => [

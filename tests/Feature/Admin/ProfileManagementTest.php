@@ -130,11 +130,33 @@ class ProfileManagementTest extends TestCase
         $this->actingAs($this->administrator())
             ->get("/admin/profiles/{$profile->id}/edit")
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Admin/Profiles/Form')
-                ->where('profile.id', $profile->id)
-                ->where('selected', [$permission->id])
-                ->has('permissions', 1)
+                ->component('Admin/Profiles/Index')
+                ->where('form.mode', 'edit')
+                ->where('form.record.id', $profile->id)
+                ->where('form.selected', [$permission->id])
+                ->has('form.permissions', 1)
                 ->etc());
+    }
+
+    public function test_create_screen_opens_over_the_listing(): void
+    {
+        $this->actingAs($this->administrator())
+            ->get('/admin/profiles/create')
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Admin/Profiles/Index')
+                ->where('form.mode', 'create')
+                ->where('form.record', null)
+                ->where('form.selected', [])
+                ->etc());
+    }
+
+    public function test_forms_require_the_listing_permission(): void
+    {
+        $profile = Profile::factory()->create();
+        $user = $this->userWith('cadastrar_perfil', 'editar_perfil');
+
+        $this->actingAs($user)->get('/admin/profiles/create')->assertForbidden();
+        $this->actingAs($user)->get("/admin/profiles/{$profile->id}/edit")->assertForbidden();
     }
 
     public function test_each_route_requires_its_permission(): void

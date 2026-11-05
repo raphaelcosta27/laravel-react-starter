@@ -155,9 +155,10 @@ class UserManagementTest extends TestCase
         $this->actingAs($this->administrator())
             ->get('/admin/users/create')
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Admin/Users/Form')
-                ->where('user', null)
-                ->has('profileOptions', 2)
+                ->component('Admin/Users/Index')
+                ->where('form.mode', 'create')
+                ->where('form.record', null)
+                ->has('form.profileOptions', 2)
                 ->etc());
 
         $this->assertNotNull($profile);
@@ -174,6 +175,42 @@ class UserManagementTest extends TestCase
         $this->actingAs($user)->patch("/admin/users/{$target->id}", ['name' => 'x'])->assertForbidden();
         $this->actingAs($user)->patch("/admin/users/{$target->id}/status", ['is_active' => false])->assertForbidden();
         $this->actingAs($user)->delete("/admin/users/{$target->id}")->assertForbidden();
+    }
+
+    public function test_the_listing_has_no_open_form(): void
+    {
+        $this->actingAs($this->administrator())
+            ->get('/admin/users')
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Admin/Users/Index')
+                ->where('form', null)
+                ->etc());
+    }
+
+    public function test_edit_opens_over_the_listing_with_its_query(): void
+    {
+        $target = User::factory()->withProfile(Profile::factory()->create())->create(['name' => 'Ana Lima']);
+        User::factory()->withProfile(Profile::factory()->create())->create(['name' => 'Bia']);
+
+        $this->actingAs($this->administrator())
+            ->get("/admin/users/{$target->id}/edit?search=Ana+Lima")
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('Admin/Users/Index')
+                ->where('form.mode', 'edit')
+                ->where('form.record.id', $target->id)
+                ->where('form.canChangeProfile', true)
+                ->where('query.search', 'Ana Lima')
+                ->has('rows.data', 1)
+                ->etc());
+    }
+
+    public function test_forms_require_the_listing_permission(): void
+    {
+        $target = User::factory()->withProfile(Profile::factory()->create())->create();
+        $user = $this->userWith('cadastrar_usuario', 'editar_usuario');
+
+        $this->actingAs($user)->get('/admin/users/create')->assertForbidden();
+        $this->actingAs($user)->get("/admin/users/{$target->id}/edit")->assertForbidden();
     }
 
     public function test_row_abilities_follow_the_policy(): void

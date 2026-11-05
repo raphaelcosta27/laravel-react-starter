@@ -44,6 +44,35 @@ describe('recursos completos do DataTable', () => {
         setPageProps({ translations, auth: { user: { id: 7 } } });
     });
 
+    test('recarregar os dados mantém o botão da linha, para o foco voltar a ele', () => {
+        const rowActions = () => [
+            { key: 'x', label: 'Ver', icon: EditIcon, onClick: () => {} },
+        ];
+
+        const props = {
+            tableKey: 'extras',
+            caption: 'Registros',
+            rows,
+            query,
+            emptyMessage: 'Vazio',
+            rowActions,
+        };
+
+        const { rerender } = render(<DataTable {...props} columns={columns} />);
+
+        const button = screen.getAllByRole('button', { name: 'Ver' })[0];
+
+        rerender(
+            <DataTable
+                {...props}
+                columns={[...columns]}
+                rows={{ ...rows, data: data.map((row) => ({ ...row })) }}
+            />,
+        );
+
+        expect(button.isConnected).toBe(true);
+    });
+
     test('abas exibem a quantidade e mudam a listagem', () => {
         table({
             tabs: [

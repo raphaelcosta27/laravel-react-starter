@@ -1,6 +1,8 @@
 import DataTable from '@/Components/DataTable/DataTable';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
+import { FORM_VISIT, withListingQuery } from '@/lib/listing';
+import ProfileFormDialog from '@/Pages/Admin/Profiles/Partials/ProfileFormDialog';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import GroupIcon from '@mui/icons-material/Group';
@@ -14,7 +16,7 @@ import { useMemo } from 'react';
 const canEdit = (row) => row.can.update;
 const updateRoute = (row) => route('admin.profiles.update', row.id);
 
-export default function Index({ rows, query, tabs, summaries, abilities }) {
+export default function Index({ rows, query, tabs, summaries, abilities, form = null }) {
     const __ = useTranslations();
 
     const columns = useMemo(
@@ -68,7 +70,8 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
                 label: __('Edit'),
                 description: __('Opens the form to change this profile.'),
                 icon: EditIcon,
-                href: (row) => route('admin.profiles.edit', row.id),
+                href: (row) => withListingQuery(route('admin.profiles.edit', row.id)),
+                visit: FORM_VISIT,
                 visible: (row) => row.can.update,
             },
             {
@@ -147,7 +150,8 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
                         abilities?.create && (
                             <Button
                                 component={Link}
-                                href={route('admin.profiles.create')}
+                                href={withListingQuery(route('admin.profiles.create'))}
+                                {...FORM_VISIT}
                                 variant="contained"
                                 size="small"
                             >
@@ -156,6 +160,8 @@ export default function Index({ rows, query, tabs, summaries, abilities }) {
                         )
                     }
                 />
+
+                {form && <ProfileFormDialog key={form.record?.id ?? 'new'} form={form} />}
             </>
         </AuthenticatedLayout>
     );

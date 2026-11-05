@@ -3,6 +3,7 @@
 namespace App\Support\Tables;
 
 use App\Models\User;
+use Closure;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -115,6 +116,27 @@ class TableQuery
             ],
             'tabs' => $this->tabs(),
             'summaries' => $this->summaries(),
+        ];
+    }
+
+    /**
+     * A mesma resposta, calculada só quando alguma propriedade for pedida.
+     *
+     * @return array<string, Closure>
+     */
+    public function lazyResponse(User $actor): array
+    {
+        $response = null;
+
+        $resolve = function () use (&$response, $actor) {
+            return $response ??= $this->response($actor);
+        };
+
+        return [
+            'rows' => fn () => $resolve()['rows'],
+            'query' => fn () => $resolve()['query'],
+            'tabs' => fn () => $resolve()['tabs'],
+            'summaries' => fn () => $resolve()['summaries'],
         ];
     }
 

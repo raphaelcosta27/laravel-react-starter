@@ -127,8 +127,9 @@ class PermissionManagementTest extends TestCase
         $this->actingAs($this->administrator())
             ->get("/admin/permissions/{$permission->id}/edit")
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Admin/Permissions/Form')
-                ->where('permission.code', $permission->code)
+                ->component('Admin/Permissions/Index')
+                ->where('form.mode', 'edit')
+                ->where('form.record.code', $permission->code)
                 ->etc());
     }
 
@@ -137,9 +138,19 @@ class PermissionManagementTest extends TestCase
         $this->actingAs($this->administrator())
             ->get('/admin/permissions/create')
             ->assertInertia(fn (Assert $page) => $page
-                ->component('Admin/Permissions/Form')
-                ->where('permission', null)
+                ->component('Admin/Permissions/Index')
+                ->where('form.mode', 'create')
+                ->where('form.record', null)
                 ->etc());
+    }
+
+    public function test_forms_require_the_listing_permission(): void
+    {
+        $permission = Permission::factory()->create();
+        $user = $this->userWith('cadastrar_permissao', 'editar_permissao');
+
+        $this->actingAs($user)->get('/admin/permissions/create')->assertForbidden();
+        $this->actingAs($user)->get("/admin/permissions/{$permission->id}/edit")->assertForbidden();
     }
 
     public function test_each_route_requires_its_permission(): void

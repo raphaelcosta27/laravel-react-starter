@@ -100,10 +100,10 @@ class UserProtectionTest extends TestCase
 
     public function test_master_profile_is_hidden_from_non_administrators_on_the_form(): void
     {
-        $this->actingAs($this->userWith('cadastrar_usuario'))
+        $this->actingAs($this->userWith('visualizar_usuario', 'cadastrar_usuario'))
             ->get('/admin/users/create')
             ->assertInertia(fn ($page) => $page->where(
-                'profileOptions',
+                'form.profileOptions',
                 fn ($options) => collect($options)->doesntContain('value', (string) Profile::administrator()->id),
             )->etc());
     }
