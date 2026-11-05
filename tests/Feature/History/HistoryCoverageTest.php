@@ -5,12 +5,15 @@ namespace Tests\Feature\History;
 use App\Models\ChangeHistory;
 use App\Models\Concerns\RecordsChanges;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class HistoryCoverageTest extends TestCase
 {
-    private const UNRECORDED_WRITES = '/DB::table\(|(->|::)(insert|upsert|increment|decrement|truncate|withoutEvents)\(|Quietly\(/';
+    use RefreshDatabase;
+
+    private const UNRECORDED_WRITES = '/DB::table\(|(->|::)(insert|upsert|increment|decrement|truncate|withoutEvents)\(|Quietly\(|WithoutModelEvents/';
 
     public function test_every_entity_is_recorded(): void
     {
@@ -36,5 +39,12 @@ class HistoryCoverageTest extends TestCase
             ->values();
 
         $this->assertSame([], $files->all());
+    }
+
+    public function test_the_default_seeder_is_recorded(): void
+    {
+        $this->seed();
+
+        $this->assertTrue(ChangeHistory::where('table_name', 'permissions')->exists());
     }
 }
