@@ -2,6 +2,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import ForwardToInboxOutlinedIcon from '@mui/icons-material/ForwardToInboxOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -39,7 +40,7 @@ export default function ForgotPassword({ status }) {
 
                 <Stack component="form" spacing={2} onSubmit={submit}>
                     <TextField
-                        {...fieldProps(form, 'email')}
+                        {...fieldProps(form, 'email', { kind: 'email' })}
                         type="email"
                         label={__('Email')}
                         autoFocus
@@ -47,6 +48,7 @@ export default function ForgotPassword({ status }) {
 
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <Button
+                            startIcon={<ForwardToInboxOutlinedIcon />}
                             type="submit"
                             variant="contained"
                             disabled={form.processing}

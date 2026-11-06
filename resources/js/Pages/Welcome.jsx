@@ -1,14 +1,18 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import TextLink from '@/Components/TextLink';
 import { useTranslations } from '@/lib/i18n';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
+import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 export default function Welcome({ canLogin, canRegister, status }) {
     const __ = useTranslations();
-    const { appName, auth } = usePage().props;
+    const { appName, auth, branding } = usePage().props;
     const checkedAt = new Date(status.checkedAt).toLocaleString(
         document.documentElement.lang || undefined,
     );
@@ -22,9 +26,9 @@ export default function Welcome({ canLogin, canRegister, status }) {
                 spacing={3}
                 sx={{
                     alignItems: 'center',
-                    bgcolor: 'grey.100',
+                    bgcolor: 'background.default',
                     justifyContent: 'center',
-                    minHeight: '100vh',
+                    minHeight: '100dvh',
                     p: 3,
                     textAlign: 'center',
                 }}
@@ -34,6 +38,12 @@ export default function Welcome({ canLogin, canRegister, status }) {
                 <Typography component="h1" variant="h4">
                     {appName}
                 </Typography>
+
+                {branding.tagline && (
+                    <Typography color="text.secondary" sx={{ maxWidth: 480 }}>
+                        {branding.tagline}
+                    </Typography>
+                )}
 
                 <Paper
                     component="section"
@@ -67,20 +77,34 @@ export default function Welcome({ canLogin, canRegister, status }) {
                     spacing={2}
                 >
                     {auth.user ? (
-                        <TextLink href={route('dashboard')}>
+                        <Button
+                            component={Link}
+                            href={route('dashboard')}
+                            variant="contained"
+                            startIcon={<DashboardOutlinedIcon />}
+                        >
                             {__('Dashboard')}
-                        </TextLink>
+                        </Button>
                     ) : (
                         <>
                             {canLogin && (
-                                <TextLink href={route('login')}>
+                                <Button
+                                    component={Link}
+                                    href={route('login')}
+                                    variant="contained"
+                                    startIcon={<LoginIcon />}
+                                >
                                     {__('Log in')}
-                                </TextLink>
+                                </Button>
                             )}
                             {canRegister && (
-                                <TextLink href={route('register')}>
+                                <Button
+                                    component={Link}
+                                    href={route('register')}
+                                    startIcon={<PersonAddOutlinedIcon />}
+                                >
                                     {__('Register')}
-                                </TextLink>
+                                </Button>
                             )}
                         </>
                     )}

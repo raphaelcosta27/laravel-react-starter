@@ -48,6 +48,7 @@ export default function ProfileFormDialog({ form }) {
         >
             <TextField
                 {...fieldProps(fields, 'name', {
+                    kind: 'label',
                     required: true,
                     htmlInput: { maxLength: 100 },
                 })}
@@ -57,6 +58,7 @@ export default function ProfileFormDialog({ form }) {
 
             <TextField
                 {...fieldProps(fields, 'description', {
+                    kind: 'description',
                     htmlInput: { maxLength: 255 },
                 })}
                 label={__('Description')}

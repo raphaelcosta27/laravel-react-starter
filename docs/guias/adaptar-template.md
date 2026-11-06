@@ -13,7 +13,7 @@ Nenhum arquivo de código precisa mudar para começar.
 
 | Assunto | Variáveis |
 | --- | --- |
-| Identidade | `APP_NAME`, `APP_LOGO`, `APP_FAVICON`, `APP_PRIMARY_COLOR`, `APP_SECONDARY_COLOR` |
+| Identidade | `APP_NAME`, `APP_LOGO`, `APP_LOGO_DARK`, `APP_TAGLINE`, `APP_ICON`, `APP_FAVICON`, `APP_PRIMARY_COLOR`, `APP_SECONDARY_COLOR` |
 | E-mail | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_FROM_ADDRESS` |
 | Contas | `REGISTRATION_ENABLED`, `PASSWORD_MIN_LENGTH` |
 | Login | `LOGIN_TWO_FACTOR_ENABLED`, `TURNSTILE_ENABLED` |

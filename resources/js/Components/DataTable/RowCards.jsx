@@ -114,7 +114,7 @@ export default function RowCards({
                         )}
 
                         {row.getIsExpanded() && (
-                            <Box sx={{ bgcolor: 'grey.50', borderRadius: 1, mt: 1, p: 1.5 }}>
+                            <Box sx={{ bgcolor: 'action.hover', borderRadius: 1, mt: 1, p: 1.5 }}>
                                 {renderDetail(row.original)}
                             </Box>
                         )}

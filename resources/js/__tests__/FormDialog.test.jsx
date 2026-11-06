@@ -1,5 +1,5 @@
 import FormDialog from '@/Components/FormDialog';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { axe } from 'jest-axe';
 import { useState } from 'react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
@@ -22,9 +22,46 @@ const dialog = (props = {}) =>
 
 const pressEscape = (element) => fireEvent.keyDown(element, { key: 'Escape' });
 
+const pressBack = () => window.dispatchEvent(new PopStateEvent('popstate'));
+
 describe('FormDialog', () => {
     beforeEach(() => setPageProps({ translations }));
-    afterEach(() => vi.unstubAllGlobals());
+    afterEach(async () => {
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
+        cleanup();
+        await new Promise((done) => setTimeout(done, 5));
+    });
+
+    test('o voltar do aparelho fecha o formulário sem alterações', () => {
+        const onClose = vi.fn();
+
+        dialog({ onClose });
+        pressBack();
+
+        expect(onClose).toHaveBeenCalledOnce();
+    });
+
+    test('com alterações, o voltar pede confirmação', async () => {
+        vi.spyOn(window.history, 'go').mockImplementation(() => {});
+
+        const onClose = vi.fn();
+
+        dialog({ onClose, isDirty: true });
+        act(pressBack);
+
+        expect(await screen.findByText('Descartar alterações')).toBeTruthy();
+        expect(onClose).not.toHaveBeenCalled();
+    });
+
+    test('fechado, o voltar segue o navegador', () => {
+        const push = vi.spyOn(window.history, 'pushState');
+
+        dialog({ open: false });
+        pressBack();
+
+        expect(push).not.toHaveBeenCalled();
+    });
 
     test('o título é o nome do diálogo e o foco fica dentro dele', async () => {
         dialog();

@@ -26,6 +26,8 @@ class EnvCatalog
     private const GROUPS = [
         'APP_LOGO' => 'branding',
         'APP_FAVICON' => 'branding',
+        'APP_ICON' => 'branding',
+        'APP_TAGLINE' => 'branding',
         'APP_PRIMARY' => 'branding',
         'APP_SECONDARY' => 'branding',
         'APP_' => 'application',

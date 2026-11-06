@@ -9,6 +9,7 @@ import ErrorOutlinedIcon from '@mui/icons-material/ErrorOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -225,6 +226,7 @@ export default function NotificationBell() {
 
                     {!loading && nextBefore !== null && (
                         <Button
+                            startIcon={<ExpandMoreIcon />}
                             fullWidth
                             sx={{ mt: 2 }}
                             onClick={() => load(nextBefore)}

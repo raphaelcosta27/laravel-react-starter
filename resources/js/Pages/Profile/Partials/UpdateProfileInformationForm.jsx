@@ -11,6 +11,8 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import FaceOutlinedIcon from '@mui/icons-material/FaceOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import WcOutlinedIcon from '@mui/icons-material/WcOutlined';
+import ForwardToInboxOutlinedIcon from '@mui/icons-material/ForwardToInboxOutlined';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -158,6 +160,7 @@ export default function UpdateProfileInformation({
                         </Typography>
 
                         <Button
+                            startIcon={<ForwardToInboxOutlinedIcon />}
                             component={PostLink}
                             href={route('verification.send')}
                             size="small"
@@ -175,6 +178,7 @@ export default function UpdateProfileInformation({
 
                 <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
                     <Button
+                        startIcon={<SaveOutlinedIcon />}
                         type="submit"
                         variant="contained"
                         disabled={form.processing || cpfBlocked}

@@ -78,6 +78,9 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `APP_URL` | `http://127.0.0.1:8000` | Endereço usado nos links dos e-mails |
 | `SERVER_PORT` | `8000` | Porta local; deve acompanhar `APP_URL` |
 | `APP_LOGO` | `/images/logo.svg` | Logo da aplicação |
+| `APP_LOGO_DARK` | vazio | Logo no tema escuro. Vazio usa `APP_LOGO` |
+| `APP_TAGLINE` | vazio | Frase da área de marca, ao lado do login |
+| `APP_ICON` | `/images/icon` | Prefixo dos ícones de instalação, que terminam em `-192.png` e `-512.png` |
 | `APP_FAVICON` | `/favicon.ico` | Ícone do navegador |
 | `APP_PRIMARY_COLOR` | `#3949ab` | Cor principal da interface, em hexadecimal e entre aspas |
 | `APP_SECONDARY_COLOR` | `#00695c` | Cor secundária da interface, em hexadecimal e entre aspas |
@@ -317,6 +320,10 @@ php vendor/bin/phpunit -c phpunit.mysql.xml
 ```
 
 ### Interface
+
+O menu fica na lateral: oculto no celular, aberto pelo ícone de três riscos, e recolhível no computador. Cada pessoa escolhe
+o tema Claro, Escuro ou Sistema no menu da conta, e a escolha fica guardada nela. No celular, o sistema pode ser adicionado à
+tela inicial e abre em tela cheia. As regras estão em [Layout](docs/especificacoes/layout.md).
 
 As telas usam o [Material UI](https://mui.com/material-ui/), em sua versão gratuita. O tema fica em `resources/js/theme.js`;
 uma cor inválida volta ao padrão.

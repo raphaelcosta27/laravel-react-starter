@@ -38,6 +38,9 @@ return [
     */
     'branding' => [
         'logo' => env('APP_LOGO', '/images/logo.svg'),
+        'logo_dark' => env('APP_LOGO_DARK'),
+        'tagline' => env('APP_TAGLINE'),
+        'icon' => env('APP_ICON', '/images/icon'),
         'favicon' => env('APP_FAVICON', '/favicon.ico'),
         'primary_color' => env('APP_PRIMARY_COLOR'),
         'secondary_color' => env('APP_SECONDARY_COLOR'),

@@ -1,4 +1,7 @@
 import { useTranslations } from '@/lib/i18n';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -12,6 +15,7 @@ export default function ConfirmDialog({
     title,
     message,
     confirmLabel,
+    confirmIcon,
     danger = false,
     processing = false,
     onConfirm,
@@ -21,6 +25,7 @@ export default function ConfirmDialog({
 }) {
     const __ = useTranslations();
     const titleId = useId();
+    const ConfirmIcon = confirmIcon ?? (danger ? DeleteOutlinedIcon : CheckIcon);
 
     return (
         <Dialog
@@ -44,13 +49,15 @@ export default function ConfirmDialog({
             )}
 
             <DialogActions>
-                <Button autoFocus onClick={onClose}>
+                <Button startIcon={<CloseIcon />} autoFocus onClick={onClose}>
                     {__('Cancel')}
                 </Button>
 
                 <Button
+                    startIcon={<CheckIcon />}
                     variant="contained"
                     color={danger ? 'error' : 'primary'}
+                    startIcon={<ConfirmIcon />}
                     disabled={processing}
                     onClick={onConfirm}
                 >

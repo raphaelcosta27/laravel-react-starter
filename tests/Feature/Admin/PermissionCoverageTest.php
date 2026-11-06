@@ -24,6 +24,7 @@ class PermissionCoverageTest extends TestCase
     private const ROUTE_EXCEPTIONS = [
         'GET /' => 'Página pública.',
         'GET up' => 'Verificação de saúde, sem dados.',
+        'GET manifest.webmanifest' => 'Instalação no aparelho, só com nome e cores públicos.',
         'GET storage/{path}' => self::SIGNED_FILE,
         'PUT storage/{path}' => self::SIGNED_FILE,
         'GET dashboard' => 'Página inicial de toda conta liberada.',
@@ -70,6 +71,7 @@ class PermissionCoverageTest extends TestCase
         'PUT password' => self::OWN_ACCOUNT,
         'GET profile' => self::OWN_ACCOUNT,
         'PATCH profile' => self::OWN_ACCOUNT,
+        'PATCH profile/theme' => self::OWN_ACCOUNT,
         'DELETE profile' => self::OWN_ACCOUNT,
     ];
 

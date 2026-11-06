@@ -85,59 +85,19 @@ describe('layouts', () => {
         expect(
             screen.getByRole('heading', { level: 1, name: 'Usuários' }),
         ).toBeTruthy();
-        expect(screen.getByRole('main').textContent).toBe('conteúdo');
+        expect(screen.getByRole('main').textContent).toContain('conteúdo');
     });
 
-    test('o menu da conta traz perfil e saída', async () => {
-        render(<AuthenticatedLayout>conteúdo</AuthenticatedLayout>);
-
-        fireEvent.click(screen.getByRole('button', { name: 'Olá, Ana' }));
-
-        const menu = await screen.findByRole('menu');
-
-        expect(within(menu).getByRole('menuitem', { name: 'Perfil' })).toBeTruthy();
-        expect(within(menu).getByRole('menuitem', { name: 'Sair' })).toBeTruthy();
-    });
-
-    test('o menu de navegação abre pelo botão', async () => {
-        render(<AuthenticatedLayout>conteúdo</AuthenticatedLayout>);
-
-        const button = screen.getByRole('button', { name: 'Menu de navegação' });
-
-        expect(button.getAttribute('aria-expanded')).toBe('false');
-
-        fireEvent.click(button);
-
-        expect(await screen.findByText('ana@example.com')).toBeTruthy();
-        expect(
-            screen.getByRole('dialog', { name: 'Menu de navegação' }),
-        ).toBeTruthy();
-        expect(
-            screen
-                .getByRole('button', { name: 'Menu de navegação', hidden: true })
-                .getAttribute('aria-expanded'),
-        ).toBe('true');
-    });
-
-    test('a área atual é indicada ao leitor de tela', () => {
-        globalThis.route = Object.assign(
-            (name) =>
-                name === undefined
-                    ? { current: (pattern) => pattern === 'admin.users.*' }
-                    : `/${name}`,
+    test('as ações ficam ao lado do título', () => {
+        render(
+            <AuthenticatedLayout title="Usuários" actions={<button>Novo</button>}>
+                conteúdo
+            </AuthenticatedLayout>,
         );
 
-        render(<AuthenticatedLayout>conteúdo</AuthenticatedLayout>);
-
-        const [link] = screen.getAllByRole('link', {
-            name: 'Usuários',
-            hidden: true,
-        });
-
-        expect(link.getAttribute('aria-current')).toBe('page');
-
-        globalThis.route = (name) =>
-            name === undefined ? { current: () => false } : `/${name}`;
+        expect(
+            within(screen.getByRole('main')).getByRole('button', { name: 'Novo' }),
+        ).toBeTruthy();
     });
 
     test('o diálogo de exclusão da conta tem nome e não repete identificadores', async () => {

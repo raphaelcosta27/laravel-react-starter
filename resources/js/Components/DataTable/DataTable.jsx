@@ -683,13 +683,22 @@ export default function DataTable({
                     aria-label={caption}
                     tabIndex={0}
                     sx={{
+                        // Prende os textos ocultos da tabela: soltos, eles alargam a página.
+                        position: 'relative',
                         '&:focus-visible': {
                             outline: '2px solid',
                             outlineColor: 'primary.main',
                         },
                     }}
                 >
-                    <Table size="small" aria-busy={busy}>
+                    <Table
+                        size="small"
+                        aria-busy={busy}
+                        sx={{
+                            opacity: busy ? 0.6 : 1,
+                            transition: 'opacity 150ms',
+                        }}
+                    >
                         <caption style={visuallyHidden}>{caption}</caption>
 
                         <TableHead>
@@ -707,7 +716,7 @@ export default function DataTable({
                                                 aria-sort={meta?.sortable ? direction : undefined}
                                                 style={columnStyle(column, columnSizing)}
                                                 sx={{
-                                                    bgcolor: 'grey.100',
+                                                    bgcolor: 'action.hover',
                                                     fontWeight: 600,
                                                     position: 'relative',
                                                     textAlign: meta?.align ?? 'start',
@@ -781,7 +790,7 @@ export default function DataTable({
                                         <TableRow>
                                             <TableCell
                                                 colSpan={visibleColumns.length}
-                                                sx={{ bgcolor: 'grey.50', py: 0 }}
+                                                sx={{ bgcolor: 'action.hover', py: 0 }}
                                             >
                                                 <GroupTitle
                                                     group={group}
@@ -810,7 +819,7 @@ export default function DataTable({
                                                 <TableRow>
                                                     <TableCell
                                                         colSpan={visibleColumns.length}
-                                                        sx={{ bgcolor: 'grey.50' }}
+                                                        sx={{ bgcolor: 'action.hover' }}
                                                     >
                                                         {renderDetail(row.original)}
                                                     </TableCell>
@@ -833,7 +842,7 @@ export default function DataTable({
                                             <TableCell
                                                 key={column.id}
                                                 sx={{
-                                                    bgcolor: 'grey.100',
+                                                    bgcolor: 'action.hover',
                                                     color: 'text.primary',
                                                     fontWeight: 600,
                                                     textAlign: meta?.align ?? 'start',

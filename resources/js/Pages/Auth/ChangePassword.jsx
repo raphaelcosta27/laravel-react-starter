@@ -4,6 +4,8 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import LogoutIcon from '@mui/icons-material/Logout';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -40,14 +42,14 @@ export default function ChangePassword() {
 
                 <Stack component="form" spacing={2} onSubmit={submit}>
                     <TextField
-                        {...fieldProps(form, 'current_password')}
+                        {...fieldProps(form, 'current_password', { kind: 'password' })}
                         type="password"
                         label={__('Current Password')}
                         autoComplete="current-password"
                     />
 
                     <TextField
-                        {...fieldProps(form, 'password')}
+                        {...fieldProps(form, 'password', { kind: 'password' })}
                         type="password"
                         label={__('New Password')}
                         autoComplete="new-password"
@@ -56,7 +58,7 @@ export default function ChangePassword() {
                     <PasswordStrength value={form.data.password} />
 
                     <TextField
-                        {...fieldProps(form, 'password_confirmation')}
+                        {...fieldProps(form, 'password_confirmation', { kind: 'password' })}
                         type="password"
                         label={__('Confirm Password')}
                         autoComplete="new-password"
@@ -66,11 +68,12 @@ export default function ChangePassword() {
                         direction="row"
                         sx={{ alignItems: 'center', justifyContent: 'space-between' }}
                     >
-                        <Button component={PostLink} href={route('logout')}>
+                        <Button startIcon={<LogoutIcon />} component={PostLink} href={route('logout')}>
                             {__('Log Out')}
                         </Button>
 
                         <Button
+                            startIcon={<SaveOutlinedIcon />}
                             type="submit"
                             variant="contained"
                             disabled={form.processing}

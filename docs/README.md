@@ -17,6 +17,7 @@ Cada documento traz objetivo, regras, comportamentos, configuração e decisões
 - [Projeto base](especificacoes/projeto-base.md)
 - [Painel de administrador](especificacoes/painel-administrador.md)
 - [Interface em Material Design](especificacoes/material-design.md)
+- [Layout](especificacoes/layout.md)
 - [Logs diários](especificacoes/logs-diarios.md)
 - [Histórico de alterações](especificacoes/historico-alteracoes.md)
 - [Cobertura de permissões](especificacoes/cobertura-permissoes.md)

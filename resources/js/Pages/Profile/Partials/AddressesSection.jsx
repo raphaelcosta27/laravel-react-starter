@@ -6,6 +6,7 @@ import { useTranslations } from '@/lib/i18n';
 import { router, usePage } from '@inertiajs/react';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -157,6 +158,7 @@ export default function AddressesSection({
 
             <Box>
                 <Button
+                    startIcon={<AddIcon />}
                     ref={addButton}
                     variant="contained"
                     onClick={() => setForm({ record: null })}

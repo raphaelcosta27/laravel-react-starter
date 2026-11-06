@@ -1,5 +1,5 @@
 import NotificationBell from '@/Components/NotificationBell';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppShell from '@/Layouts/AppShell';
 import {
     act,
     fireEvent,
@@ -137,7 +137,7 @@ describe('sino', () => {
         setPageProps({
             auth: { user: { id: 1, name: 'Ana', email: 'a@b.c' }, displayName: 'Ana', permissions: [] },
         });
-        render(<AuthenticatedLayout title="Página">conteúdo</AuthenticatedLayout>);
+        render(<AppShell>conteúdo</AppShell>);
 
         expect(screen.getByRole('button', { name: /^Notifications:/ })).toBeTruthy();
     });

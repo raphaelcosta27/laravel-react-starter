@@ -1,6 +1,8 @@
 import UserAvatar from '@/Components/UserAvatar';
 import { useTranslations } from '@/lib/i18n';
 import { router, usePage } from '@inertiajs/react';
+import PhotoCameraOutlinedIcon from '@mui/icons-material/PhotoCameraOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -77,6 +79,7 @@ export default function UpdateAvatarForm({ maxKb = 2048 }) {
                 />
 
                 <Button
+                    startIcon={<PhotoCameraOutlinedIcon />}
                     variant="contained"
                     disabled={processing}
                     onClick={() => input.current.click()}
@@ -85,7 +88,7 @@ export default function UpdateAvatarForm({ maxKb = 2048 }) {
                 </Button>
 
                 {auth.avatarUrl && (
-                    <Button color="inherit" disabled={processing} onClick={remove}>
+                    <Button startIcon={<DeleteOutlinedIcon />} color="inherit" disabled={processing} onClick={remove}>
                         {__('Remove picture')}
                     </Button>
                 )}

@@ -3,6 +3,8 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import CheckIcon from '@mui/icons-material/Check';
+import ForwardToInboxOutlinedIcon from '@mui/icons-material/ForwardToInboxOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -54,6 +56,7 @@ export default function LoginCode({ minutes, status }) {
                 <Stack component="form" spacing={2} onSubmit={submit}>
                     <TextField
                         {...fieldProps(form, 'code', {
+                            kind: 'pin',
                             required: true,
                             htmlInput: { maxLength: 6, inputMode: 'numeric' },
                         })}
@@ -63,6 +66,7 @@ export default function LoginCode({ minutes, status }) {
                     />
 
                     <Button
+                        startIcon={<CheckIcon />}
                         type="submit"
                         variant="contained"
                         disabled={form.processing}
@@ -71,7 +75,7 @@ export default function LoginCode({ minutes, status }) {
                     </Button>
                 </Stack>
 
-                <Button disabled={form.processing} onClick={resend}>
+                <Button startIcon={<ForwardToInboxOutlinedIcon />} disabled={form.processing} onClick={resend}>
                     {__('Send another code')}
                 </Button>
 

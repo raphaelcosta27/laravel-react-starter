@@ -5,6 +5,7 @@ import { useTranslations } from '@/lib/i18n';
 import { useForm } from '@inertiajs/react';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LockResetOutlinedIcon from '@mui/icons-material/LockResetOutlined';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -88,6 +89,7 @@ export default function UpdatePasswordForm() {
 
                 <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
                     <Button
+                        startIcon={<SaveOutlinedIcon />}
                         type="submit"
                         variant="contained"
                         disabled={form.processing}

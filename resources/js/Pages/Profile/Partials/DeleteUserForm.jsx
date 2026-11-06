@@ -3,6 +3,8 @@ import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { useForm } from '@inertiajs/react';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -57,6 +59,7 @@ export default function DeleteUserForm() {
             </header>
 
             <Button
+                startIcon={<DeleteOutlinedIcon />}
                 variant="contained"
                 color="error"
                 onClick={() => setConfirming(true)}
@@ -94,9 +97,10 @@ export default function DeleteUserForm() {
                     </DialogContent>
 
                     <DialogActions>
-                        <Button onClick={closeModal}>{__('Cancel')}</Button>
+                        <Button startIcon={<CloseIcon />} onClick={closeModal}>{__('Cancel')}</Button>
 
                         <Button
+                            startIcon={<DeleteOutlinedIcon />}
                             type="submit"
                             variant="contained"
                             color="error"

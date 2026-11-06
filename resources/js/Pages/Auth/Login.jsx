@@ -4,6 +4,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import LoginIcon from '@mui/icons-material/Login';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
@@ -55,7 +56,7 @@ export default function Login({
 
                 <Stack component="form" spacing={2} onSubmit={submit}>
                     <TextField
-                        {...fieldProps(form, 'email')}
+                        {...fieldProps(form, 'email', { kind: 'email' })}
                         type="email"
                         label={__('Email')}
                         autoComplete="username"
@@ -63,7 +64,7 @@ export default function Login({
                     />
 
                     <TextField
-                        {...fieldProps(form, 'password')}
+                        {...fieldProps(form, 'password', { kind: 'password' })}
                         type="password"
                         label={__('Password')}
                         autoComplete="current-password"
@@ -108,6 +109,7 @@ export default function Login({
                         )}
 
                         <Button
+                            startIcon={<LoginIcon />}
                             type="submit"
                             variant="contained"
                             disabled={form.processing}

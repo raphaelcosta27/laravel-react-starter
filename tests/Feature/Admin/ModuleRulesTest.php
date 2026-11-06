@@ -18,9 +18,10 @@ class ModuleRulesTest extends TestCase
      * @param  array<string, array<string, mixed>>  $modules
      * @param  array<int, string>  $permissions
      * @param  array<int, string>  $menu
+     * @param  array<string, bool>|null  $icons
      * @return array<int, string>
      */
-    private function problems(array $modules, array $permissions, array $menu): array
+    private function problems(array $modules, array $permissions, array $menu, ?array $icons = null): array
     {
         $problems = [];
         $declared = [];
@@ -56,13 +57,37 @@ class ModuleRulesTest extends TestCase
             $problems[] = "menu {$code} sem módulo";
         }
 
+        foreach (array_keys($icons === null ? [] : $modules) as $key) {
+            if (! array_key_exists($key, $icons)) {
+                $problems[] = "módulo {$key} fora do menu";
+            } elseif (! $icons[$key]) {
+                $problems[] = "módulo {$key} sem ícone";
+            }
+        }
+
         return $problems;
+    }
+
+    /**
+     * Chave de cada item de resources/js/navigation.js e se ele tem ícone.
+     *
+     * @return array<string, bool>
+     */
+    private function menuIcons(): array
+    {
+        preg_match_all('/\{[^{}]*key:[^{}]*\}/', File::get(resource_path('js/navigation.js')), $items);
+
+        return collect($items[0])->mapWithKeys(function (string $item) {
+            preg_match("/key: '([a-z_]+)'/", $item, $key);
+
+            return [$key[1] => preg_match('/icon: [A-Za-z]+Icon/', $item) === 1];
+        })->all();
     }
 
     /** @return array<int, string> */
     private function menuPermissions(): array
     {
-        preg_match_all("/permission: '([a-z_]+)'/", File::get(resource_path('js/Layouts/AuthenticatedLayout.jsx')), $matches);
+        preg_match_all("/permission: '([a-z_]+)'/", File::get(resource_path('js/navigation.js')), $matches);
 
         return $matches[1];
     }
@@ -75,7 +100,22 @@ class ModuleRulesTest extends TestCase
             Modules::all(),
             array_keys(trans('permissions', [], 'pt_BR')),
             $this->menuPermissions(),
+            $this->menuIcons(),
         ));
+    }
+
+    public function test_a_module_without_icon_is_pointed_out(): void
+    {
+        $modules = ['novo' => ['view' => 'ver_novo', 'basic' => ['ver_novo', 'a', 'b', 'c']]];
+
+        $this->assertContains('módulo novo sem ícone', $this->problems($modules, ['ver_novo', 'a', 'b', 'c'], ['ver_novo'], ['novo' => false]));
+    }
+
+    public function test_a_module_outside_the_menu_is_pointed_out(): void
+    {
+        $modules = ['novo' => ['view' => 'ver_novo', 'basic' => ['ver_novo', 'a', 'b', 'c']]];
+
+        $this->assertContains('módulo novo fora do menu', $this->problems($modules, ['ver_novo', 'a', 'b', 'c'], [], []));
     }
 
     public function test_a_module_without_view_is_pointed_out(): void

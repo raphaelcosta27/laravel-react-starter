@@ -2,6 +2,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import CheckIcon from '@mui/icons-material/Check';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -34,7 +35,7 @@ export default function ConfirmPassword() {
 
                 <Stack component="form" spacing={2} onSubmit={submit}>
                     <TextField
-                        {...fieldProps(form, 'password')}
+                        {...fieldProps(form, 'password', { kind: 'password' })}
                         type="password"
                         label={__('Password')}
                         autoFocus
@@ -42,6 +43,7 @@ export default function ConfirmPassword() {
 
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <Button
+                            startIcon={<CheckIcon />}
                             type="submit"
                             variant="contained"
                             disabled={form.processing}

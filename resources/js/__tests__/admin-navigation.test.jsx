@@ -1,5 +1,5 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { render, screen, within } from '@testing-library/react';
+import AppShell from '@/Layouts/AppShell';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { axe } from 'jest-axe';
 import { beforeEach, describe, expect, test } from 'vitest';
 import translations from '../../../lang/pt_BR.json';
@@ -13,32 +13,35 @@ const layout = (auth) => {
         auth: { user: { name: 'Ana', email: 'ana@example.com' }, ...auth },
     });
 
-    return render(<AuthenticatedLayout>conteúdo</AuthenticatedLayout>);
+    const view = render(<AppShell>conteúdo</AppShell>);
+    const config = screen.queryByRole('button', { name: 'Config' });
+
+    if (config) {
+        fireEvent.click(config);
+    }
+
+    return view;
 };
 
 const menu = () => within(screen.getByRole('navigation'));
 
-/** O menu lateral fechado fica invisível e sem nome acessível: conta pelo texto. */
-const links = (area) =>
-    menu()
-        .getAllByRole('link', { hidden: true })
-        .filter((link) => link.textContent === area);
+const links = (area) => menu().queryAllByRole('link', { name: area });
 
 describe('menu do painel', () => {
     beforeEach(() => setPageProps({ translations }));
 
-    test('administrador vê as três áreas nos dois menus', () => {
+    test('administrador vê as três áreas', () => {
         layout({ isAdministrator: true, permissions: [] });
 
         areas.forEach((area) => {
-            expect(links(area)).toHaveLength(2);
+            expect(links(area)).toHaveLength(1);
         });
     });
 
     test('usuário vê somente as áreas permitidas', () => {
         layout({ isAdministrator: false, permissions: ['visualizar_usuario'] });
 
-        expect(links('Usuários')).toHaveLength(2);
+        expect(links('Usuários')).toHaveLength(1);
         expect(links('Perfis')).toHaveLength(0);
         expect(links('Permissões')).toHaveLength(0);
     });

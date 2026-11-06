@@ -5,6 +5,7 @@ import EnvironmentForm, {
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
@@ -69,6 +70,7 @@ export default function Index({ groups, version, writable, editable }) {
                     {!readOnly && (
                         <Stack direction="row">
                             <Button
+                                startIcon={<SaveOutlinedIcon />}
                                 type="submit"
                                 variant="contained"
                                 disabled={form.processing}

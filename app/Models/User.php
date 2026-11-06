@@ -26,6 +26,10 @@ class User extends Authenticatable implements MustVerifyEmail
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, RecordsChanges, SoftDeletes;
 
+    public const THEME_SYSTEM = 'system';
+
+    public const THEMES = ['light', 'dark', self::THEME_SYSTEM];
+
     /**
      * Todo usuário nasce ativo e com a troca de senha pendente.
      *

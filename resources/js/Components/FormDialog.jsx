@@ -1,5 +1,10 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import ConfirmDialog from '@/Components/ConfirmDialog';
 import { useTranslations } from '@/lib/i18n';
+import { useBackClose } from '@/lib/useBackClose';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -46,6 +51,8 @@ export default function FormDialog({
         onClose();
     };
 
+    useBackClose(open, close);
+
     const submit = (event) => {
         event.preventDefault();
         onSubmit();
@@ -70,19 +77,41 @@ export default function FormDialog({
                     minHeight: 0,
                 }}
             >
-                <DialogTitle id={titleId}>{title}</DialogTitle>
+                <DialogTitle
+                    sx={{ alignItems: 'center', display: 'flex', gap: 1 }}
+                >
+                    {fullScreen && (
+                        <ActionIconButton
+                            icon={ArrowBackIcon}
+                            label={__('Back')}
+                            disabled={processing}
+                            onClick={close}
+                        />
+                    )}
+
+                    <span id={titleId}>{title}</span>
+                </DialogTitle>
 
                 <DialogContent dividers>
                     <Box sx={{ display: 'grid', gap: 2 }}>{children}</Box>
                 </DialogContent>
 
                 <DialogActions>
-                    <Button disabled={processing} onClick={close}>
+                    <Button
+                        startIcon={<CloseIcon />}
+                        disabled={processing}
+                        onClick={close}
+                    >
                         {__('Cancel')}
                     </Button>
 
                     {!hideSubmit && (
-                        <Button type="submit" variant="contained" disabled={processing}>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            startIcon={<SaveOutlinedIcon />}
+                            disabled={processing}
+                        >
                             {submitLabel ?? __('Save')}
                         </Button>
                     )}

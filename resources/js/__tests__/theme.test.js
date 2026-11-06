@@ -57,6 +57,51 @@ describe('createAppTheme', () => {
         ).toBeGreaterThanOrEqual(4.5);
     });
 
+    test.each([
+        ['#3949ab'],
+        ['#ffeb3b'],
+        ['#0d1b4c'],
+        ['#ffffff'],
+        ['#000000'],
+    ])('%s fica legível nos dois esquemas', (brand) => {
+        const { colorSchemes } = createAppTheme({
+            primaryColor: brand,
+            secondaryColor: brand,
+        });
+
+        ['light', 'dark'].forEach((name) => {
+            const { palette } = colorSchemes[name];
+
+            [palette.background.default, palette.background.paper].forEach(
+                (surface) => {
+                    ['primary', 'secondary'].forEach((tone) => {
+                        expect(
+                            getContrastRatio(palette[tone].main, surface),
+                        ).toBeGreaterThanOrEqual(4.5);
+                    });
+                    expect(
+                        getContrastRatio(palette.text.primary, surface),
+                    ).toBeGreaterThanOrEqual(4.5);
+                    expect(
+                        getContrastRatio(palette.text.secondary, surface),
+                    ).toBeGreaterThanOrEqual(4.5);
+                },
+            );
+
+            expect(
+                getContrastRatio(palette.primary.main, palette.primary.contrastText),
+            ).toBeGreaterThanOrEqual(4.5);
+        });
+    });
+
+    test('o esquema fica em um atributo do documento', () => {
+        const theme = createAppTheme();
+
+        expect(theme.colorSchemeSelector).toBe('data-color-scheme');
+        expect(theme.shape.borderRadius).toBe(12);
+        expect(theme.colorSchemes.dark.palette.mode).toBe('dark');
+    });
+
     test('ícones importados por caminho funcionam nos testes', () => {
         expect(EditIcon).toBeTruthy();
     });

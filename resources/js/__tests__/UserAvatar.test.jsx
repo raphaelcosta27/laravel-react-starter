@@ -1,6 +1,6 @@
 import PersonAvatar from '@/Components/PersonAvatar';
 import UserAvatar, { initials } from '@/Components/UserAvatar';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppShell from '@/Layouts/AppShell';
 import Dashboard from '@/Pages/Dashboard';
 import UpdateAvatarForm from '@/Pages/Profile/Partials/UpdateAvatarForm';
 import { fireEvent, render, screen } from '@testing-library/react';
@@ -174,9 +174,10 @@ describe('UpdateAvatarForm', () => {
 
 describe('saudação', () => {
     test('o menu usa o nome preferido', () => {
-        render(<AuthenticatedLayout title="Página">conteúdo</AuthenticatedLayout>);
+        render(<AppShell>conteúdo</AppShell>);
 
-        expect(screen.getAllByText('Hello, Aninha').length).toBeGreaterThan(0);
+        expect(screen.getByRole('button', { name: 'Hello, Aninha' })).toBeTruthy();
+        expect(screen.getByText('Aninha')).toBeTruthy();
     });
 
     test('o painel inicial usa o nome preferido', () => {

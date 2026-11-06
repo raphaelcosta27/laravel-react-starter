@@ -84,6 +84,9 @@ Everything that varies between projects lives in `.env`. The main options:
 | `APP_URL` | `http://127.0.0.1:8000` | Address used in email links |
 | `SERVER_PORT` | `8000` | Local port; must match `APP_URL` |
 | `APP_LOGO` | `/images/logo.svg` | Application logo |
+| `APP_LOGO_DARK` | empty | Logo in the dark theme. Empty uses `APP_LOGO` |
+| `APP_TAGLINE` | empty | Brand area sentence, next to the login |
+| `APP_ICON` | `/images/icon` | Prefix of the install icons, ending in `-192.png` and `-512.png` |
 | `APP_FAVICON` | `/favicon.ico` | Browser icon |
 | `APP_PRIMARY_COLOR` | `#3949ab` | Main interface color, hexadecimal and in quotes |
 | `APP_SECONDARY_COLOR` | `#00695c` | Secondary interface color, hexadecimal and in quotes |
@@ -321,6 +324,10 @@ php vendor/bin/phpunit -c phpunit.mysql.xml
 ```
 
 ### Interface
+
+The menu sits on the side: hidden on phones, opened by the three-line icon, and collapsible on computers. Each person picks
+the Light, Dark or System theme in the account menu, and the choice is kept in the account. On phones, the system can be
+added to the home screen and opens full screen. The rules are in [Layout](docs/especificacoes/layout.md).
 
 Screens use [Material UI](https://mui.com/material-ui/), in its free version. The theme is in `resources/js/theme.js`; an
 invalid color falls back to the default.

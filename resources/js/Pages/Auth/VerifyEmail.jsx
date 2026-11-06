@@ -2,6 +2,8 @@ import PostLink from '@/Components/PostLink';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import ForwardToInboxOutlinedIcon from '@mui/icons-material/ForwardToInboxOutlined';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -49,6 +51,7 @@ export default function VerifyEmail({ status }) {
                     onSubmit={submit}
                 >
                     <Button
+                        startIcon={<ForwardToInboxOutlinedIcon />}
                         type="submit"
                         variant="contained"
                         disabled={form.processing}
@@ -56,7 +59,7 @@ export default function VerifyEmail({ status }) {
                         {__('Resend Verification Email')}
                     </Button>
 
-                    <Button component={PostLink} href={route('logout')}>
+                    <Button startIcon={<LogoutIcon />} component={PostLink} href={route('logout')}>
                         {__('Log Out')}
                     </Button>
                 </Stack>

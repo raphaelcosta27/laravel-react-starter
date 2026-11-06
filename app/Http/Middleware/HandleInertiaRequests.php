@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use App\Support\Auth\PasswordCriteria;
 use App\Support\ScreenNotifications;
 use Illuminate\Http\Request;
@@ -36,6 +37,8 @@ class HandleInertiaRequests extends Middleware
             'appName' => config('app.name'),
             'branding' => [
                 'logo' => config('template.branding.logo'),
+                'logoDark' => config('template.branding.logo_dark') ?: null,
+                'tagline' => config('template.branding.tagline') ?: null,
                 'primaryColor' => $this->color(config('template.branding.primary_color')),
                 'secondaryColor' => $this->color(config('template.branding.secondary_color')),
             ],
@@ -62,6 +65,7 @@ class HandleInertiaRequests extends Middleware
             'user' => $user,
             'displayName' => rescue(fn () => $user?->displayName(), null, false),
             'avatarUrl' => rescue(fn () => $user?->avatarUrl(), null, false),
+            'theme' => $user === null ? null : ($user->theme ?? User::THEME_SYSTEM),
             'isAdministrator' => $isAdministrator,
             'permissions' => $isAdministrator ? [] : rescue(fn () => $user?->effectivePermissions() ?? [], [], false),
         ];

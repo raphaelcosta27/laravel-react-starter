@@ -11,6 +11,7 @@ Dar a todas as telas o mesmo visual, com ações discretas e formulários em mod
 - Abaixo de 600 px, cada registro vira um cartão com os campos essenciais, sem rolagem horizontal da página.
 - Em ponteiro de toque, os botões de ícone têm ao menos 44 px.
 - Criação e edição abrem em modal.
+- Estrutura, temas, ícones de campos e botões seguem a [especificação de layout](layout.md).
 - As telas cumprem a WCAG 2.2 AA.
 
 ## Comportamentos

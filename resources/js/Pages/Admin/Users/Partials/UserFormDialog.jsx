@@ -36,6 +36,7 @@ export default function UserFormDialog({ form }) {
         >
             <TextField
                 {...fieldProps(fields, 'name', {
+                    kind: 'person',
                     required: true,
                     htmlInput: { maxLength: 255 },
                 })}
@@ -45,6 +46,7 @@ export default function UserFormDialog({ form }) {
 
             <TextField
                 {...fieldProps(fields, 'email', {
+                    kind: 'email',
                     required: true,
                     htmlInput: { maxLength: 255 },
                 })}

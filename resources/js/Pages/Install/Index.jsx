@@ -7,6 +7,9 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -34,7 +37,7 @@ function Unlock({ codePath }) {
             </Typography>
 
             <TextField
-                {...fieldProps(form, 'code', { required: true })}
+                {...fieldProps(form, 'code', { kind: 'key', required: true })}
                 label={__('Installation code')}
                 autoComplete="off"
                 autoFocus
@@ -46,7 +49,7 @@ function Unlock({ codePath }) {
                 )}
             </Typography>
 
-            <Button type="submit" variant="contained" disabled={form.processing}>
+            <Button startIcon={<ArrowForwardIcon />} type="submit" variant="contained" disabled={form.processing}>
                 {__('Continue')}
             </Button>
         </Stack>
@@ -84,7 +87,7 @@ function Environment({ groups, writable }) {
 
             <EnvironmentForm groups={groups} form={form} />
 
-            <Button type="submit" variant="contained" disabled={form.processing}>
+            <Button type="submit" variant="contained" startIcon={<StorageOutlinedIcon />} disabled={form.processing}>
                 {__('Save and test connection')}
             </Button>
         </Stack>
@@ -112,7 +115,7 @@ function Database() {
                 <Alert severity="error">{form.errors.database}</Alert>
             )}
 
-            <Button type="submit" variant="contained" disabled={form.processing}>
+            <Button type="submit" variant="contained" startIcon={<StorageOutlinedIcon />} disabled={form.processing}>
                 {__('Prepare the database')}
             </Button>
         </Stack>
@@ -144,21 +147,21 @@ function FirstUser() {
             </Typography>
 
             <TextField
-                {...fieldProps(form, 'name', { required: true })}
+                {...fieldProps(form, 'name', { kind: 'person', required: true })}
                 label={__('Name')}
                 autoComplete="name"
                 autoFocus
             />
 
             <TextField
-                {...fieldProps(form, 'email', { required: true })}
+                {...fieldProps(form, 'email', { kind: 'email', required: true })}
                 type="email"
                 label={__('Email')}
                 autoComplete="username"
             />
 
             <TextField
-                {...fieldProps(form, 'password', { required: true })}
+                {...fieldProps(form, 'password', { kind: 'password', required: true })}
                 type="password"
                 label={__('Password')}
                 autoComplete="new-password"
@@ -167,13 +170,13 @@ function FirstUser() {
             <PasswordStrength value={form.data.password} />
 
             <TextField
-                {...fieldProps(form, 'password_confirmation', { required: true })}
+                {...fieldProps(form, 'password_confirmation', { kind: 'password', required: true })}
                 type="password"
                 label={__('Confirm Password')}
                 autoComplete="new-password"
             />
 
-            <Button type="submit" variant="contained" disabled={form.processing}>
+            <Button type="submit" variant="contained" startIcon={<CheckCircleOutlinedIcon />} disabled={form.processing}>
                 {__('Finish installation')}
             </Button>
         </Stack>

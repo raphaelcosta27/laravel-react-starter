@@ -4,6 +4,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -37,21 +38,21 @@ export default function Register() {
 
                 <Stack component="form" spacing={2} onSubmit={submit}>
                     <TextField
-                        {...fieldProps(form, 'name', { required: true })}
+                        {...fieldProps(form, 'name', { kind: 'person', required: true })}
                         label={__('Name')}
                         autoComplete="name"
                         autoFocus
                     />
 
                     <TextField
-                        {...fieldProps(form, 'email', { required: true })}
+                        {...fieldProps(form, 'email', { kind: 'email', required: true })}
                         type="email"
                         label={__('Email')}
                         autoComplete="username"
                     />
 
                     <TextField
-                        {...fieldProps(form, 'password', { required: true })}
+                        {...fieldProps(form, 'password', { kind: 'password', required: true })}
                         type="password"
                         label={__('Password')}
                         autoComplete="new-password"
@@ -61,6 +62,7 @@ export default function Register() {
 
                     <TextField
                         {...fieldProps(form, 'password_confirmation', {
+                            kind: 'password',
                             required: true,
                         })}
                         type="password"
@@ -78,6 +80,7 @@ export default function Register() {
                         </TextLink>
 
                         <Button
+                            startIcon={<PersonAddOutlinedIcon />}
                             type="submit"
                             variant="contained"
                             disabled={form.processing}

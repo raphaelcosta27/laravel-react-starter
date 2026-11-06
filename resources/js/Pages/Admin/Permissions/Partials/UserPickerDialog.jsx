@@ -2,6 +2,7 @@ import { requestJson } from '@/lib/http';
 import { useTranslations } from '@/lib/i18n';
 import { FORM_VISIT, withListingQuery } from '@/lib/listing';
 import { router } from '@inertiajs/react';
+import CloseIcon from '@mui/icons-material/Close';
 import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -92,7 +93,7 @@ export default function UserPickerDialog({ open, onClose }) {
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose}>{__('Cancel')}</Button>
+                <Button startIcon={<CloseIcon />} onClick={onClose}>{__('Cancel')}</Button>
             </DialogActions>
         </Dialog>
     );

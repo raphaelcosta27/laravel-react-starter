@@ -521,5 +521,16 @@
     "User": "Usuário",
     "Module": "Módulo",
     "The module of a system permission cannot be changed.": "O módulo de uma permissão de sistema não pode ser alterado.",
-    "Other permissions": "Outras"
+    "Other permissions": "Outras",
+    "Collapse menu": "Recolher menu",
+    "Expand menu": "Expandir menu",
+    "Skip to content": "Pular para o conteúdo",
+    "Theme": "Tema",
+    "Light": "Claro",
+    "Dark": "Escuro",
+    "System": "Sistema",
+    "Open menu": "Abrir menu",
+    "Back": "Voltar",
+    "Config": "Config",
+    "Environment variables": "Variáveis de Ambiente"
 }

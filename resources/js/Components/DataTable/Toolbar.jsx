@@ -1,6 +1,7 @@
 import ActionIconButton from '@/Components/ActionIconButton';
 import ColumnFilter from '@/Components/DataTable/ColumnFilter';
 import { useTranslations } from '@/lib/i18n';
+import { useShortcuts } from '@/lib/useShortcuts';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -11,7 +12,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 const isEmpty = (value) =>
     value === '' ||
@@ -34,6 +35,9 @@ export default function Toolbar({
     const [term, setTerm] = useState(query.search ?? '');
     const [open, setOpen] = useState(false);
     const [draft, setDraft] = useState(query.filter ?? {});
+    const searchInput = useRef(null);
+
+    useShortcuts({ k: () => searchInput.current?.focus() });
 
     const activeFilters = Object.keys(query.filter ?? {}).length;
 
@@ -71,6 +75,7 @@ export default function Toolbar({
                 >
                     <TextField
                         id="table-search"
+                        inputRef={searchInput}
                         type="search"
                         size="small"
                         fullWidth
@@ -175,6 +180,7 @@ export default function Toolbar({
                     </Box>
 
                     <Button
+                        startIcon={<FilterAltIcon />}
                         type="submit"
                         variant="contained"
                         size="small"

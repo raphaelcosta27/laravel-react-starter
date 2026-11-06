@@ -37,6 +37,7 @@ export default function PermissionFormDialog({ form, modules = [] }) {
         >
             <TextField
                 {...fieldProps(fields, 'title', {
+                    kind: 'label',
                     required: true,
                     htmlInput: { maxLength: 150 },
                 })}
@@ -46,6 +47,7 @@ export default function PermissionFormDialog({ form, modules = [] }) {
 
             <TextField
                 {...fieldProps(fields, 'code', {
+                    kind: 'key',
                     required: true,
                     htmlInput: { maxLength: 100, readOnly: editing },
                 })}
@@ -60,6 +62,7 @@ export default function PermissionFormDialog({ form, modules = [] }) {
 
             <TextField
                 {...fieldProps(fields, 'description', {
+                    kind: 'description',
                     required: true,
                     htmlInput: { maxLength: 255 },
                 })}

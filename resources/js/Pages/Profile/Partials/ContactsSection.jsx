@@ -5,6 +5,7 @@ import { formatPhone } from '@/lib/phone';
 import { router } from '@inertiajs/react';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
+import AddIcon from '@mui/icons-material/Add';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -140,6 +141,7 @@ export default function ContactsSection({ contacts = [], relationships = [] }) {
 
             <Box>
                 <Button
+                    startIcon={<AddIcon />}
                     ref={addButton}
                     variant="contained"
                     onClick={() => setForm({ record: null })}

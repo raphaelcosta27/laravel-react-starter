@@ -26,7 +26,8 @@ Organizar as permissões pelas áreas do sistema, para que a tela mostre só o q
 
 ## Configuração
 
-Os módulos ficam em `template.modules`, com `label`, `view`, `basic`, `specific`, `without_records` e `enabled_by`. O
+Os módulos ficam em `template.modules`, com `label`, `view`, `basic`, `specific`, `without_records` e `enabled_by`, e o
+menu fica em `resources/js/navigation.js`. O
 passo a passo está em [estender o template](../guias/estender-template.md#novo-módulo).
 
 ## Decisões

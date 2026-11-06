@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/material/styles';
+import { useColorScheme, useTheme } from '@mui/material/styles';
 import { BarChart } from '@mui/x-charts/BarChart';
 import { LineChart } from '@mui/x-charts/LineChart';
 import { useId } from 'react';
@@ -13,6 +13,8 @@ const everyNth = (length) => {
 
 export default function DailyChartPlot({ label, series, type, height }) {
     const theme = useTheme();
+    const { mode, systemMode } = useColorScheme();
+    const { palette } = theme.colorSchemes?.[systemMode ?? mode] ?? theme;
     const gradientId = useId().replace(/\W/g, '');
 
     const common = {
@@ -20,7 +22,7 @@ export default function DailyChartPlot({ label, series, type, height }) {
         hideLegend: true,
         grid: { horizontal: true },
         margin: { left: 0, right: 16, top: 16, bottom: 0 },
-        colors: [theme.palette.primary.main],
+        colors: [palette.primary.main],
         yAxis: [
             { width: 32, tickMinStep: 1, disableLine: true, disableTicks: true },
         ],
@@ -64,12 +66,12 @@ export default function DailyChartPlot({ label, series, type, height }) {
                 <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
                     <stop
                         offset="0%"
-                        stopColor={theme.palette.primary.main}
+                        stopColor={palette.primary.main}
                         stopOpacity={0.45}
                     />
                     <stop
                         offset="100%"
-                        stopColor={theme.palette.primary.main}
+                        stopColor={palette.primary.main}
                         stopOpacity={0.08}
                     />
                 </linearGradient>

@@ -3,6 +3,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -42,7 +43,7 @@ export default function RequestAccess({ status }) {
 
                 <Stack component="form" spacing={2} onSubmit={submit}>
                     <TextField
-                        {...fieldProps(form, 'email')}
+                        {...fieldProps(form, 'email', { kind: 'email' })}
                         type="email"
                         label={__('Email')}
                         autoComplete="username"
@@ -56,6 +57,7 @@ export default function RequestAccess({ status }) {
                         <TextLink href={route('login')}>{__('Log in')}</TextLink>
 
                         <Button
+                            startIcon={<SendOutlinedIcon />}
                             type="submit"
                             variant="contained"
                             disabled={form.processing}

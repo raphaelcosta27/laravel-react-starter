@@ -22,7 +22,8 @@ Todo módulo novo traz suas permissões, e os testes apontam o que faltar. Veja
 1. Acrescente o módulo em `template.modules`, com Visualizar, Criar, Editar, Excluir e as específicas.
 2. Escreva título e descrição de cada código em `lang/pt_BR/permissions.php`.
 3. Rode o comando abaixo, que cria as permissões sem alterar as existentes.
-4. Proteja as rotas com `can:` e aponte o item de menu para a permissão Visualizar.
+4. Proteja as rotas com `can:` e declare o item em `resources/js/navigation.js`, com a permissão Visualizar e um ícone.
+   Os dois tamanhos do menu leem desse arquivo. Módulo de administração leva `group: CONFIG_GROUP` e vai para Config.
 
 ```bash
 php artisan db:seed --class=AdminPanelSeeder

@@ -3,6 +3,7 @@ import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { Head, useForm } from '@inertiajs/react';
+import LockResetOutlinedIcon from '@mui/icons-material/LockResetOutlined';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -36,14 +37,14 @@ export default function ResetPassword({ token, email }) {
 
                 <Stack component="form" spacing={2} onSubmit={submit}>
                     <TextField
-                        {...fieldProps(form, 'email')}
+                        {...fieldProps(form, 'email', { kind: 'email' })}
                         type="email"
                         label={__('Email')}
                         autoComplete="username"
                     />
 
                     <TextField
-                        {...fieldProps(form, 'password')}
+                        {...fieldProps(form, 'password', { kind: 'password' })}
                         type="password"
                         label={__('Password')}
                         autoComplete="new-password"
@@ -53,7 +54,7 @@ export default function ResetPassword({ token, email }) {
                     <PasswordStrength value={form.data.password} />
 
                     <TextField
-                        {...fieldProps(form, 'password_confirmation')}
+                        {...fieldProps(form, 'password_confirmation', { kind: 'password' })}
                         type="password"
                         label={__('Confirm Password')}
                         autoComplete="new-password"
@@ -61,6 +62,7 @@ export default function ResetPassword({ token, email }) {
 
                     <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
                         <Button
+                            startIcon={<LockResetOutlinedIcon />}
                             type="submit"
                             variant="contained"
                             disabled={form.processing}
