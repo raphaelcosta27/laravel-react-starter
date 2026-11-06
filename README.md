@@ -221,6 +221,12 @@ ScreenNotifications::send($profile->users, 'Title', 'Text', 'success', '/dashboa
 Types are `info`, `success`, `warning` and `error`. The link is optional and accepts an internal path or an http(s) address.
 Content is always shown as text. The count updates on navigation and every `NOTIFICATIONS_POLL_SECONDS`.
 
+## Home screen
+
+After login, the home screen shows blocks according to each person's permissions: profile, notifications and recent activity
+for everyone, and user, access and change indicators for those who manage. The cards open the list already filtered. Use
+`DASHBOARD_DISABLED_BLOCKS` to turn blocks off. See the [guide to add a block](docs/guias/estender-template.md).
+
 ## Browser installation
 
 While there are no users, every request goes to `/install`, which works even without `.env`, key or database. The wizard
@@ -274,7 +280,7 @@ is in the log of the day. If email delivery is down, use `LOGIN_TWO_FACTOR_ENABL
 ## Admin panel
 
 The panel manages profiles, permissions and users. Setup creates the master profile, the default profile and
-the 21 panel permissions, and the first user created in the system becomes an administrator.
+the 22 panel permissions, and the first user created in the system becomes an administrator.
 
 **Checking a permission.** A permission is identified by its code, and the same check works everywhere:
 

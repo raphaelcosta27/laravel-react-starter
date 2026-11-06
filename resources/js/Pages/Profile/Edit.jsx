@@ -29,7 +29,7 @@ export default function Edit({
             <Head title={__('Profile')} />
 
             <Stack spacing={3}>
-                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                <Paper id="personal-data" sx={{ p: { xs: 2, sm: 4 } }}>
                     <UpdateProfileInformationForm
                         mustVerifyEmail={mustVerifyEmail}
                         status={status}
@@ -39,18 +39,18 @@ export default function Edit({
                     />
                 </Paper>
 
-                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                <Paper id="avatar" sx={{ p: { xs: 2, sm: 4 } }}>
                     <UpdateAvatarForm maxKb={avatarMaxKb} />
                 </Paper>
 
-                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                <Paper id="contacts" sx={{ p: { xs: 2, sm: 4 } }}>
                     <ContactsSection
                         contacts={contacts}
                         relationships={relationships}
                     />
                 </Paper>
 
-                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                <Paper id="addresses" sx={{ p: { xs: 2, sm: 4 } }}>
                     <AddressesSection
                         addresses={addresses}
                         defaultCountry={defaultCountry}

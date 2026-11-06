@@ -1,5 +1,15 @@
 <?php
 
+use App\Support\Dashboard\Blocks\Accesses;
+use App\Support\Dashboard\Blocks\MyActivity;
+use App\Support\Dashboard\Blocks\Notifications;
+use App\Support\Dashboard\Blocks\PendingAccounts;
+use App\Support\Dashboard\Blocks\ProfileCompletion;
+use App\Support\Dashboard\Blocks\ProfileDistribution;
+use App\Support\Dashboard\Blocks\SystemMovement;
+use App\Support\Dashboard\Blocks\UserGrowth;
+use App\Support\Dashboard\Blocks\UsersOverview;
+
 return [
 
     /*
@@ -85,6 +95,29 @@ return [
         'enabled' => (bool) env('NOTIFICATIONS_ENABLED', true),
         'poll_seconds' => (int) env('NOTIFICATIONS_POLL_SECONDS', 60),
         'per_page' => (int) env('NOTIFICATIONS_PER_PAGE', 20),
+    ],
+
+    /*
+    | Tela inicial. Os blocos aparecem nesta ordem. Um projeto acrescenta o seu aqui
+    | e desliga os demais pela chave, em DASHBOARD_DISABLED_BLOCKS.
+    */
+    'dashboard' => [
+        'blocks' => [
+            ProfileCompletion::class,
+            Notifications::class,
+            MyActivity::class,
+            UsersOverview::class,
+            PendingAccounts::class,
+            ProfileDistribution::class,
+            Accesses::class,
+            UserGrowth::class,
+            SystemMovement::class,
+        ],
+        'disabled' => array_values(array_filter(array_map('trim', explode(',', (string) env('DASHBOARD_DISABLED_BLOCKS', ''))))),
+        'growth_days' => (int) env('DASHBOARD_GROWTH_DAYS', 30),
+        'movement_days' => (int) env('DASHBOARD_MOVEMENT_DAYS', 7),
+        'access_days' => (int) env('DASHBOARD_ACCESS_DAYS', 30),
+        'profile_items' => array_values(array_filter(array_map('trim', explode(',', (string) env('DASHBOARD_PROFILE_ITEMS', 'personal_data,avatar,contact,emergency_contact,main_address'))))),
     ],
 
     /*

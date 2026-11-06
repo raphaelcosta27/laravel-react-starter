@@ -216,6 +216,12 @@ ScreenNotifications::send($profile->users, 'Título', 'Texto', 'success', '/dash
 Os tipos são `info`, `success`, `warning` e `error`. O link é opcional e aceita caminho interno ou endereço http(s).
 O conteúdo é sempre exibido como texto. A contagem é atualizada ao navegar e a cada `NOTIFICATIONS_POLL_SECONDS`.
 
+## Tela inicial
+
+Depois do login, a tela inicial mostra blocos conforme as permissões de cada pessoa: perfil, notificações e atividade recente
+para todos, e indicadores de usuários, acessos e alterações para quem gerencia. Os cartões levam à lista já filtrada. Use
+`DASHBOARD_DISABLED_BLOCKS` para desligar blocos. Veja o [guia para adicionar um bloco](docs/guias/estender-template.md).
+
 ## Instalação pelo navegador
 
 Enquanto não há usuários, todo acesso vai para `/install`, que funciona mesmo sem `.env`, chave ou banco. O assistente pede
@@ -268,7 +274,7 @@ fica no log do dia. Se o envio de e-mail estiver fora do ar, use `LOGIN_TWO_FACT
 
 ## Painel de administrador
 
-O painel gerencia perfis, permissões e usuários. A preparação cria o perfil master, o perfil padrão e as 21
+O painel gerencia perfis, permissões e usuários. A preparação cria o perfil master, o perfil padrão e as 22
 permissões do painel, e o primeiro usuário criado no sistema vira administrador.
 
 **Verificar uma permissão.** A permissão é identificada pelo código, e a mesma verificação vale em todo lugar:

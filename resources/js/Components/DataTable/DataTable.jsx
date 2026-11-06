@@ -188,9 +188,19 @@ export default function DataTable({
         () => mergeOrder(storedOrder, dataColumnIds),
         [storedOrder, dataColumnIds],
     );
-    const [columnVisibility, setColumnVisibility] = useState(
-        preferences.columnVisibility ?? {},
+    const hiddenByDefault = useMemo(
+        () =>
+            Object.fromEntries(
+                columns
+                    .filter((column) => column.meta?.defaultHidden)
+                    .map((column) => [columnId(column), false]),
+            ),
+        [columns],
     );
+    const [columnVisibility, setColumnVisibility] = useState({
+        ...hiddenByDefault,
+        ...preferences.columnVisibility,
+    });
     const [columnSizing, setColumnSizing] = useState(
         preferences.columnSizing ?? {},
     );
@@ -436,7 +446,7 @@ export default function DataTable({
     const restore = () => {
         clear();
         setOrder(undefined);
-        setColumnVisibility({});
+        setColumnVisibility(hiddenByDefault);
         setColumnSizing({});
         request({});
     };

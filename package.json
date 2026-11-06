@@ -30,5 +30,8 @@
     },
     "engines": {
         "node": ">=22.12"
+    },
+    "dependencies": {
+        "@mui/x-charts": "9.17.0"
     }
 }

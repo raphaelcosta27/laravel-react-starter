@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Models\Concerns\RecordsChanges;
 use Database\Factories\UserFactory;
+use DateTimeInterface;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -71,6 +73,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'must_change_password' => 'boolean',
             'temporary_password_expires_at' => 'datetime',
+            'last_login_at' => 'datetime',
             'is_active' => 'boolean',
         ];
     }
@@ -99,6 +102,48 @@ class User extends Authenticatable implements MustVerifyEmail
     public function requirePasswordChange(): void
     {
         $this->forceFill(['must_change_password' => true])->save();
+    }
+
+    /** @param  Builder<User>  $query */
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
+
+    /** @param  Builder<User>  $query */
+    public function scopeInactive(Builder $query): void
+    {
+        $query->where('is_active', false);
+    }
+
+    /** @param  Builder<User>  $query */
+    public function scopeConfirmationPending(Builder $query): void
+    {
+        $query->whereNull('email_verified_at');
+    }
+
+    /** @param  Builder<User>  $query */
+    public function scopePasswordChangePending(Builder $query): void
+    {
+        $query->where('must_change_password', true);
+    }
+
+    /** @param  Builder<User>  $query */
+    public function scopeWithExpiredTemporaryPassword(Builder $query): void
+    {
+        $query->where('temporary_password_expires_at', '<', now());
+    }
+
+    /** @param  Builder<User>  $query */
+    public function scopeAccessedSince(Builder $query, DateTimeInterface $date): void
+    {
+        $query->where('last_login_at', '>=', $date);
+    }
+
+    /** @param  Builder<User>  $query */
+    public function scopeWithoutRecordedAccess(Builder $query): void
+    {
+        $query->whereNull('last_login_at');
     }
 
     /** @return BelongsTo<Profile, $this> */

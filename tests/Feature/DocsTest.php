@@ -9,7 +9,7 @@ class DocsTest extends TestCase
 {
     private const SECTIONS = ['## Objetivo', '## Regras', '## Comportamentos', '## Configuração', '## Decisões'];
 
-    private const VARIABLE = '/`((?:APP|DB|MAIL|LOGIN|PROFILE|ADDRESS|NOTIFICATIONS|LOG|HISTORY|INSTALL|ENVIRONMENT|TURNSTILE|PASSWORD|REGISTRATION|TEMPORARY|ADMIN|DEFAULT|EXPORT|INITIAL|DOCKER)_[A-Z_]+)`/';
+    private const VARIABLE = '/`((?:APP|DB|MAIL|LOGIN|PROFILE|ADDRESS|NOTIFICATIONS|LOG|HISTORY|INSTALL|ENVIRONMENT|TURNSTILE|PASSWORD|REGISTRATION|TEMPORARY|ADMIN|DEFAULT|EXPORT|INITIAL|DOCKER|DASHBOARD)_[A-Z_]+)`/';
 
     private const FORBIDDEN = [
         'caminho local do Windows' => '/\b[A-Z]:\\\\/',

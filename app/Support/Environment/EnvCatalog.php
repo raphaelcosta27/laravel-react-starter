@@ -18,7 +18,7 @@ class EnvCatalog
     private const PUBLIC_KEYS = ['TURNSTILE_SITE_KEY'];
 
     private const ORDER = [
-        'application', 'branding', 'database', 'mail', 'accounts', 'login', 'profile', 'notifications',
+        'application', 'branding', 'database', 'mail', 'accounts', 'login', 'profile', 'notifications', 'dashboard',
         'setup', 'panel', 'logs', 'infrastructure', 'other',
     ];
 
@@ -41,6 +41,7 @@ class EnvCatalog
         'PROFILE_' => 'profile',
         'ADDRESS_' => 'profile',
         'NOTIFICATIONS_' => 'notifications',
+        'DASHBOARD_' => 'dashboard',
         'INITIAL_' => 'setup',
         'INSTALL_' => 'setup',
         'ENVIRONMENT_' => 'setup',

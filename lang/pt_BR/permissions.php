@@ -21,5 +21,6 @@ return [
     'restaurar_perfil' => ['title' => 'Restaurar Perfis', 'description' => 'Permissão permite consultar e restaurar perfis excluídos.'],
     'restaurar_permissao' => ['title' => 'Restaurar Permissões', 'description' => 'Permissão permite consultar e restaurar permissões excluídas.'],
     'configura_env' => ['title' => 'Configurar Ambiente', 'description' => 'Permissão de confiança elevada: permite alterar o arquivo de ambiente, inclusive banco de dados e envio de e-mail.'],
+    'visualizar_historico' => ['title' => 'Visualizar Histórico', 'description' => 'Permite ver o movimento de alterações do sistema no painel.'],
     'restaurar_usuario' => ['title' => 'Restaurar Usuários', 'description' => 'Permissão permite consultar e restaurar usuários excluídos.'],
 ];

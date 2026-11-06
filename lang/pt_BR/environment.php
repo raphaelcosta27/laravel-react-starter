@@ -12,6 +12,7 @@ return [
         'login' => 'Login',
         'profile' => 'Perfil e endereços',
         'notifications' => 'Notificações',
+        'dashboard' => 'Tela inicial',
         'setup' => 'Instalação',
         'panel' => 'Painel de administrador',
         'logs' => 'Logs e histórico',
@@ -20,6 +21,11 @@ return [
     ],
 
     'descriptions' => [
+        'DASHBOARD_DISABLED_BLOCKS' => 'Blocos desligados na tela inicial, pela chave, separados por vírgula.',
+        'DASHBOARD_GROWTH_DAYS' => 'Dias do gráfico de novos usuários.',
+        'DASHBOARD_MOVEMENT_DAYS' => 'Dias do gráfico de alterações do sistema.',
+        'DASHBOARD_ACCESS_DAYS' => 'Dias considerados no indicador de acessos.',
+        'DASHBOARD_PROFILE_ITEMS' => 'Itens que contam no percentual do perfil.',
         'APP_NAME' => 'Nome exibido nas telas e nos e-mails.',
         'APP_ENV' => 'Ambiente: local, staging ou production.',
         'APP_KEY' => 'Chave de criptografia. Não pode ser alterada aqui: trocá-la invalida sessões e dados criptografados.',

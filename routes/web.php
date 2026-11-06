@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InstallController;
 use App\Http\Controllers\PostalCodeController;
@@ -10,13 +11,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScreenNotificationController;
 use App\Http\Middleware\EnsureNotificationsEnabled;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', HomeController::class)->name('home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware('account.ready')->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware('account.ready')->name('dashboard');
 
 Route::middleware('account.ready')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

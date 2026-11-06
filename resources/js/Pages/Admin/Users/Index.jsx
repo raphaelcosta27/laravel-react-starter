@@ -84,6 +84,18 @@ export default function Index({
                     row.original.confirmed ? __('Confirmed') : __('Pending'),
                 meta: { filter: 'boolean' },
             },
+            {
+                accessorKey: 'password_change_pending',
+                header: __('Password change pending'),
+                cell: ({ getValue }) => (getValue() ? __('Yes') : __('No')),
+                meta: { filter: 'boolean', defaultHidden: true },
+            },
+            {
+                accessorKey: 'temporary_password_expired',
+                header: __('Temporary password expired'),
+                cell: ({ getValue }) => (getValue() ? __('Yes') : __('No')),
+                meta: { filter: 'boolean', defaultHidden: true },
+            },
             ...(query.tab === 'trashed'
                 ? [{ accessorKey: 'deleted_at', header: __('Deleted at') }]
                 : []),

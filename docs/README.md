@@ -28,4 +28,5 @@ Cada documento traz objetivo, regras, comportamentos, configuração e decisões
 - [Notificações em tela](especificacoes/notificacoes.md)
 - [Primeira inicialização](especificacoes/primeira-inicializacao.md)
 - [Instalação Docker](especificacoes/docker.md)
+- [Dashboard gerencial](especificacoes/dashboard.md)
 - [Documentação pública](especificacoes/documentacao-publica.md)
