@@ -79,6 +79,10 @@ Everything that varies between projects lives in `.env`. The main options:
 | `TEMPORARY_PASSWORD_EXPIRE` | `60` | Validity of the temporary password and link, in minutes |
 | `INITIAL_USER_EMAIL` | `admin@example.com` | Initial user's email; empty skips creating the user |
 | `PASSWORD_MIN_LENGTH` | `8` | Minimum password length, from 8 to 72 |
+| `PROFILE_GENDERS` | `Female,Male,Non-binary,Prefer not to say,Other` | Gender options, translated by `lang/pt_BR.json` |
+| `PROFILE_CPF_REQUIRED` | `false` | Makes the CPF required on the profile page |
+| `PROFILE_AVATAR_MAX_KB` | `2048` | Maximum profile picture size, in KB. PHP's `upload_max_filesize` also applies |
+| `PROFILE_AVATAR_DISK` | `local` | Disk for profile pictures |
 | `INITIAL_USER_PASSWORD` | empty | Temporary password; empty generates one automatically |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Name of the master profile, used only on creation |
 | `DEFAULT_PROFILE_NAME` | `Usuário` | Name of the default profile, used only on creation |
@@ -143,6 +147,20 @@ The criteria live in `App\Support\Auth\PasswordCriteria`. The server validates w
 ```jsx
 <PasswordStrength value={form.data.password} />
 ```
+
+## Personal data
+
+The profile page stores the full name, preferred name, date of birth, gender, CPF and picture in the `user_dados` table
+(`App\Models\UserData`, `$user->personalData`). The record is created on the first save, and the full name follows
+`users.name` in both directions.
+
+The CPF is stored without the mask and is unique among accounts that are not deleted. It is hidden from serialization,
+masked in the change history and kept out of the session. Deleting an account frees the CPF; restoring it is refused if
+another account already uses it.
+
+Pictures live on a private disk and are served by `GET /profile/avatar` only to their owner. Replacing or removing one
+does not delete the previous file, whose path stays in the change history. Projects subject to data erasure requests
+need to handle these files.
 
 ## Login
 

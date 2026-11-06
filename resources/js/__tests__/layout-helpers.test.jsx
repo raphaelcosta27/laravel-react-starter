@@ -72,6 +72,7 @@ describe('layouts', () => {
             translations,
             auth: {
                 user: { name: 'Ana', email: 'ana@example.com' },
+                displayName: 'Ana',
                 isAdministrator: true,
                 permissions: [],
             },
@@ -90,7 +91,7 @@ describe('layouts', () => {
     test('o menu da conta traz perfil e saída', async () => {
         render(<AuthenticatedLayout>conteúdo</AuthenticatedLayout>);
 
-        fireEvent.click(screen.getByRole('button', { name: 'Ana' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Olá, Ana' }));
 
         const menu = await screen.findByRole('menu');
 

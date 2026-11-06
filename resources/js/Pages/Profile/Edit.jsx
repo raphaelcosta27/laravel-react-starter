@@ -4,10 +4,18 @@ import { Head } from '@inertiajs/react';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import DeleteUserForm from './Partials/DeleteUserForm';
+import UpdateAvatarForm from './Partials/UpdateAvatarForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 
-export default function Edit({ mustVerifyEmail, status }) {
+export default function Edit({
+    mustVerifyEmail,
+    status,
+    personalData,
+    genders,
+    cpfRequired,
+    avatarMaxKb,
+}) {
     const __ = useTranslations();
 
     return (
@@ -19,7 +27,14 @@ export default function Edit({ mustVerifyEmail, status }) {
                     <UpdateProfileInformationForm
                         mustVerifyEmail={mustVerifyEmail}
                         status={status}
+                        personalData={personalData}
+                        genders={genders}
+                        cpfRequired={cpfRequired}
                     />
+                </Paper>
+
+                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                    <UpdateAvatarForm maxKb={avatarMaxKb} />
                 </Paper>
 
                 <Paper sx={{ p: { xs: 2, sm: 4 } }}>

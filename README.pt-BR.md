@@ -75,6 +75,10 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `INITIAL_USER_EMAIL` | `admin@example.com` | E-mail do usuário inicial; vazio não cria o usuário |
 | `INITIAL_USER_PASSWORD` | vazio | Senha temporária; vazia gera uma automaticamente. Precisa cumprir os critérios de senha |
 | `PASSWORD_MIN_LENGTH` | `8` | Tamanho mínimo das senhas, de 8 a 72 |
+| `PROFILE_GENDERS` | `Female,Male,Non-binary,Prefer not to say,Other` | Opções de gênero, traduzidas por `lang/pt_BR.json` |
+| `PROFILE_CPF_REQUIRED` | `false` | Torna o CPF obrigatório no perfil |
+| `PROFILE_AVATAR_MAX_KB` | `2048` | Tamanho máximo da imagem de perfil, em KB. Respeite também o `upload_max_filesize` do PHP |
+| `PROFILE_AVATAR_DISK` | `local` | Disco das imagens de perfil |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Nome do perfil master, usado somente na criação |
 | `DEFAULT_PROFILE_NAME` | `Usuário` | Nome do perfil padrão, usado somente na criação |
 | `ADMIN_EMAIL_THROTTLE` | `3` | E-mails do painel por usuário de destino, por janela |
@@ -139,6 +143,19 @@ barra `Components/PasswordStrength.jsx` recebe os mesmos padrões pela prop comp
 ```jsx
 <PasswordStrength value={form.data.password} />
 ```
+
+## Dados pessoais
+
+A página de perfil guarda nome completo, como a pessoa quer ser chamada, data de nascimento, gênero, CPF e imagem
+na tabela `user_dados` (modelo `App\Models\UserData`, relação `$user->personalData`). O registro nasce no primeiro
+salvamento, e o nome completo acompanha `users.name` nos dois sentidos.
+
+O CPF é guardado sem máscara e é único entre contas não excluídas. Ele fica oculto na serialização, aparece mascarado
+no histórico e não vai para a sessão. Excluir a conta libera o CPF; restaurá-la é recusado se outra conta já o usa.
+
+As imagens ficam em disco privado e são servidas por `GET /profile/avatar` somente à própria pessoa. Trocar ou remover
+não apaga o arquivo anterior, cujo caminho fica no histórico. Projetos sujeitos a pedidos de eliminação de dados precisam
+tratar esses arquivos.
 
 ## Login
 

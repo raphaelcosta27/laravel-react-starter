@@ -1,4 +1,6 @@
 import PostLink from '@/Components/PostLink';
+import SelectField from '@/Components/SelectField';
+import { formatCpf } from '@/lib/cpf';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { useForm, usePage } from '@inertiajs/react';
@@ -8,12 +10,24 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
+export default function UpdateProfileInformation({
+    mustVerifyEmail,
+    status,
+    personalData = {},
+    genders = [],
+    cpfRequired = false,
+}) {
     const __ = useTranslations();
     const user = usePage().props.auth.user;
 
     const form = useForm({
         name: user.name,
+        preferred_name: personalData.preferred_name ?? '',
+        birth_date: personalData.birth_date ?? '',
+        gender: genders.some(({ value }) => value === personalData.gender)
+            ? personalData.gender
+            : '',
+        cpf: formatCpf(personalData.cpf),
         email: user.email,
     });
 
@@ -38,9 +52,50 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status }) {
             <Stack component="form" spacing={3} onSubmit={submit}>
                 <TextField
                     {...fieldProps(form, 'name', { required: true })}
-                    label={__('Name')}
+                    label={__('Full name')}
                     autoComplete="name"
                     autoFocus
+                />
+
+                <TextField
+                    {...fieldProps(form, 'preferred_name', {
+                        htmlInput: { maxLength: 100 },
+                    })}
+                    label={__('How should we call you?')}
+                    autoComplete="nickname"
+                />
+
+                <TextField
+                    {...fieldProps(form, 'birth_date')}
+                    type="date"
+                    label={__('Date of birth')}
+                    autoComplete="bday"
+                    slotProps={{ inputLabel: { shrink: true } }}
+                />
+
+                <SelectField
+                    {...fieldProps(form, 'gender')}
+                    size="medium"
+                    label={__('Gender')}
+                >
+                    <option value="">{__('Select')}</option>
+                    {genders.map(({ value, label }) => (
+                        <option key={value} value={value}>
+                            {label}
+                        </option>
+                    ))}
+                </SelectField>
+
+                <TextField
+                    {...fieldProps(form, 'cpf', {
+                        required: cpfRequired,
+                        htmlInput: { inputMode: 'numeric', maxLength: 14 },
+                    })}
+                    label="CPF"
+                    autoComplete="off"
+                    onChange={(event) =>
+                        form.setData('cpf', formatCpf(event.target.value))
+                    }
                 />
 
                 <TextField

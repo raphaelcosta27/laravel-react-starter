@@ -17,6 +17,7 @@ class DeleteUser
         DB::transaction(function () use ($user) {
             $this->ensureAdministratorRemains->handle($user);
 
+            $user->personalData?->delete();
             $user->delete();
         });
     }

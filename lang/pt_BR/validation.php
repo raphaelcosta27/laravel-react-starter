@@ -5,6 +5,7 @@ return [
     'current_password' => 'A senha está incorreta.',
     'different' => 'O campo :attribute deve ser diferente de :other.',
     'email' => 'O campo :attribute deve ser um e-mail válido.',
+    'in' => 'O valor do campo :attribute não é válido.',
     'lowercase' => 'O campo :attribute deve estar em letras minúsculas.',
     'max' => [
         'string' => 'O campo :attribute não pode ter mais de :max caracteres.',
@@ -24,11 +25,15 @@ return [
     'unique' => 'Este :attribute já está em uso.',
 
     'attributes' => [
+        'birth_date' => 'data de nascimento',
         'code' => 'código',
         'current_password' => 'senha atual',
+        'cpf' => 'CPF',
         'email' => 'e-mail',
+        'gender' => 'gênero',
         'name' => 'nome',
         'password' => 'senha',
         'password_confirmation' => 'confirmação da senha',
+        'preferred_name' => 'como quer ser chamado',
     ],
 ];

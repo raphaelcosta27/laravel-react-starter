@@ -57,6 +57,17 @@ return [
     ],
 
     /*
+    | Dados pessoais da página de perfil. Os gêneros ficam em inglês e são
+    | traduzidos pelos arquivos de idioma. Tamanho da imagem em kilobytes.
+    */
+    'profile' => [
+        'genders' => array_filter(array_map('trim', explode(',', (string) env('PROFILE_GENDERS', 'Female,Male,Non-binary,Prefer not to say,Other')))),
+        'cpf_required' => (bool) env('PROFILE_CPF_REQUIRED', false),
+        'avatar_max_kb' => (int) env('PROFILE_AVATAR_MAX_KB', 2048),
+        'avatar_disk' => env('PROFILE_AVATAR_DISK', 'local'),
+    ],
+
+    /*
     | Usuário criado por "php artisan app:setup".
     */
     'initial_user' => [

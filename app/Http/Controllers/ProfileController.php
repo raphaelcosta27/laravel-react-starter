@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Admin\DeleteUser;
+use App\Actions\UpdateProfile;
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -19,24 +20,31 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $data = $request->user()->personalData;
+
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'personalData' => [
+                'preferred_name' => $data?->preferred_name,
+                'birth_date' => $data?->birth_date?->format('Y-m-d'),
+                'gender' => $data?->gender,
+                'cpf' => $data?->cpf,
+            ],
+            'genders' => collect(config('template.profile.genders'))
+                ->map(fn (string $gender) => ['value' => $gender, 'label' => __($gender)])
+                ->values(),
+            'cpfRequired' => (bool) config('template.profile.cpf_required'),
+            'avatarMaxKb' => (int) config('template.profile.avatar_max_kb'),
         ]);
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request, UpdateProfile $updateProfile): RedirectResponse
     {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $request->user()->save();
+        $updateProfile->handle($request->user(), $request->validated());
 
         return Redirect::route('profile.edit');
     }

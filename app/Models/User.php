@@ -10,13 +10,14 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 
 #[Fillable(['name', 'email', 'password', 'profile_id'])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'personalData'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
@@ -45,6 +46,18 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>|null
      */
     private ?array $effectivePermissions = null;
+
+    /**
+     * O nome completo repete o nome da conta. UserData faz o caminho inverso.
+     */
+    protected static function booted(): void
+    {
+        static::updated(function (User $user) {
+            if ($user->wasChanged('name')) {
+                UserData::withTrashed()->where('user_id', $user->id)->update(['full_name' => $user->name]);
+            }
+        });
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -92,6 +105,26 @@ class User extends Authenticatable implements MustVerifyEmail
     public function profile(): BelongsTo
     {
         return $this->belongsTo(Profile::class);
+    }
+
+    /** @return HasOne<UserData, $this> */
+    public function personalData(): HasOne
+    {
+        return $this->hasOne(UserData::class);
+    }
+
+    /** Como a pessoa quer ser chamada. */
+    public function displayName(): string
+    {
+        return $this->personalData?->preferred_name ?: $this->name;
+    }
+
+    /** O endereço muda com a imagem, para o navegador não mostrar a anterior. */
+    public function avatarUrl(): ?string
+    {
+        $path = $this->personalData?->avatar_path;
+
+        return $path === null ? null : route('profile.avatar.show', ['v' => pathinfo($path, PATHINFO_FILENAME)]);
     }
 
     /** @return HasMany<UserPermission, $this> */

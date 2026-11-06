@@ -1,6 +1,7 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import PostLink from '@/Components/PostLink';
 import StatusAnnouncer from '@/Components/StatusAnnouncer';
+import UserAvatar from '@/Components/UserAvatar';
 import { useTranslations } from '@/lib/i18n';
 import { useCan } from '@/lib/permissions';
 import { Link, usePage } from '@inertiajs/react';
@@ -33,7 +34,8 @@ const panelAreas = [
 export default function AuthenticatedLayout({ title, children }) {
     const __ = useTranslations();
     const can = useCan();
-    const user = usePage().props.auth.user;
+    const { user, displayName } = usePage().props.auth;
+    const greeting = __('Hello, :name', { name: displayName });
     const accountId = useId();
 
     const [drawerOpen, setDrawerOpen] = useState(false);
@@ -108,11 +110,12 @@ export default function AuthenticatedLayout({ title, children }) {
                             color="inherit"
                             aria-haspopup="menu"
                             aria-expanded={accountAnchor !== null}
+                            startIcon={<UserAvatar />}
                             endIcon={<ArrowDropDownIcon />}
                             sx={{ textTransform: 'none' }}
                             onClick={(event) => setAccountAnchor(event.currentTarget)}
                         >
-                            {user.name}
+                            {greeting}
                         </Button>
 
                         <Menu
@@ -157,11 +160,27 @@ export default function AuthenticatedLayout({ title, children }) {
 
                         <Divider />
 
-                        <Box sx={{ px: 2, py: 1.5 }}>
-                            <Typography>{user.name}</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                                {user.email}
-                            </Typography>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1.5,
+                                px: 2,
+                                py: 1.5,
+                            }}
+                        >
+                            <UserAvatar size={40} />
+
+                            <Box sx={{ minWidth: 0 }}>
+                                <Typography noWrap>{greeting}</Typography>
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    noWrap
+                                >
+                                    {user.email}
+                                </Typography>
+                            </Box>
                         </Box>
 
                         <List>

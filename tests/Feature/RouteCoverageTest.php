@@ -35,7 +35,7 @@ class RouteCoverageTest extends TestCase
 
     public function test_area_routes_use_the_released_account_group(): void
     {
-        foreach (['dashboard', 'profile.edit', 'profile.update', 'profile.destroy', 'password.confirm'] as $name) {
+        foreach (['dashboard', 'profile.edit', 'profile.update', 'profile.destroy', 'profile.avatar.show', 'profile.avatar.update', 'profile.avatar.destroy', 'password.confirm'] as $name) {
             $this->assertContains('account.ready', Route::getRoutes()->getByName($name)->gatherMiddleware(), $name);
         }
     }

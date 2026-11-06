@@ -58,6 +58,8 @@ class HandleInertiaRequests extends Middleware
 
         return [
             'user' => $user,
+            'displayName' => rescue(fn () => $user?->displayName(), null, false),
+            'avatarUrl' => rescue(fn () => $user?->avatarUrl(), null, false),
             'isAdministrator' => $isAdministrator,
             'permissions' => $isAdministrator ? [] : rescue(fn () => $user?->effectivePermissions() ?? [], [], false),
         ];

@@ -3,13 +3,17 @@
 namespace App\Actions\Admin;
 
 use App\Actions\IssueTemporaryPassword;
+use App\Actions\RestoreUserData;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class ReactivateUser
 {
-    public function __construct(private IssueTemporaryPassword $issueTemporaryPassword) {}
+    public function __construct(
+        private IssueTemporaryPassword $issueTemporaryPassword,
+        private RestoreUserData $restoreUserData,
+    ) {}
 
     /**
      * Novo cadastro de um e-mail excluído segue as regras de criação, e o acesso
@@ -19,6 +23,7 @@ class ReactivateUser
     {
         DB::transaction(function () use ($user, $name, $profile) {
             $user->restore();
+            $this->restoreUserData->handle($user, 'email');
             $user->permissionAdjustments->each->delete();
 
             $user->forceFill([
