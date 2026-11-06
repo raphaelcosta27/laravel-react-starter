@@ -127,6 +127,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $path === null ? null : route('profile.avatar.show', ['v' => pathinfo($path, PATHINFO_FILENAME)]);
     }
 
+    /** @return HasMany<UserContact, $this> */
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(UserContact::class);
+    }
+
     /** @return HasMany<UserPermission, $this> */
     public function permissionAdjustments(): HasMany
     {

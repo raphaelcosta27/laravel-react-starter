@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Admin\DeleteUser;
 use App\Actions\UpdateProfile;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\UserContact;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,6 +37,20 @@ class ProfileController extends Controller
                 ->values(),
             'cpfRequired' => (bool) config('template.profile.cpf_required'),
             'avatarMaxKb' => (int) config('template.profile.avatar_max_kb'),
+            'contacts' => $request->user()->contacts()->orderBy('id')->get()
+                ->map(fn (UserContact $contact) => [
+                    'id' => $contact->id,
+                    'type' => $contact->type,
+                    'value' => $contact->value,
+                    'is_whatsapp' => $contact->is_whatsapp,
+                    'is_emergency' => $contact->is_emergency,
+                    'relationship' => $contact->relationship,
+                    'relationship_label' => $contact->relationship ? __($contact->relationship) : null,
+                    'contact_name' => $contact->contact_name,
+                ]),
+            'relationships' => collect(config('template.profile.relationships'))
+                ->map(fn (string $relationship) => ['value' => $relationship, 'label' => __($relationship)])
+                ->values(),
         ]);
     }
 

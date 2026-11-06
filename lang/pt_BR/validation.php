@@ -27,6 +27,7 @@ return [
     'attributes' => [
         'birth_date' => 'data de nascimento',
         'code' => 'código',
+        'contact_name' => 'nome da pessoa',
         'current_password' => 'senha atual',
         'cpf' => 'CPF',
         'email' => 'e-mail',
@@ -35,5 +36,8 @@ return [
         'password' => 'senha',
         'password_confirmation' => 'confirmação da senha',
         'preferred_name' => 'como quer ser chamado',
+        'relationship' => 'parentesco',
+        'type' => 'tipo',
+        'value' => 'contato',
     ],
 ];

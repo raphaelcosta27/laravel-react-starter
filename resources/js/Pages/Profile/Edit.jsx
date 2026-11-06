@@ -3,6 +3,7 @@ import { useTranslations } from '@/lib/i18n';
 import { Head } from '@inertiajs/react';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import ContactsSection from './Partials/ContactsSection';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdateAvatarForm from './Partials/UpdateAvatarForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
@@ -15,6 +16,8 @@ export default function Edit({
     genders,
     cpfRequired,
     avatarMaxKb,
+    contacts,
+    relationships,
 }) {
     const __ = useTranslations();
 
@@ -35,6 +38,13 @@ export default function Edit({
 
                 <Paper sx={{ p: { xs: 2, sm: 4 } }}>
                     <UpdateAvatarForm maxKb={avatarMaxKb} />
+                </Paper>
+
+                <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+                    <ContactsSection
+                        contacts={contacts}
+                        relationships={relationships}
+                    />
                 </Paper>
 
                 <Paper sx={{ p: { xs: 2, sm: 4 } }}>

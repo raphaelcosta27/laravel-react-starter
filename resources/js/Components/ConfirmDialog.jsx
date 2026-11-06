@@ -16,6 +16,7 @@ export default function ConfirmDialog({
     processing = false,
     onConfirm,
     onClose,
+    onExited,
     children,
 }) {
     const __ = useTranslations();
@@ -25,6 +26,7 @@ export default function ConfirmDialog({
         <Dialog
             open={show}
             onClose={onClose}
+            slotProps={{ transition: { onExited } }}
             aria-labelledby={titleId}
             maxWidth="sm"
             fullWidth

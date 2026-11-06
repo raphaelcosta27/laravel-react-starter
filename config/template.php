@@ -65,6 +65,7 @@ return [
         'cpf_required' => (bool) env('PROFILE_CPF_REQUIRED', false),
         'avatar_max_kb' => (int) env('PROFILE_AVATAR_MAX_KB', 2048),
         'avatar_disk' => env('PROFILE_AVATAR_DISK', 'local'),
+        'relationships' => array_filter(array_map('trim', explode(',', (string) env('PROFILE_RELATIONSHIPS', 'Mother,Father,Spouse or partner,Child,Sibling,Grandparent,Uncle or aunt,Cousin,Friend,Other relationship')))),
     ],
 
     /*

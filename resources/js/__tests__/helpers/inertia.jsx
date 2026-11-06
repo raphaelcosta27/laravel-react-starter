@@ -12,8 +12,12 @@ const defaults = () => ({
 
 let pageProps = defaults();
 
+export const formActions = { post: vi.fn(), patch: vi.fn() };
+
 export function resetPageProps() {
-    Object.values(router).forEach((method) => method.mockClear?.());
+    [...Object.values(router), ...Object.values(formActions)].forEach((method) =>
+        method.mockClear?.(),
+    );
     pageProps = defaults();
 }
 
@@ -36,9 +40,9 @@ export function useForm(initial = {}) {
         errors: pageProps.errors ?? {},
         processing: false,
         recentlySuccessful: false,
-        post: noop,
+        post: formActions.post,
         put: noop,
-        patch: noop,
+        patch: formActions.patch,
         delete: noop,
         reset: noop,
         clearErrors: noop,

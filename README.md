@@ -83,6 +83,7 @@ Everything that varies between projects lives in `.env`. The main options:
 | `PROFILE_CPF_REQUIRED` | `false` | Makes the CPF required on the profile page |
 | `PROFILE_AVATAR_MAX_KB` | `2048` | Maximum profile picture size, in KB. PHP's `upload_max_filesize` also applies |
 | `PROFILE_AVATAR_DISK` | `local` | Disk for profile pictures |
+| `PROFILE_RELATIONSHIPS` | `Mother,Father,...,Other relationship` | Relationships of emergency contacts, translated by `lang/pt_BR.json` |
 | `INITIAL_USER_PASSWORD` | empty | Temporary password; empty generates one automatically |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Name of the master profile, used only on creation |
 | `DEFAULT_PROFILE_NAME` | `Usuário` | Name of the default profile, used only on creation |
@@ -161,6 +162,16 @@ another account already uses it.
 Pictures live on a private disk and are served by `GET /profile/avatar` only to their owner. Replacing or removing one
 does not delete the previous file, whose path stays in the change history. Projects subject to data erasure requests
 need to handle these files.
+
+## Contacts
+
+On the profile page, each person manages their own phones and emails in the `user_contatos` table (model
+`App\Models\UserContact`, relation `$user->contacts`). Phones are stored as digits only, in the Brazilian landline and
+mobile formats, and emails in lowercase. The same value cannot repeat among a person's active contacts.
+
+Phones can be marked as WhatsApp. Any contact can be an emergency contact, which then requires a relationship and a name.
+An email contact does not change the login email. A contact of another person answers 404, even to administrators:
+the panel has no contact lookup. Deletion is logical, and contacts stay with the account when it is deleted and restored.
 
 ## Login
 
