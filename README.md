@@ -9,6 +9,10 @@ A base for new projects with Laravel 13, React 19, Inertia 2 and MySQL. It inclu
 confirmation by email, a mandatory password change on first access, and automated tests. The interface ships
 in Brazilian Portuguese.
 
+The [documentation](docs/README.md), written in Brazilian Portuguese, holds the guides to adapt and extend the
+template and the logical specification of each feature, with the decisions behind it. To collaborate, see the
+[contribution guide](CONTRIBUTING.md).
+
 ## Docker
 
 With Docker installed, PHP, Apache and Node are not needed on the machine:
@@ -367,6 +371,9 @@ contract of the component is documented in its props and in `TableDefinition`.
 1. Click **Use this template** on GitHub to create your repository, then clone it.
 2. Copy `.env.example` to `.env` and change `APP_NAME`, `APP_LOGO`, `DB_DATABASE` and `INITIAL_USER_EMAIL`.
 3. Run `composer setup` and `composer dev`.
+
+To configure it on screen instead of editing `.env`, use the [browser installation](#browser-installation). The
+[adaptation guide](docs/guias/adaptar-template.md) lists what to adjust in a new project.
 
 No application code needs to change.
 

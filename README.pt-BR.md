@@ -5,6 +5,9 @@
 Base para novos projetos com Laravel 13, React 19, Inertia 2 e MySQL. Já inclui autenticação, confirmação
 da conta por e-mail, troca obrigatória de senha no primeiro acesso e testes automatizados.
 
+A [documentação](docs/README.md) reúne os guias para adaptar e estender o template e as especificações
+lógicas de cada recurso, com as decisões tomadas. Para colaborar, veja o [guia de contribuição](CONTRIBUTING.md).
+
 ## Docker
 
 Com o Docker instalado, não é preciso PHP, Apache ou Node na máquina:
@@ -363,6 +366,9 @@ componente está nas props dele e em `TableDefinition`.
 1. Clique em **Use this template** no GitHub para criar o seu repositório e clone-o.
 2. Copie `.env.example` para `.env` e altere `APP_NAME`, `APP_LOGO`, `DB_DATABASE` e `INITIAL_USER_EMAIL`.
 3. Execute `composer setup` e `composer dev`.
+
+Para configurar pela tela em vez de editar o `.env`, use a [instalação pelo navegador](#instalação-pelo-navegador).
+O [guia de adaptação](docs/guias/adaptar-template.md) lista o que ajustar em um projeto novo.
 
 Nenhum arquivo de código precisa ser alterado.
 
