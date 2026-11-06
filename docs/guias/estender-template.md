@@ -19,6 +19,21 @@
 Use `resources/js/Components/DataTable` com uma definição em `app/Support/Tables/Definitions`. Veja o
 [painel de administrador](../especificacoes/painel-administrador.md).
 
+Marque as colunas do cartão de celular com `meta: { essential: true }`. A primeira é o título. Sem nenhuma
+marcada, valem as três primeiras.
+
+O botão de cadastro vai na propriedade `toolbar`, e cada ação em massa declara `icon` e `description`:
+
+```jsx
+<ActionIconButton
+    emphasis
+    icon={PersonAddIcon}
+    label={__('New user')}
+    description={__('Opens the form to register a user.')}
+    href={route('admin.users.create')}
+/>
+```
+
 ## Formulário com endereço
 
 Renderize `Components/AddressFields.jsx` com um `useForm` que tenha os campos de endereço, e aplique

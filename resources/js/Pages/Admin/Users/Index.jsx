@@ -1,24 +1,45 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import ConfirmDialog from '@/Components/ConfirmDialog';
 import DataTable from '@/Components/DataTable/DataTable';
+import PersonAvatar from '@/Components/PersonAvatar';
 import SelectField from '@/Components/SelectField';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
 import { FORM_VISIT, withListingQuery } from '@/lib/listing';
 import UserFormDialog from '@/Pages/Admin/Users/Partials/UserFormDialog';
+import BlockIcon from '@mui/icons-material/Block';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import KeyIcon from '@mui/icons-material/Key';
 import MailOutlinedIcon from '@mui/icons-material/MailOutlined';
 import PasswordIcon from '@mui/icons-material/Password';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
-import Button from '@mui/material/Button';
-import { Head, Link, router } from '@inertiajs/react';
+import Box from '@mui/material/Box';
+import { Head, router } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 
 const BULK_ACTIONS = {
-    activate: { label: 'Activate selected', message: 'Activate the selected users?' },
-    deactivate: { label: 'Deactivate selected', message: 'Deactivate the selected users?' },
-    delete: { label: 'Delete selected', message: 'Delete the selected users?', variant: 'danger' },
+    activate: {
+        label: 'Activate selected',
+        description: 'Allows the selected users to access the system.',
+        message: 'Activate the selected users?',
+        icon: CheckCircleOutlinedIcon,
+    },
+    deactivate: {
+        label: 'Deactivate selected',
+        description: 'Blocks the access of the selected users.',
+        message: 'Deactivate the selected users?',
+        icon: BlockIcon,
+    },
+    delete: {
+        label: 'Delete selected',
+        description: 'Moves the selected users to the deleted records.',
+        message: 'Delete the selected users?',
+        icon: DeleteOutlinedIcon,
+        variant: 'danger',
+    },
 };
 
 export default function Index({
@@ -40,16 +61,23 @@ export default function Index({
             {
                 accessorKey: 'name',
                 header: __('Name'),
+                cell: ({ row }) => (
+                    <Box sx={{ alignItems: 'center', display: 'flex', gap: 1 }}>
+                        <PersonAvatar name={row.original.name} src={row.original.avatar_url} />
+                        {row.original.name}
+                    </Box>
+                ),
                 meta: {
                     sortable: true,
                     filter: 'text',
                     required: true,
+                    essential: true,
                 },
             },
             {
                 accessorKey: 'email',
                 header: __('Email'),
-                meta: { sortable: true, filter: 'text' },
+                meta: { sortable: true, filter: 'text', essential: true },
             },
             {
                 id: 'profile_id',
@@ -65,6 +93,7 @@ export default function Index({
                 header: __('Status'),
                 meta: {
                     filter: 'boolean',
+                    essential: true,
                     toggle: {
                         label: (row) =>
                             __(':column of :name', {
@@ -194,6 +223,8 @@ export default function Index({
     const bulkActions = (abilities?.bulk ?? []).map((action) => ({
         key: action,
         label: __(BULK_ACTIONS[action].label),
+        description: __(BULK_ACTIONS[action].description),
+        icon: BULK_ACTIONS[action].icon,
         variant: BULK_ACTIONS[action].variant,
         confirm: {
             title: __(BULK_ACTIONS[action].label),
@@ -251,15 +282,14 @@ export default function Index({
                     emptyMessage={__('No users found.')}
                     toolbar={
                         abilities?.create && (
-                            <Button
-                                component={Link}
+                            <ActionIconButton
+                                emphasis
+                                icon={PersonAddIcon}
+                                label={__('New user')}
+                                description={__('Opens the form to register a user.')}
                                 href={withListingQuery(route('admin.users.create'))}
                                 {...FORM_VISIT}
-                                variant="contained"
-                                size="small"
-                            >
-                                {__('New user')}
-                            </Button>
+                            />
                         )
                     }
                 />

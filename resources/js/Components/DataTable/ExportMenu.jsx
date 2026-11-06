@@ -1,5 +1,6 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import { useTranslations } from '@/lib/i18n';
-import Button from '@mui/material/Button';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useId, useState } from 'react';
@@ -55,16 +56,15 @@ export default function ExportMenu({ exportRoute, columns, query, selectedIds })
 
     return (
         <>
-            <Button
+            <ActionIconButton
                 id={buttonId}
-                variant="outlined"
-                size="small"
+                icon={FileDownloadIcon}
+                label={__('Export')}
+                description={__('Downloads the records of this table as a file.')}
                 aria-haspopup="menu"
                 aria-expanded={anchor !== null}
                 onClick={(event) => setAnchor(event.currentTarget)}
-            >
-                {__('Export')}
-            </Button>
+            />
 
             <Menu
                 anchorEl={anchor}

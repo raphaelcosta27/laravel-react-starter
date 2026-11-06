@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\EnvironmentController;
 use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\UserAvatarController;
 use App\Http\Controllers\Admin\UserBulkActionController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserPermissionController;
@@ -107,6 +108,11 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
     Route::post('users', [UserController::class, 'store'])
         ->middleware('can:cadastrar_usuario')
         ->name('users.store');
+
+    Route::get('users/{user}/avatar', [UserAvatarController::class, 'show'])
+        ->middleware('can:visualizar_usuario')
+        ->withTrashed()
+        ->name('users.avatar');
 
     Route::get('users/{user}/edit', [UserController::class, 'edit'])
         ->middleware(['can:visualizar_usuario', 'can:editar_usuario'])

@@ -3,28 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UpdateAvatarRequest;
+use App\Support\AvatarResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProfileAvatarController extends Controller
 {
-    /**
-     * O arquivo fica em disco privado. O endereço muda a cada imagem, por isso
-     * o navegador pode guardá-la sem prazo.
-     */
     public function show(Request $request): StreamedResponse
     {
-        $path = $request->user()->personalData?->avatar_path;
-        $disk = Storage::disk(config('template.profile.avatar_disk'));
-
-        abort_unless($path !== null && $disk->exists($path), 404);
-
-        return $disk->response($path, null, [
-            'Cache-Control' => 'private, max-age=31536000, immutable',
-            'X-Content-Type-Options' => 'nosniff',
-        ]);
+        return AvatarResponse::for($request->user()->personalData?->avatar_path);
     }
 
     /**

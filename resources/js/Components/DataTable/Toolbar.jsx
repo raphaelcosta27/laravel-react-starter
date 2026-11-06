@@ -1,7 +1,13 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import ColumnFilter from '@/Components/DataTable/ColumnFilter';
 import { useTranslations } from '@/lib/i18n';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -54,12 +60,10 @@ export default function Toolbar({
                 spacing={1}
                 sx={{ alignItems: 'center', flexWrap: 'wrap' }}
             >
-                <Stack
+                <Box
                     component="form"
                     role="search"
-                    direction="row"
-                    spacing={1}
-                    sx={{ alignItems: 'center' }}
+                    sx={{ width: { xs: '100%', sm: 280 } }}
                     onSubmit={(event) => {
                         event.preventDefault();
                         onSearch(term);
@@ -69,38 +73,58 @@ export default function Toolbar({
                         id="table-search"
                         type="search"
                         size="small"
+                        fullWidth
                         label={__('Search')}
                         value={term}
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <ActionIconButton
+                                            type="submit"
+                                            icon={SearchIcon}
+                                            label={__('Search')}
+                                            description={__('Searches the records of this table.')}
+                                        />
+                                    </InputAdornment>
+                                ),
+                            },
+                        }}
                         onChange={(event) => setTerm(event.target.value)}
                     />
-                    <Button type="submit" variant="outlined" size="small">
-                        {__('Search')}
-                    </Button>
-                </Stack>
+                </Box>
 
                 {filters.length > 0 && (
-                    <Button
-                        variant="outlined"
-                        size="small"
+                    <ActionIconButton
+                        icon={FilterAltIcon}
+                        label={
+                            activeFilters > 0
+                                ? __('Filters (:count)', { count: activeFilters })
+                                : __('Filters')
+                        }
+                        description={__('Shows or hides the filters of this table.')}
+                        badge={activeFilters}
                         aria-expanded={open}
                         aria-controls="table-filters"
                         onClick={() => setOpen((value) => !value)}
-                    >
-                        {activeFilters > 0
-                            ? __('Filters (:count)', { count: activeFilters })
-                            : __('Filters')}
-                    </Button>
+                    />
                 )}
 
                 {activeFilters > 0 && (
-                    <Button variant="outlined" size="small" onClick={clearFilters}>
-                        {__('Clear filters')}
-                    </Button>
+                    <ActionIconButton
+                        icon={FilterAltOffIcon}
+                        label={__('Clear filters')}
+                        description={__('Removes all the filters in use.')}
+                        onClick={clearFilters}
+                    />
                 )}
 
-                <Button variant="outlined" size="small" onClick={onRestore}>
-                    {__('Restore defaults')}
-                </Button>
+                <ActionIconButton
+                    icon={RestartAltIcon}
+                    label={__('Restore defaults')}
+                    description={__('Returns search, filters, order and columns to the initial state.')}
+                    onClick={onRestore}
+                />
 
                 <Stack
                     direction="row"

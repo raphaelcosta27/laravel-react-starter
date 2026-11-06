@@ -12,7 +12,7 @@ class UsersTable extends TableDefinition
 {
     public function query(): Builder
     {
-        return User::query()->with('profile');
+        return User::query()->with(['profile', 'personalData' => fn ($query) => $query->withTrashed()]);
     }
 
     public function columns(): array
@@ -79,6 +79,7 @@ class UsersTable extends TableDefinition
             'id' => $row->id,
             'name' => $row->name,
             'email' => $row->email,
+            'avatar_url' => $row->managedAvatarUrl(),
             'profile_id' => $row->profile_id,
             'profile_name' => $row->profile?->name,
             'is_active' => $row->is_active,

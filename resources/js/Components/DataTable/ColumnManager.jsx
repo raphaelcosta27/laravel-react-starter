@@ -1,10 +1,11 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import { useTranslations } from '@/lib/i18n';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import RemoveIcon from '@mui/icons-material/Remove';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
@@ -52,14 +53,13 @@ export default function ColumnManager({
 
     return (
         <Box sx={{ position: 'relative' }}>
-            <Button
-                variant="outlined"
-                size="small"
+            <ActionIconButton
+                icon={ViewColumnIcon}
+                label={__('Columns')}
+                description={__('Chooses, moves and resizes the columns of this table.')}
                 aria-expanded={open}
                 onClick={() => setOpen((value) => !value)}
-            >
-                {__('Columns')}
-            </Button>
+            />
 
             {open && (
                 <Paper

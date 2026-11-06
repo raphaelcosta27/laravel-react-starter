@@ -18,6 +18,20 @@ const button = (props = {}) =>
 describe('ActionIconButton', () => {
     afterEach(() => vi.useRealTimers());
 
+    test('a ação principal ganha destaque', () => {
+        button({ emphasis: true });
+
+        expect(screen.getByRole('button', { name: 'Editar' }).className).toContain('MuiIconButton');
+    });
+
+    test('a quantidade aparece no ícone, sem mudar o nome', () => {
+        button({ badge: 3 });
+
+        const element = screen.getByRole('button', { name: 'Editar' });
+
+        expect(element.querySelector('.MuiBadge-badge').textContent).toBe('3');
+    });
+
     test('o título é o nome acessível', () => {
         button();
 

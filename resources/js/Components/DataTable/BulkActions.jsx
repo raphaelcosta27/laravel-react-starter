@@ -1,6 +1,6 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import ConfirmDialog from '@/Components/ConfirmDialog';
 import { useTranslations } from '@/lib/i18n';
-import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
@@ -40,15 +40,14 @@ export default function BulkActions({ actions, rows }) {
             </Typography>
 
             {actions.map((action) => (
-                <Button
+                <ActionIconButton
                     key={action.key}
-                    variant="outlined"
-                    size="small"
+                    icon={action.icon}
+                    label={action.label}
+                    description={action.description}
                     color={action.variant === 'danger' ? 'error' : 'primary'}
                     onClick={() => run(action)}
-                >
-                    {action.label}
-                </Button>
+                />
             ))}
 
             <ConfirmDialog

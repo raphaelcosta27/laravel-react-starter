@@ -1,13 +1,14 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import DataTable from '@/Components/DataTable/DataTable';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
 import { FORM_VISIT, withListingQuery } from '@/lib/listing';
 import PermissionFormDialog from '@/Pages/Admin/Permissions/Partials/PermissionFormDialog';
+import AddModeratorIcon from '@mui/icons-material/AddModerator';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
-import Button from '@mui/material/Button';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useMemo } from 'react';
 
 
@@ -23,6 +24,7 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     sortable: true,
                     filter: 'text',
                     required: true,
+                    essential: true,
                 },
             },
             {
@@ -111,15 +113,14 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     emptyMessage={__('No permissions found.')}
                     toolbar={
                         abilities?.create && (
-                            <Button
-                                component={Link}
+                            <ActionIconButton
+                                emphasis
+                                icon={AddModeratorIcon}
+                                label={__('New permission')}
+                                description={__('Opens the form to register a permission.')}
                                 href={withListingQuery(route('admin.permissions.create'))}
                                 {...FORM_VISIT}
-                                variant="contained"
-                                size="small"
-                            >
-                                {__('New permission')}
-                            </Button>
+                            />
                         )
                     }
                 />

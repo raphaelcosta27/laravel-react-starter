@@ -15,7 +15,8 @@ Guardar nome completo, como a pessoa quer ser chamada, nascimento, gênero, CPF 
 ## Comportamentos
 
 - A saudação usa o nome preferido, com o nome da conta como alternativa.
-- Sem imagem, aparecem as iniciais.
+- Sem imagem, ou se ela falhar, aparecem as iniciais.
+- A tabela de usuários mostra a foto ao lado do nome, inclusive na aba de excluídos.
 - Excluir a conta libera o CPF; restaurá-la é recusado se outra conta já o usa.
 
 ## Configuração
@@ -24,7 +25,8 @@ Guardar nome completo, como a pessoa quer ser chamada, nascimento, gênero, CPF 
 
 ## Decisões
 
-- **Imagem em disco privado:** servida só à própria pessoa, sem depender de `storage:link`.
+- **Imagem em disco privado:** servida à própria pessoa e a quem tem `visualizar_usuario`, sem depender de `storage:link`.
+- **Miniatura com o arquivo original:** gerar versões menores exigiria a extensão GD, ausente no Docker. A imagem só é baixada quando aparece na tela.
 - **Trocar a imagem não apaga a anterior:** segue a regra de preservar dados. Projetos sujeitos a pedidos de eliminação precisam tratar esses arquivos.
 - **Um formulário para os nomes:** dois campos de nome em telas diferentes ficariam fora de sincronia.
 - **CPF validado ao digitar:** o CPF concluído e errado fica vermelho na hora e bloqueia o salvar. Pela metade, bloqueia e só avisa ao sair do campo. O servidor segue validando.

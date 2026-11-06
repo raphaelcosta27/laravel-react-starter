@@ -1,8 +1,9 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import DataTable from '@/Components/DataTable/DataTable';
-import TextLink from '@/Components/TextLink';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
 import { Head } from '@inertiajs/react';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useMemo } from 'react';
 
 export default function Users({ profile, rows, query }) {
@@ -45,9 +46,12 @@ export default function Users({ profile, rows, query }) {
                 query={query}
                 emptyMessage={__('No users found.')}
                 toolbar={
-                    <TextLink href={route('admin.profiles.index')}>
-                        {__('Back to list')}
-                    </TextLink>
+                    <ActionIconButton
+                        icon={ArrowBackIcon}
+                        label={__('Back to list')}
+                        description={__('Returns to the list of profiles.')}
+                        href={route('admin.profiles.index')}
+                    />
                 }
             />
         </AuthenticatedLayout>

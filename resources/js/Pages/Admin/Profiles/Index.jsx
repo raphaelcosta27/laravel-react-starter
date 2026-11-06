@@ -1,3 +1,4 @@
+import ActionIconButton from '@/Components/ActionIconButton';
 import DataTable from '@/Components/DataTable/DataTable';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
@@ -6,11 +7,11 @@ import ProfileFormDialog from '@/Pages/Admin/Profiles/Partials/ProfileFormDialog
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import GroupIcon from '@mui/icons-material/Group';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useMemo } from 'react';
 
 
@@ -26,6 +27,7 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     sortable: true,
                     filter: 'text',
                     required: true,
+                    essential: true,
                 },
             },
             {
@@ -41,6 +43,7 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     filter: 'number',
                     align: 'end',
                     summary: 'sum',
+                    essential: true,
                 },
             },
             ...(query.tab === 'trashed'
@@ -144,15 +147,14 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     emptyMessage={__('No profiles found.')}
                     toolbar={
                         abilities?.create && (
-                            <Button
-                                component={Link}
+                            <ActionIconButton
+                                emphasis
+                                icon={GroupAddIcon}
+                                label={__('New profile')}
+                                description={__('Opens the form to register a profile.')}
                                 href={withListingQuery(route('admin.profiles.create'))}
                                 {...FORM_VISIT}
-                                variant="contained"
-                                size="small"
-                            >
-                                {__('New profile')}
-                            </Button>
+                            />
                         )
                     }
                 />

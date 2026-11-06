@@ -1,3 +1,4 @@
+import PersonAvatar from '@/Components/PersonAvatar';
 import UserAvatar, { initials } from '@/Components/UserAvatar';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import Dashboard from '@/Pages/Dashboard';
@@ -61,6 +62,44 @@ describe('UserAvatar', () => {
         const { container } = render(<UserAvatar />);
 
         expect(await axe(container)).toHaveNoViolations();
+    });
+});
+
+describe('PersonAvatar', () => {
+    test('a foto só carrega quando aparece na tela', () => {
+        render(<PersonAvatar name="Ana Lima" src="/foto?v=1" alt="Foto" />);
+
+        expect(screen.getByAltText('Foto').getAttribute('loading')).toBe('lazy');
+    });
+
+    test('sem foto, mostra as iniciais', () => {
+        render(<PersonAvatar name="Ana Lima" />);
+
+        expect(screen.getByText('AL')).toBeTruthy();
+    });
+
+    test('uma foto que falha vira iniciais', () => {
+        render(<PersonAvatar name="Ana Lima" src="/foto?v=1" alt="Foto" />);
+
+        fireEvent.error(screen.getByAltText('Foto'));
+
+        expect(screen.getByText('AL')).toBeTruthy();
+        expect(document.querySelector('img')).toBeNull();
+    });
+
+    test('a foto nova é tentada depois de uma falha', () => {
+        const { rerender } = render(<PersonAvatar name="Ana" src="/foto?v=1" alt="Foto" />);
+
+        fireEvent.error(screen.getByAltText('Foto'));
+        rerender(<PersonAvatar name="Ana" src="/foto?v=2" alt="Foto" />);
+
+        expect(screen.getByAltText('Foto').getAttribute('src')).toBe('/foto?v=2');
+    });
+
+    test('sem texto alternativo, é decorativa', () => {
+        const { container } = render(<PersonAvatar name="Ana" src="/foto?v=1" />);
+
+        expect(container.firstChild.getAttribute('aria-hidden')).toBe('true');
     });
 });
 

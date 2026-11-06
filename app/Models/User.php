@@ -172,6 +172,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $path === null ? null : route('profile.avatar.show', ['v' => pathinfo($path, PATHINFO_FILENAME)]);
     }
 
+    /** A foto vista por quem gerencia usuários, em uma rota com permissão própria. */
+    public function managedAvatarUrl(): ?string
+    {
+        $path = $this->personalData?->avatar_path;
+
+        return $path === null ? null : route('admin.users.avatar', ['user' => $this->id, 'v' => pathinfo($path, PATHINFO_FILENAME)]);
+    }
+
     /** @return HasMany<ScreenNotification, $this> */
     public function screenNotifications(): HasMany
     {

@@ -1,5 +1,6 @@
 import { visuallyHidden } from '@/lib/visuallyHidden';
 import { Link } from '@inertiajs/react';
+import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -8,6 +9,16 @@ import { useId, useRef } from 'react';
 
 const LONG_PRESS = 500;
 
+const TOUCH_TARGET = {
+    '@media (pointer: coarse)': { minHeight: 44, minWidth: 44 },
+};
+
+const EMPHASIS = {
+    bgcolor: 'primary.main',
+    color: 'primary.contrastText',
+    '&:hover': { bgcolor: 'primary.dark' },
+};
+
 export default function ActionIconButton({
     icon: Icon,
     label,
@@ -15,7 +26,10 @@ export default function ActionIconButton({
     href,
     disabled = false,
     color = 'default',
+    emphasis = false,
+    badge = 0,
     onClick,
+    sx,
     ...props
 }) {
     const descriptionId = useId();
@@ -49,10 +63,13 @@ export default function ActionIconButton({
                 touchedAt.current = Date.now();
             }}
             onClick={click}
+            sx={[TOUCH_TARGET, emphasis && EMPHASIS, ...(Array.isArray(sx) ? sx : [sx])]}
             {...(href ? { component: Link, href } : {})}
             {...props}
         >
-            <Icon fontSize="small" />
+            <Badge badgeContent={badge} color="primary" aria-hidden="true">
+                <Icon fontSize="small" />
+            </Badge>
         </IconButton>
     );
 

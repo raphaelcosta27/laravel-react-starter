@@ -117,6 +117,7 @@ describe('recursos completos do DataTable', () => {
                 {
                     key: 'delete',
                     label: 'Excluir selecionados',
+                    icon: EditIcon,
                     onClick,
                     confirm: { title: 'Excluir', message: 'Confirme' },
                 },
@@ -140,7 +141,7 @@ describe('recursos completos do DataTable', () => {
     });
 
     test('selecionar todos marca os registros da página', () => {
-        table({ bulkActions: [{ key: 'a', label: 'Agir', onClick: () => {} }] });
+        table({ bulkActions: [{ key: 'a', label: 'Agir', icon: EditIcon, onClick: () => {} }] });
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Selecionar todos' }));
 
@@ -230,7 +231,7 @@ describe('recursos completos do DataTable', () => {
 
     test('com coluna fixa, cabeçalho e células seguem a mesma ordem', () => {
         table({
-            bulkActions: [{ key: 'a', label: 'Agir', onClick: () => {} }],
+            bulkActions: [{ key: 'a', label: 'Agir', icon: EditIcon, onClick: () => {} }],
             renderDetail: (row) => <p>{row.name}</p>,
             rowActions: () => [{ key: 'x', label: 'Ver', icon: EditIcon, onClick: () => {} }],
         });
@@ -246,7 +247,7 @@ describe('recursos completos do DataTable', () => {
     });
 
     test('colunas de controle ficam fixas antes da coluna fixa', () => {
-        table({ bulkActions: [{ key: 'a', label: 'Agir', onClick: () => {} }] });
+        table({ bulkActions: [{ key: 'a', label: 'Agir', icon: EditIcon, onClick: () => {} }] });
 
         const select = screen.getByRole('checkbox', { name: 'Selecionar Ana' }).closest('td');
         const name = screen.getByRole('cell', { name: 'Ana' });
@@ -318,7 +319,7 @@ describe('recursos completos do DataTable', () => {
         table({
             canExport: true,
             exportRoute: 'admin.users.export',
-            bulkActions: [{ key: 'a', label: 'Agir', onClick: () => {} }],
+            bulkActions: [{ key: 'a', label: 'Agir', icon: EditIcon, onClick: () => {} }],
         });
 
         fireEvent.click(screen.getByRole('checkbox', { name: 'Selecionar Bia' }));
@@ -343,7 +344,7 @@ describe('recursos completos do DataTable', () => {
     test('não tem violações de acessibilidade', async () => {
         const { container } = table({
             tabs: [{ key: 'all', label: 'Todos', count: 2 }],
-            bulkActions: [{ key: 'a', label: 'Agir', onClick: () => {} }],
+            bulkActions: [{ key: 'a', label: 'Agir', icon: EditIcon, onClick: () => {} }],
             renderDetail: (row) => <p>{row.name}</p>,
             summaries: { total: { sum: 5 } },
             canExport: true,
