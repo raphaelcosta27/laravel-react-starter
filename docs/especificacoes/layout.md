@@ -8,7 +8,7 @@ Dar às telas a aparência e a fluidez de um aplicativo, no computador e no celu
 
 - O `AppShell` envolve as telas internas e não desmonta ao trocar de tela. `Auth/*`, `Install/*`, `Welcome` e `Error` ficam fora dele.
 - Todo módulo tem ícone antes do nome. Os itens ficam em `resources/js/navigation.js`.
-- O Painel e os módulos do projeto ficam no topo do menu. Usuários, Perfis, Permissões e Variáveis de Ambiente ficam em Config, com `group: CONFIG_GROUP`.
+- O Painel e os módulos do projeto ficam no topo do menu. Usuários, Perfis, Permissões e Ambiente ficam em Config, com `group: CONFIG_GROUP`.
 - Config fica no rodapé, logo acima da conta, e cresce para cima ao abrir. Aparece para quem tem ao menos um dos seus módulos, só com esses módulos.
 - Todo botão tem ícone. Quando o sentido é evidente, fica só o ícone, com título e descrição. Ação destrutiva mantém o texto.
 - Campos usam `kind` em `fieldProps`, que define ícone, tipo e teclado: `email`, `password`, `phone`, `person`, `pin`, `key`, `label`, `document` e `description`.

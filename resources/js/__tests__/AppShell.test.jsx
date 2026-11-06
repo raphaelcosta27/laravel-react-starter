@@ -72,7 +72,7 @@ describe('AppShell', () => {
         render(shell());
         openConfig();
 
-        ['Perfis', 'Permissões', 'Usuários', 'Variáveis de Ambiente'].forEach((name) => {
+        ['Perfis', 'Permissões', 'Usuários', 'Ambiente'].forEach((name) => {
             expect(
                 nav().getByRole('link', { name }).querySelector('svg'),
             ).toBeTruthy();
@@ -182,7 +182,7 @@ describe('AppShell', () => {
                 'Usuários',
                 'Perfis',
                 'Permissões',
-                'Variáveis de Ambiente',
+                'Ambiente',
             ]);
             expect(
                 order(
@@ -192,7 +192,7 @@ describe('AppShell', () => {
             ).toBeTruthy();
             expect(
                 order(
-                    nav().getByRole('link', { name: 'Variáveis de Ambiente' }),
+                    nav().getByRole('link', { name: 'Ambiente' }),
                     nav().getByRole('button', { name: 'Olá, Ana' }),
                 ),
             ).toBeTruthy();

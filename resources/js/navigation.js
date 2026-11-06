@@ -49,7 +49,7 @@ export const navigation = [
     },
     {
         key: 'environment',
-        label: 'Environment variables',
+        label: 'Environment',
         route: 'admin.environment',
         index: 'admin.environment.index',
         permission: 'visualizar_ambiente',
