@@ -15,6 +15,7 @@ import { router } from '@inertiajs/react';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
@@ -121,6 +122,41 @@ const withoutEmpty = (params) =>
 const resolveUpdater = (updater, current) =>
     typeof updater === 'function' ? updater(current) : updater;
 
+/** Registros seguidos do mesmo grupo. Sem `groupBy`, é um grupo só, sem título. */
+function groupRows(rows, groupBy) {
+    if (!groupBy) {
+        return [{ key: null, rows }];
+    }
+
+    return rows.reduce((groups, row) => {
+        const { key, label } = groupBy(row.original);
+        const last = groups.at(-1);
+
+        if (last?.key === key) {
+            last.rows.push(row);
+        } else {
+            groups.push({ key, label, rows: [row] });
+        }
+
+        return groups;
+    }, []);
+}
+
+function GroupTitle({ group, open, onToggle }) {
+    return (
+        <Button
+            fullWidth
+            color="inherit"
+            aria-expanded={open}
+            startIcon={open ? <ExpandMoreIcon /> : <ChevronRightIcon />}
+            sx={{ fontWeight: 600, justifyContent: 'flex-start', textTransform: 'none' }}
+            onClick={onToggle}
+        >
+            {`${group.label} (${group.rows.length})`}
+        </Button>
+    );
+}
+
 function cardFields(columns) {
     const essential = columns.filter((column) => column.meta?.essential);
     const fields =
@@ -189,6 +225,7 @@ export default function DataTable({
     bulkActions = [],
     renderDetail,
     rowSx,
+    groupBy,
     toolbar,
     emptyMessage,
     exportRoute,
@@ -230,6 +267,7 @@ export default function DataTable({
     );
     const [rowSelection, setRowSelection] = useState({});
     const [expanded, setExpanded] = useState({});
+    const [collapsedGroups, setCollapsedGroups] = useState([]);
 
     useEffect(() => {
         setRowSelection({});
@@ -518,6 +556,14 @@ export default function DataTable({
     };
 
     const tableRows = table.getRowModel().rows;
+    const groups = groupRows(tableRows, groupBy);
+    const isOpen = (group) => !collapsedGroups.includes(group.key);
+    const toggleGroup = (group) =>
+        setCollapsedGroups((current) =>
+            current.includes(group.key)
+                ? current.filter((key) => key !== group.key)
+                : [...current, group.key],
+        );
     const visibleColumns = table.getVisibleLeafColumns();
     const hasSummaries = Object.keys(summaries).length > 0;
     const selectedRows = rows.data.filter((row) => rowSelection[String(row.id)]);
@@ -604,16 +650,30 @@ export default function DataTable({
                         />
                     </Box>
 
-                    <RowCards
-                        rows={tableRows}
-                        label={caption}
-                        busy={busy}
-                        fields={cardFields(columns)}
-                        emptyMessage={emptyMessage}
-                        renderCell={renderCell}
-                        renderDetail={renderDetail}
-                        rowSx={rowSx}
-                    />
+                    {(groups.length > 0 ? groups : [{ key: null, rows: [] }]).map((group) => (
+                        <Fragment key={group.key}>
+                            {group.key !== null && (
+                                <GroupTitle
+                                    group={group}
+                                    open={isOpen(group)}
+                                    onToggle={() => toggleGroup(group)}
+                                />
+                            )}
+
+                            {isOpen(group) && (
+                                <RowCards
+                                    rows={group.rows}
+                                    label={group.label ?? caption}
+                                    busy={busy}
+                                    fields={cardFields(columns)}
+                                    emptyMessage={emptyMessage}
+                                    renderCell={renderCell}
+                                    renderDetail={renderDetail}
+                                    rowSx={rowSx}
+                                />
+                            )}
+                        </Fragment>
+                    ))}
                 </>
             ) : (
                 <TableContainer
@@ -715,30 +775,49 @@ export default function DataTable({
                                 </TableRow>
                             )}
 
-                            {tableRows.map((row) => (
-                                <Fragment key={row.id}>
-                                    <TableRow sx={rowSx?.(row.original)}>
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell
-                                                key={cell.id}
-                                                style={columnStyle(cell.column, columnSizing)}
-                                                sx={cellSx(cell.column)}
-                                            >
-                                                {renderCell(cell)}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-
-                                    {expandable && row.getIsExpanded() && (
+                            {groups.map((group) => (
+                                <Fragment key={group.key}>
+                                    {group.key !== null && (
                                         <TableRow>
                                             <TableCell
                                                 colSpan={visibleColumns.length}
-                                                sx={{ bgcolor: 'grey.50' }}
+                                                sx={{ bgcolor: 'grey.50', py: 0 }}
                                             >
-                                                {renderDetail(row.original)}
+                                                <GroupTitle
+                                                    group={group}
+                                                    open={isOpen(group)}
+                                                    onToggle={() => toggleGroup(group)}
+                                                />
                                             </TableCell>
                                         </TableRow>
                                     )}
+
+                                    {(isOpen(group) ? group.rows : []).map((row) => (
+                                        <Fragment key={row.id}>
+                                            <TableRow sx={rowSx?.(row.original)}>
+                                                {row.getVisibleCells().map((cell) => (
+                                                    <TableCell
+                                                        key={cell.id}
+                                                        style={columnStyle(cell.column, columnSizing)}
+                                                        sx={cellSx(cell.column)}
+                                                    >
+                                                        {renderCell(cell)}
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+
+                                            {expandable && row.getIsExpanded() && (
+                                                <TableRow>
+                                                    <TableCell
+                                                        colSpan={visibleColumns.length}
+                                                        sx={{ bgcolor: 'grey.50' }}
+                                                    >
+                                                        {renderDetail(row.original)}
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </Fragment>
+                                    ))}
                                 </Fragment>
                             ))}
                         </TableBody>

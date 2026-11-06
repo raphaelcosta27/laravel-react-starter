@@ -16,7 +16,13 @@ const withUnavailable = [
     { ...permissions[1], available: false },
 ];
 
-const creating = { mode: 'create', record: null, permissions, selected: [] };
+const grouped = (items) => [
+    { key: 'users', label: 'Usuários', view: null, notice: null, permissions: items },
+];
+
+const creating = { mode: 'create', record: null, modules: grouped(permissions), selected: [] };
+
+const expand = () => fireEvent.click(screen.getByRole('button', { name: /Usuários/ }));
 
 const meta = { currentPage: 1, lastPage: 1, perPage: 25, total: 1 };
 const query = { sort: 'name', search: '', filter: {}, tab: null, per_page: 25 };
@@ -36,9 +42,11 @@ describe('telas de perfil', () => {
     test('a seleção de permissões usa caixas nativas, operáveis pelo teclado', () => {
         render(
             <ProfileFormDialog
-                form={{ mode: 'create', record: null, permissions, selected: [1] }}
+                form={{ mode: 'create', record: null, modules: grouped(permissions), selected: [1] }}
             />,
         );
+
+        expand();
 
         const first = screen.getByRole('checkbox', { name: /Gerar Relatório/ });
         const second = screen.getByRole('checkbox', { name: /Exportar Dados/ });
@@ -57,11 +65,13 @@ describe('telas de perfil', () => {
                 form={{
                     mode: 'create',
                     record: null,
-                    permissions: withUnavailable,
+                    modules: grouped(withUnavailable),
                     selected: [2],
                 }}
             />,
         );
+
+        expand();
 
         const unavailable = screen.getByRole('checkbox', { name: /Exportar Dados/ });
 
@@ -69,7 +79,7 @@ describe('telas de perfil', () => {
         expect(unavailable.checked).toBe(true);
         expect(screen.getByRole('checkbox', { name: /Gerar Relatório/ }).disabled).toBe(false);
         expect(
-            screen.getByText('Permissões que você não possui ficam indisponíveis.'),
+            screen.getByText('Você não possui esta permissão, por isso não pode alterá-la.'),
         ).toBeTruthy();
         expect(await axe(container)).toHaveNoViolations();
     });
@@ -78,7 +88,7 @@ describe('telas de perfil', () => {
         render(<ProfileFormDialog form={creating} />);
 
         expect(
-            screen.queryByText('Permissões que você não possui ficam indisponíveis.'),
+            screen.queryByText('Você não possui esta permissão, por isso não pode alterá-la.'),
         ).toBeNull();
     });
 
@@ -88,7 +98,7 @@ describe('telas de perfil', () => {
                 form={{
                     mode: 'edit',
                     record: { id: 1, name: 'Administrador', is_administrator: true },
-                    permissions,
+                    modules: grouped(permissions),
                     selected: [],
                 }}
             />,

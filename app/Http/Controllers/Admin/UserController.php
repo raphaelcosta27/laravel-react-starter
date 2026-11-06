@@ -15,6 +15,7 @@ use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Models\Profile;
 use App\Models\User;
+use App\Support\Permissions\UserPermissionForm;
 use App\Support\Tables\Definitions\UsersTable;
 use App\Support\Tables\TableQuery;
 use Closure;
@@ -156,6 +157,13 @@ class UserController extends Controller
         ));
     }
 
+    public function permissions(Request $request, User $user): Response
+    {
+        Gate::authorize('managePermissions', $user);
+
+        return $this->listing($request, fn () => UserPermissionForm::for($user, $request->user(), 'users'));
+    }
+
     private function listing(Request $request, ?Closure $form = null): Response
     {
         $actor = $request->user();
@@ -164,7 +172,7 @@ class UserController extends Controller
             ...(new TableQuery(new UsersTable($actor), $request->query()))->lazyResponse($actor),
             'abilities' => fn () => [
                 'create' => $actor->can('cadastrar_usuario'),
-                'export' => $actor->can('exportar_dados'),
+                'export' => $actor->can('exportar_usuario'),
                 'bulk' => [
                     ...($actor->can('alterar_situacao_usuario') ? ['activate', 'deactivate'] : []),
                     ...($actor->can('excluir_usuario') ? ['delete'] : []),

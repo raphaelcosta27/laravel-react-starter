@@ -134,7 +134,7 @@ class ProfileManagementTest extends TestCase
                 ->where('form.mode', 'edit')
                 ->where('form.record.id', $profile->id)
                 ->where('form.selected', [$permission->id])
-                ->has('form.permissions', 1)
+                ->has('form.modules.0.permissions', 1)
                 ->etc());
     }
 

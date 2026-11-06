@@ -30,7 +30,7 @@ const panelAreas = [
     { label: 'Profiles', route: 'admin.profiles', permission: 'visualizar_perfil' },
     { label: 'Permissions', route: 'admin.permissions', permission: 'visualizar_permissao' },
     { label: 'Users', route: 'admin.users', permission: 'visualizar_usuario' },
-    { label: 'Environment', route: 'admin.environment', permission: 'configura_env' },
+    { label: 'Environment', route: 'admin.environment', permission: 'visualizar_ambiente' },
 ];
 
 export default function AuthenticatedLayout({ title, children }) {

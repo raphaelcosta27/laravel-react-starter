@@ -18,6 +18,7 @@ export default function FormDialog({
     processing = false,
     isDirty = false,
     submitLabel,
+    hideSubmit = false,
     children,
 }) {
     const __ = useTranslations();
@@ -80,9 +81,11 @@ export default function FormDialog({
                         {__('Cancel')}
                     </Button>
 
-                    <Button type="submit" variant="contained" disabled={processing}>
-                        {submitLabel ?? __('Save')}
-                    </Button>
+                    {!hideSubmit && (
+                        <Button type="submit" variant="contained" disabled={processing}>
+                            {submitLabel ?? __('Save')}
+                        </Button>
+                    )}
                 </DialogActions>
             </Box>
 

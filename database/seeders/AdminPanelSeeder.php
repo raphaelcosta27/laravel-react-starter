@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Permission;
+use App\Actions\Admin\ReorganizePermissions;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -18,23 +18,10 @@ class AdminPanelSeeder extends Seeder
         $administrator = Profile::administrator();
         $default = Profile::default();
 
-        $this->createPermissions();
+        app(ReorganizePermissions::class)->handle();
         $this->assignAdministrator($administrator);
 
         User::withTrashed()->whereNull('profile_id')->update(['profile_id' => $default->id]);
-    }
-
-    private function createPermissions(): void
-    {
-        foreach (trans('permissions', [], 'pt_BR') as $code => $texts) {
-            if (Permission::withTrashed()->where('code', $code)->exists()) {
-                continue;
-            }
-
-            $permission = new Permission(['code' => $code, ...$texts]);
-            $permission->is_system = true;
-            $permission->save();
-        }
     }
 
     private function assignAdministrator(Profile $administrator): void

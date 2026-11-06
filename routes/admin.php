@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(function () {
     Route::get('environment', [EnvironmentController::class, 'index'])
-        ->middleware('can:configura_env')
+        ->middleware('can:visualizar_ambiente')
         ->name('environment.index');
 
     Route::patch('environment', [EnvironmentController::class, 'update'])
@@ -24,7 +24,7 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->name('profiles.index');
 
     Route::get('profiles/export', [ExportController::class, 'profiles'])
-        ->middleware(['can:visualizar_perfil', 'can:exportar_dados'])
+        ->middleware('can:exportar_perfil')
         ->name('profiles.export');
 
     Route::get('profiles/create', [ProfileController::class, 'create'])
@@ -60,8 +60,17 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->middleware('can:visualizar_permissao')
         ->name('permissions.index');
 
+    Route::get('permissions/users', [UserPermissionController::class, 'search'])
+        ->middleware('can:gerenciar_permissoes_usuario')
+        ->name('permissions.users.search');
+
+    Route::get('permissions/users/{user}', [PermissionController::class, 'userPermissions'])
+        ->middleware('can:gerenciar_permissoes_usuario')
+        ->whereNumber('user')
+        ->name('permissions.users.edit');
+
     Route::get('permissions/export', [ExportController::class, 'permissions'])
-        ->middleware(['can:visualizar_permissao', 'can:exportar_dados'])
+        ->middleware('can:exportar_permissao')
         ->name('permissions.export');
 
     Route::get('permissions/create', [PermissionController::class, 'create'])
@@ -94,7 +103,7 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->name('users.index');
 
     Route::get('users/export', [ExportController::class, 'users'])
-        ->middleware(['can:visualizar_usuario', 'can:exportar_dados'])
+        ->middleware('can:exportar_usuario')
         ->name('users.export');
 
     Route::post('users/bulk', UserBulkActionController::class)
@@ -135,8 +144,8 @@ Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(funct
         ->withTrashed()
         ->name('users.restore');
 
-    Route::get('users/{user}/permissions', [UserPermissionController::class, 'edit'])
-        ->middleware('can:gerenciar_permissoes_usuario')
+    Route::get('users/{user}/permissions', [UserController::class, 'permissions'])
+        ->middleware(['can:visualizar_usuario', 'can:gerenciar_permissoes_usuario'])
         ->name('users.permissions');
 
     Route::put('users/{user}/permissions', [UserPermissionController::class, 'update'])

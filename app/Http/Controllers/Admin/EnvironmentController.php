@@ -13,13 +13,13 @@ use Inertia\Response;
 
 class EnvironmentController extends Controller
 {
-    public function index(EnvCatalog $catalog, EnvFile $file): Response
+    public function index(Request $request, EnvCatalog $catalog, EnvFile $file): Response
     {
         return Inertia::render('Admin/Environment/Index', [
             'groups' => $catalog->groups(),
             'version' => $file->version(),
             'writable' => $file->writable(),
-            'editable' => (bool) config('template.install.editor_enabled'),
+            'editable' => config('template.install.editor_enabled') && $request->user()->can('configura_env'),
         ]);
     }
 

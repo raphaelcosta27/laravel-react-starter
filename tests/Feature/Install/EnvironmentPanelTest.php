@@ -123,7 +123,7 @@ class EnvironmentPanelTest extends EnvironmentTestCase
 
     public function test_a_profile_with_the_permission_is_allowed(): void
     {
-        $permission = Permission::factory()->create(['code' => 'configura_env']);
+        $permission = Permission::factory()->create(['code' => 'visualizar_ambiente']);
         $profile = Profile::factory()->create();
         $profile->profilePermissions()->create(['permission_id' => $permission->id]);
 

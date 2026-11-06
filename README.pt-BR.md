@@ -232,13 +232,13 @@ ali, e `php artisan app:setup` continua como alternativa.
 
 ## Ambiente pelo painel
 
-Em `/admin/environment`, administradores e perfis com `configura_env` editam o `.env` por grupos. Segredos nunca chegam
+Em `/admin/environment`, administradores e perfis com `configura_env` e `visualizar_ambiente` editam o `.env` por grupos. Segredos nunca chegam
 ao navegador: em branco, o valor atual é mantido. Variáveis fora de `.env.example` são tratadas como segredo. `APP_KEY`
 não é alterada por ali. Ao salvar, a cópia anterior fica em `storage/app/private/system/.env.backup`, config, cache e
 rotas são limpos, e o histórico guarda quem mudou o quê, com segredos mascarados. Mudança em `DB_*` só é aceita se a nova
 conexão responder. Em produção, use `ENVIRONMENT_EDITOR_ENABLED=false` para deixar a tela só para leitura.
 
-Em uma instalação já existente, rode o comando abaixo para criar a permissão `configura_env`:
+Em uma instalação já existente, rode o comando abaixo para criar as permissões de ambiente:
 
 ```bash
 php artisan db:seed --class=AdminPanelSeeder

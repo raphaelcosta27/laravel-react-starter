@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\RecordsChanges;
+use App\Support\Permissions\Modules;
 use Database\Factories\UserFactory;
 use DateTimeInterface;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -48,6 +49,9 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>|null
      */
     private ?array $effectivePermissions = null;
+
+    /** @var array<int, string>|null */
+    private ?array $assignedPermissions = null;
 
     /**
      * O nome completo repete o nome da conta. UserData faz o caminho inverso.
@@ -210,14 +214,24 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Permissões do perfil somadas às concessões, menos as revogações. Vínculos,
-     * permissões e perfis excluídos não têm efeito.
+     * As atribuídas, sem as de módulos em que falta Visualizar.
      *
      * @return array<int, string>
      */
     public function effectivePermissions(): array
     {
-        return $this->effectivePermissions ??= $this->resolveEffectivePermissions();
+        return $this->effectivePermissions ??= Modules::effective($this->assignedPermissions());
+    }
+
+    /**
+     * Permissões do perfil somadas às concessões, menos as revogações. Vínculos,
+     * permissões e perfis excluídos não têm efeito.
+     *
+     * @return array<int, string>
+     */
+    public function assignedPermissions(): array
+    {
+        return $this->assignedPermissions ??= $this->resolveAssignedPermissions();
     }
 
     /**
@@ -231,7 +245,8 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Como ficariam as permissões efetivas com estes ajustes. Na repetição de
+     * Como ficariam as permissões efetivas com estes ajustes. Conceder Visualizar
+     * ativa o que estava sem efeito, e isso também conta. Na repetição de
      * uma permissão, vale o último item, como em SyncUserPermissions.
      *
      * @param  array<int, array{permission_id: int|string, effect: string}>  $adjustments
@@ -245,14 +260,25 @@ class User extends Authenticatable implements MustVerifyEmail
 
         $codes = Permission::whereIn('id', $effects->keys())->pluck('code', 'id');
 
-        return $this->combinePermissions(
+        return Modules::effective($this->combinePermissions(
+            $this->profile?->permissionCodes() ?? [],
             $codes->filter(fn (string $code, int $id) => $effects[$id] === UserPermission::GRANT),
             $codes->filter(fn (string $code, int $id) => $effects[$id] === UserPermission::REVOKE),
-        );
+        ));
+    }
+
+    /**
+     * Como ficariam as permissões efetivas com este perfil, mantendo os ajustes.
+     *
+     * @return array<int, string>
+     */
+    public function permissionsWithProfile(Profile $profile): array
+    {
+        return Modules::effective($this->resolveAssignedPermissions($profile));
     }
 
     /** @return array<int, string> */
-    private function resolveEffectivePermissions(): array
+    private function resolveAssignedPermissions(?Profile $profile = null): array
     {
         $adjustments = $this->permissionAdjustments()->with('permission')->get()
             ->filter(fn (UserPermission $adjustment) => $adjustment->permission !== null);
@@ -261,17 +287,22 @@ class User extends Authenticatable implements MustVerifyEmail
             ->where('effect', $effect)
             ->map(fn (UserPermission $adjustment) => $adjustment->permission->code);
 
-        return $this->combinePermissions($codesWith(UserPermission::GRANT), $codesWith(UserPermission::REVOKE));
+        return $this->combinePermissions(
+            ($profile ?? $this->profile)?->permissionCodes() ?? [],
+            $codesWith(UserPermission::GRANT),
+            $codesWith(UserPermission::REVOKE),
+        );
     }
 
     /**
+     * @param  array<int, string>  $base
      * @param  Collection<int, string>  $granted
      * @param  Collection<int, string>  $revoked
      * @return array<int, string>
      */
-    private function combinePermissions(Collection $granted, Collection $revoked): array
+    private function combinePermissions(array $base, Collection $granted, Collection $revoked): array
     {
-        return collect($this->profile?->permissionCodes() ?? [])
+        return collect($base)
             ->merge($granted)
             ->diff($revoked)
             ->unique()

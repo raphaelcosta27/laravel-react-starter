@@ -4,15 +4,24 @@ namespace App\Support\Tables\Definitions;
 
 use App\Models\Permission;
 use App\Models\User;
+use App\Support\Permissions\Modules;
 use App\Support\Tables\TableDefinition;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class PermissionsTable extends TableDefinition
 {
+    /**
+     * A tela mostra um título por módulo, então o módulo vem antes de qualquer
+     * ordem escolhida.
+     */
     public function query(): Builder
     {
-        return Permission::query();
+        $keys = Modules::keys();
+        $cases = implode(' ', array_fill(0, count($keys), 'WHEN ? THEN ?'));
+        $bindings = collect($keys)->flatMap(fn (string $key, int $position) => [$key, $position])->all();
+
+        return Permission::query()->orderByRaw("CASE module {$cases} ELSE ? END", [...$bindings, count($keys)]);
     }
 
     public function columns(): array
@@ -21,6 +30,7 @@ class PermissionsTable extends TableDefinition
             'title' => ['label' => __('Title'), 'sortable' => true, 'searchable' => true, 'filter' => 'text'],
             'code' => ['label' => __('Code'), 'sortable' => true, 'searchable' => true, 'filter' => 'text'],
             'description' => ['label' => __('Description'), 'searchable' => true, 'filter' => 'text'],
+            'module' => ['label' => __('Module'), 'filter' => 'multiselect'],
             'deleted_at' => ['label' => __('Deleted at')],
         ];
     }
@@ -50,6 +60,8 @@ class PermissionsTable extends TableDefinition
             'title' => $row->title,
             'code' => $row->code,
             'description' => $row->description,
+            'module' => $row->module,
+            'module_label' => Modules::label($row->module),
             'is_system' => $row->is_system,
             'deleted_at' => $row->deleted_at?->format('d/m/Y H:i'),
         ];

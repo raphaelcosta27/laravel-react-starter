@@ -28,7 +28,7 @@ class ExportTest extends TestCase
     public function test_exports_every_record_of_the_filter_not_only_the_page(): void
     {
         User::factory()->count(30)->create(['name' => 'Ana']);
-        User::factory()->create(['name' => 'Bia']);
+        User::factory()->create(['name' => 'Bia', 'email' => 'bia@example.com']);
 
         $content = $this->csv('search=Ana&per_page=10&columns[]=name');
 
@@ -79,16 +79,9 @@ class ExportTest extends TestCase
         $this->assertStringContainsString('spreadsheetml', $response->headers->get('Content-Type'));
     }
 
-    public function test_requires_exportar_dados(): void
+    public function test_requires_the_export_of_the_module(): void
     {
         $this->actingAs($this->userWith('visualizar_usuario'))
-            ->get('/admin/users/export?format=csv')
-            ->assertForbidden();
-    }
-
-    public function test_requires_the_view_permission_of_the_area(): void
-    {
-        $this->actingAs($this->userWith('exportar_dados'))
             ->get('/admin/users/export?format=csv')
             ->assertForbidden();
     }
@@ -117,7 +110,7 @@ class ExportTest extends TestCase
 
         $content = $this->csv(
             'tab=trashed&columns[]=name',
-            $this->userWith('visualizar_usuario', 'exportar_dados'),
+            $this->userWith('visualizar_usuario', 'exportar_usuario'),
         );
 
         $this->assertStringNotContainsString('Excluída', $content);
@@ -130,7 +123,7 @@ class ExportTest extends TestCase
 
         $content = $this->csv(
             'tab=trashed&columns[]=name',
-            $this->userWith('visualizar_usuario', 'exportar_dados', 'restaurar_usuario'),
+            $this->userWith('visualizar_usuario', 'exportar_usuario', 'restaurar_usuario'),
         );
 
         $this->assertStringContainsString('Excluída', $content);

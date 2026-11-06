@@ -1,12 +1,10 @@
 import FormDialog from '@/Components/FormDialog';
+import PermissionGroups from '@/Components/PermissionGroups';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { closeForm, FORM_SUBMIT } from '@/lib/listing';
 import { useForm } from '@inertiajs/react';
-import Box from '@mui/material/Box';
-import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormLabel from '@mui/material/FormLabel';
 import TextField from '@mui/material/TextField';
@@ -14,7 +12,7 @@ import Typography from '@mui/material/Typography';
 
 export default function ProfileFormDialog({ form }) {
     const __ = useTranslations();
-    const { record, permissions, selected } = form;
+    const { record, modules, selected } = form;
     const editing = form.mode === 'edit';
 
     const fields = useForm({
@@ -75,34 +73,11 @@ export default function ProfileFormDialog({ form }) {
                 >
                     <FormLabel component="legend">{__('Permissions')}</FormLabel>
 
-                    {permissions.some(({ available }) => !available) && (
-                        <Typography variant="body2">
-                            {__('Permissions you do not have are unavailable.')}
-                        </Typography>
-                    )}
-
-                    <Box
-                        sx={{
-                            display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-                        }}
-                    >
-                        {permissions.map((permission) => (
-                            <FormControlLabel
-                                key={permission.id}
-                                label={permission.title}
-                                control={
-                                    <Checkbox
-                                        disabled={!permission.available}
-                                        checked={fields.data.permissions.includes(permission.id)}
-                                        onChange={(event) =>
-                                            toggle(permission.id, event.target.checked)
-                                        }
-                                    />
-                                }
-                            />
-                        ))}
-                    </Box>
+                    <PermissionGroups
+                        modules={modules}
+                        checked={fields.data.permissions}
+                        onToggle={toggle}
+                    />
 
                     {fields.errors.permissions && (
                         <FormHelperText>{fields.errors.permissions}</FormHelperText>

@@ -3,36 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Admin\SyncUserPermissions;
+use App\Http\Controllers\Admin\Concerns\RedirectsToListing;
 use App\Http\Controllers\Controller;
-use App\Models\Permission;
+use App\Models\Profile;
 use App\Models\User;
 use App\Models\UserPermission;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
-use Inertia\Inertia;
-use Inertia\Response;
 
 class UserPermissionController extends Controller
 {
-    public function edit(Request $request, User $user): Response
-    {
-        Gate::authorize('managePermissions', $user);
+    use RedirectsToListing;
 
-        return Inertia::render('Admin/Users/Permissions', [
-            'user' => $user->only('id', 'name'),
-            'permissions' => $this->permissions($user, $request->user()),
-            'canAdjust' => ! $user->isAdministrator(),
-        ]);
-    }
+    private const SEARCH_LIMIT = 20;
+
+    private const LISTINGS = [
+        'users' => 'admin.users.index',
+        'permissions' => 'admin.permissions.index',
+    ];
 
     public function update(Request $request, User $user, SyncUserPermissions $sync): RedirectResponse
     {
         Gate::authorize('managePermissions', $user);
 
         $validated = $request->validate([
+            'origin' => ['sometimes', Rule::in(array_keys(self::LISTINGS))],
             'adjustments' => ['present', 'array'],
             'adjustments.*.permission_id' => ['required', 'integer', Rule::exists('permissions', 'id')->whereNull('deleted_at')],
             'adjustments.*.effect' => ['required', Rule::in([UserPermission::GRANT, UserPermission::REVOKE])],
@@ -42,31 +40,28 @@ class UserPermissionController extends Controller
 
         $sync->handle($user, $validated['adjustments']);
 
-        return back()->with('flash', ['type' => 'success', 'message' => __('User permissions saved.')]);
+        return $this->redirectToListing($request, self::LISTINGS[$validated['origin'] ?? 'users'])
+            ->with('flash', ['type' => 'success', 'message' => __('User permissions saved.')]);
     }
 
-    /**
-     * Cada permissão com seu estado efetivo e sua origem.
-     *
-     * @return Collection<int, array<string, mixed>>
-     */
-    private function permissions(User $user, User $actor): Collection
+    /** Quem usa o módulo Permissões pode não ter acesso à listagem de usuários. */
+    public function search(Request $request): JsonResponse
     {
-        $isAdministrator = $user->isAdministrator();
-        $effective = $user->effectivePermissions();
-        $adjustments = $user->permissionAdjustments()->pluck('effect', 'permission_id');
+        $actor = $request->user();
+        $term = trim((string) $request->query('search'));
 
-        return Permission::orderBy('title')->get()->map(function (Permission $permission) use ($actor, $isAdministrator, $effective, $adjustments) {
-            $adjustment = $adjustments->get($permission->id);
-            $active = $isAdministrator || in_array($permission->code, $effective, true);
+        $users = User::query()
+            ->whereKeyNot($actor->id)
+            ->when(! $actor->isAdministrator(), fn ($query) => $query->where(fn ($others) => $others
+                ->whereNull('profile_id')
+                ->orWhere('profile_id', '!=', Profile::administrator()->id)))
+            ->when($term !== '', fn ($query) => $query->where(fn ($matching) => $matching
+                ->where('name', 'like', "%{$term}%")
+                ->orWhere('email', 'like', "%{$term}%")))
+            ->orderBy('name')
+            ->limit(self::SEARCH_LIMIT)
+            ->get(['id', 'name', 'email']);
 
-            return [
-                ...$permission->only('id', 'title', 'code'),
-                'active' => $active,
-                'adjustment' => $adjustment,
-                'origin' => $adjustment ?? ($active ? 'profile' : 'none'),
-                'available' => $actor->holdsPermissions([$permission->code]),
-            ];
-        });
+        return response()->json($users->map->only('id', 'name', 'email'));
     }
 }

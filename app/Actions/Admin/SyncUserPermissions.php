@@ -11,6 +11,7 @@ class SyncUserPermissions
 {
     /**
      * Sem `sync`: remover exclui logicamente, e refazer restaura a mesma linha.
+     * Ajuste de permissão excluída não aparece na tela e fica como está.
      *
      * @param  array<int, array{permission_id: int|string, effect: string}>  $adjustments
      *
@@ -29,10 +30,10 @@ class SyncUserPermissions
         );
 
         DB::transaction(function () use ($user, $wanted) {
-            $rows = UserPermission::withTrashed()->where('user_id', $user->id)->get()->keyBy('permission_id');
+            $rows = UserPermission::withTrashed()->with('permission')->where('user_id', $user->id)->get()->keyBy('permission_id');
 
             foreach ($rows as $permissionId => $row) {
-                if (! $wanted->has($permissionId) && ! $row->trashed()) {
+                if (! $wanted->has($permissionId) && ! $row->trashed() && $row->permission !== null) {
                     $row->delete();
                 }
             }

@@ -68,8 +68,7 @@ class UserPermissionsProtectionTest extends TestCase
         $this->actingAs(User::factory()->administrator()->create())
             ->get("/admin/users/{$target->id}/permissions")
             ->assertInertia(fn (Assert $page) => $page
-                ->where('canAdjust', false)
-                ->where('permissions.0.active', true)
+                ->where('form.canAdjust', false)
                 ->etc());
     }
 

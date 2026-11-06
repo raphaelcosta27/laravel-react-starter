@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use LogicException;
 
-#[Fillable(['title', 'code', 'description'])]
+#[Fillable(['title', 'code', 'description', 'module'])]
 #[Hidden(['active_code'])]
 class Permission extends Model
 {

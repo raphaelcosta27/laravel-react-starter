@@ -19,6 +19,7 @@ class PermissionManagementTest extends TestCase
         'title' => 'Cadastrar Relatórios',
         'code' => 'cadastrar_relatorio',
         'description' => 'Permissão permite o cadastro de novos relatórios',
+        'module' => 'users',
     ];
 
     private function administrator(): User

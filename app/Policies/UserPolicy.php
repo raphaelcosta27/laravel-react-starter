@@ -34,7 +34,7 @@ class UserPolicy
     {
         return ! $profile->isAdministrator()
             && $actor->id !== $target->id
-            && $actor->holdsPermissions(array_diff($profile->permissionCodes(), $target->effectivePermissions()));
+            && $actor->holdsPermissions(array_diff($target->permissionsWithProfile($profile), $target->effectivePermissions()));
     }
 
     public function changeStatus(User $actor, User $target): bool

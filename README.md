@@ -237,13 +237,13 @@ registration stays closed until then, and `php artisan app:setup` remains an alt
 
 ## Environment in the panel
 
-At `/admin/environment`, administrators and profiles with `configura_env` edit `.env` by group. Secrets never reach the
+At `/admin/environment`, administrators and profiles with `configura_env` and `visualizar_ambiente` edit `.env` by group. Secrets never reach the
 browser: left blank, the current value is kept. Variables outside `.env.example` are treated as secrets. `APP_KEY` cannot
 be changed there. On save, the previous copy goes to `storage/app/private/system/.env.backup`, config, cache and routes
 are cleared, and the history records who changed what, with secrets masked. A `DB_*` change is accepted only if the new
 connection answers. In production, use `ENVIRONMENT_EDITOR_ENABLED=false` to make the page read only.
 
-On an existing installation, run the command below to create the `configura_env` permission:
+On an existing installation, run the command below to create the environment permissions:
 
 ```bash
 php artisan db:seed --class=AdminPanelSeeder

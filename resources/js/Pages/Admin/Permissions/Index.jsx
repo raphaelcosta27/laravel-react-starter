@@ -1,19 +1,32 @@
 import ActionIconButton from '@/Components/ActionIconButton';
 import DataTable from '@/Components/DataTable/DataTable';
+import UserPermissionsDialog from '@/Components/UserPermissionsDialog';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
 import { FORM_VISIT, withListingQuery } from '@/lib/listing';
 import PermissionFormDialog from '@/Pages/Admin/Permissions/Partials/PermissionFormDialog';
+import UserPickerDialog from '@/Pages/Admin/Permissions/Partials/UserPickerDialog';
 import AddModeratorIcon from '@mui/icons-material/AddModerator';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import RestoreFromTrashIcon from '@mui/icons-material/RestoreFromTrash';
 import { Head, router } from '@inertiajs/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
+const groupByModule = (row) => ({ key: row.module ?? 'other', label: row.module_label });
 
-export default function Index({ rows, query, tabs, summaries, abilities, form = null }) {
+export default function Index({
+    rows,
+    query,
+    tabs,
+    summaries,
+    abilities,
+    modules = [],
+    form = null,
+}) {
     const __ = useTranslations();
+    const [picking, setPicking] = useState(false);
 
     const columns = useMemo(
         () => [
@@ -25,6 +38,15 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     filter: 'text',
                     required: true,
                     essential: true,
+                },
+            },
+            {
+                id: 'module',
+                accessorKey: 'module_label',
+                header: __('Module'),
+                meta: {
+                    defaultHidden: true,
+                    filter: { type: 'multiselect', options: modules },
                 },
             },
             {
@@ -42,7 +64,7 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                 : []),
         ],
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [query.tab],
+        [modules, query.tab],
     );
 
     const rowActions = useMemo(
@@ -111,21 +133,45 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     exportRoute="admin.permissions.export"
                     canExport={abilities?.export}
                     emptyMessage={__('No permissions found.')}
+                    groupBy={groupByModule}
                     toolbar={
-                        abilities?.create && (
-                            <ActionIconButton
-                                emphasis
-                                icon={AddModeratorIcon}
-                                label={__('New permission')}
-                                description={__('Opens the form to register a permission.')}
-                                href={withListingQuery(route('admin.permissions.create'))}
-                                {...FORM_VISIT}
-                            />
-                        )
+                        <>
+                            {abilities?.manageUsers && (
+                                <ActionIconButton
+                                    icon={ManageAccountsIcon}
+                                    label={__('User permissions')}
+                                    description={__('Chooses a user to adjust individual permissions.')}
+                                    onClick={() => setPicking(true)}
+                                />
+                            )}
+
+                            {abilities?.create && (
+                                <ActionIconButton
+                                    emphasis
+                                    icon={AddModeratorIcon}
+                                    label={__('New permission')}
+                                    description={__('Opens the form to register a permission.')}
+                                    href={withListingQuery(route('admin.permissions.create'))}
+                                    {...FORM_VISIT}
+                                />
+                            )}
+                        </>
                     }
                 />
 
-                {form && <PermissionFormDialog key={form.record?.id ?? 'new'} form={form} />}
+                <UserPickerDialog open={picking} onClose={() => setPicking(false)} />
+
+                {form?.mode === 'user-permissions' && (
+                    <UserPermissionsDialog key={form.user.id} form={form} />
+                )}
+
+                {form && form.mode !== 'user-permissions' && (
+                    <PermissionFormDialog
+                        key={form.record?.id ?? 'new'}
+                        form={form}
+                        modules={modules}
+                    />
+                )}
             </>
         </AuthenticatedLayout>
     );

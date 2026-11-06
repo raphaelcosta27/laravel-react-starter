@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Models\ProfilePermission;
 use App\Models\User;
 use App\Models\UserPermission;
+use Database\Seeders\AdminPanelSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -243,15 +244,58 @@ class PrivilegeEscalationTest extends TestCase
         $this->assertTrue(User::where('email', 'ana@example.com')->exists());
     }
 
+    /** Conceder Visualizar ativa o que estava guardado, e isso exige possuir também. */
+    public function test_granting_view_cannot_activate_a_dormant_permission_the_actor_lacks(): void
+    {
+        $this->seed(AdminPanelSeeder::class);
+
+        $actor = $this->userWith('visualizar_usuario', 'visualizar_permissao', 'gerenciar_permissoes_usuario');
+        $target = $this->userWith('editar_usuario');
+
+        $this->actingAs($actor)
+            ->put("/admin/users/{$target->id}/permissions", ['adjustments' => [
+                ['permission_id' => $this->permission('visualizar_usuario')->id, 'effect' => 'grant'],
+            ]])
+            ->assertForbidden();
+    }
+
+    public function test_changing_the_profile_cannot_activate_a_dormant_grant_the_actor_lacks(): void
+    {
+        $this->seed(AdminPanelSeeder::class);
+
+        $actor = $this->userWith('visualizar_usuario', 'editar_usuario');
+        $target = $this->userWith();
+        $reader = $this->profileWith('visualizar_perfil');
+
+        UserPermission::create(['user_id' => $target->id, 'permission_id' => $this->permission('excluir_perfil')->id, 'effect' => 'grant']);
+
+        $this->assertFalse($actor->can('changeProfile', [$target, $reader]));
+    }
+
+    public function test_a_profile_cannot_receive_view_that_activates_what_the_actor_lacks(): void
+    {
+        $this->seed(AdminPanelSeeder::class);
+
+        $actor = $this->userWith('visualizar_perfil', 'editar_perfil', 'visualizar_usuario');
+        $profile = $this->profileWith('editar_usuario');
+
+        $this->actingAs($actor)
+            ->patch("/admin/profiles/{$profile->id}", ['permissions' => [
+                $this->permission('editar_usuario')->id,
+                $this->permission('visualizar_usuario')->id,
+            ]])
+            ->assertForbidden();
+    }
+
     public function test_the_user_screen_marks_what_the_actor_cannot_grant(): void
     {
         $this->permission(self::CODE);
         $target = $this->userWith();
 
-        $this->actingAs($this->userWith('gerenciar_permissoes_usuario'))
+        $this->actingAs($this->userWith('visualizar_usuario', 'gerenciar_permissoes_usuario'))
             ->get("/admin/users/{$target->id}/permissions")
-            ->assertInertia(fn (Assert $page) => $page->where('permissions', function ($permissions) {
-                $availability = collect($permissions)->pluck('available', 'code');
+            ->assertInertia(fn (Assert $page) => $page->where('form.modules', function ($modules) {
+                $availability = collect($modules)->flatMap(fn ($module) => $module['permissions'])->pluck('available', 'code');
 
                 return $availability[self::CODE] === false && $availability['gerenciar_permissoes_usuario'] === true;
             }));
@@ -263,8 +307,8 @@ class PrivilegeEscalationTest extends TestCase
 
         $this->actingAs($this->userWith('visualizar_perfil', 'cadastrar_perfil'))
             ->get('/admin/profiles/create')
-            ->assertInertia(fn (Assert $page) => $page->where('form.permissions', function ($permissions) {
-                $availability = collect($permissions)->pluck('available', 'code');
+            ->assertInertia(fn (Assert $page) => $page->where('form.modules', function ($modules) {
+                $availability = collect($modules)->flatMap(fn ($module) => $module['permissions'])->pluck('available', 'code');
 
                 return $availability[self::CODE] === false && $availability['cadastrar_perfil'] === true;
             }));
@@ -277,8 +321,8 @@ class PrivilegeEscalationTest extends TestCase
         $this->actingAs(User::factory()->administrator()->create())
             ->get('/admin/profiles/create')
             ->assertInertia(fn (Assert $page) => $page->where(
-                'form.permissions',
-                fn ($permissions) => collect($permissions)->every(fn ($permission) => $permission['available'] === true),
+                'form.modules',
+                fn ($modules) => collect($modules)->flatMap(fn ($module) => $module['permissions'])->every(fn ($permission) => $permission['available'] === true),
             ));
     }
 

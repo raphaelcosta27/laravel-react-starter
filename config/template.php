@@ -121,6 +121,45 @@ return [
     ],
 
     /*
+    | Módulos do sistema, na ordem das telas. Sem `view`, as demais permissões do
+    | módulo não têm efeito. Veja docs/especificacoes/permissoes-por-modulo.md.
+    */
+    'modules' => [
+        'dashboard' => [
+            'label' => 'Dashboard',
+            'view' => null,
+            'basic' => [],
+            'specific' => ['visualizar_historico'],
+        ],
+        'profiles' => [
+            'label' => 'Profiles',
+            'view' => 'visualizar_perfil',
+            'basic' => ['visualizar_perfil', 'cadastrar_perfil', 'editar_perfil', 'excluir_perfil'],
+            'specific' => ['restaurar_perfil', 'exportar_perfil'],
+        ],
+        'permissions' => [
+            'label' => 'Permissions',
+            'view' => 'visualizar_permissao',
+            'basic' => ['visualizar_permissao', 'cadastrar_permissao', 'editar_permissao', 'excluir_permissao'],
+            'specific' => ['restaurar_permissao', 'exportar_permissao', 'gerenciar_permissoes_usuario'],
+        ],
+        'users' => [
+            'label' => 'Users',
+            'view' => 'visualizar_usuario',
+            'basic' => ['visualizar_usuario', 'cadastrar_usuario', 'editar_usuario', 'excluir_usuario'],
+            'specific' => ['restaurar_usuario', 'exportar_usuario', 'alterar_situacao_usuario', 'solicitar_troca_senha', 'enviar_email_autenticacao'],
+        ],
+        'environment' => [
+            'label' => 'Environment',
+            'view' => 'visualizar_ambiente',
+            'without_records' => true,
+            'enabled_by' => 'template.install.editor_enabled',
+            'basic' => ['visualizar_ambiente', 'configura_env'],
+            'specific' => [],
+        ],
+    ],
+
+    /*
     | Endereços. {cep} é trocado pelos dígitos; os serviços são tentados em ordem.
     */
     'address' => [

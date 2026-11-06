@@ -1,11 +1,12 @@
 import FormDialog from '@/Components/FormDialog';
+import SelectField from '@/Components/SelectField';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { closeForm, FORM_SUBMIT } from '@/lib/listing';
 import { useForm } from '@inertiajs/react';
 import TextField from '@mui/material/TextField';
 
-export default function PermissionFormDialog({ form }) {
+export default function PermissionFormDialog({ form, modules = [] }) {
     const __ = useTranslations();
     const { record } = form;
     const editing = form.mode === 'edit';
@@ -14,6 +15,7 @@ export default function PermissionFormDialog({ form }) {
         title: record?.title ?? '',
         code: record?.code ?? '',
         description: record?.description ?? '',
+        module: record?.module ?? '',
     });
 
     const submit = () => {
@@ -63,6 +65,29 @@ export default function PermissionFormDialog({ form }) {
                 })}
                 label={__('Description')}
             />
+
+            <SelectField
+                id="permission-module"
+                label={__('Module')}
+                required={!record?.is_system}
+                disabled={Boolean(record?.is_system)}
+                value={fields.data.module}
+                error={Boolean(fields.errors.module)}
+                helperText={
+                    fields.errors.module ??
+                    (record?.is_system
+                        ? __('The module of a system permission cannot be changed.')
+                        : undefined)
+                }
+                onChange={(event) => fields.setData('module', event.target.value)}
+            >
+                <option value="">{__('Select')}</option>
+                {modules.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </SelectField>
         </FormDialog>
     );
 }

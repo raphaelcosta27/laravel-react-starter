@@ -2,6 +2,7 @@ import ActionIconButton from '@/Components/ActionIconButton';
 import ConfirmDialog from '@/Components/ConfirmDialog';
 import DataTable from '@/Components/DataTable/DataTable';
 import PersonAvatar from '@/Components/PersonAvatar';
+import UserPermissionsDialog from '@/Components/UserPermissionsDialog';
 import SelectField from '@/Components/SelectField';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useTranslations } from '@/lib/i18n';
@@ -149,7 +150,8 @@ export default function Index({
                 label: __('Permissions'),
                 description: __('Manages the individual permissions of this user.'),
                 icon: KeyIcon,
-                href: (row) => route('admin.users.permissions', row.id),
+                href: (row) => withListingQuery(route('admin.users.permissions', row.id)),
+                visit: FORM_VISIT,
                 visible: (row) => row.can.permissions,
             },
             {
@@ -337,7 +339,13 @@ export default function Index({
                     )}
                 </ConfirmDialog>
 
-                {form && <UserFormDialog key={form.record?.id ?? 'new'} form={form} />}
+                {form?.mode === 'user-permissions' && (
+                    <UserPermissionsDialog key={form.user.id} form={form} />
+                )}
+
+                {form && form.mode !== 'user-permissions' && (
+                    <UserFormDialog key={form.record?.id ?? 'new'} form={form} />
+                )}
             </>
         </AuthenticatedLayout>
     );

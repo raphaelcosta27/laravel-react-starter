@@ -20,8 +20,8 @@ class AdminPanelSeederTest extends TestCase
         'visualizar_permissao', 'cadastrar_permissao', 'editar_permissao', 'excluir_permissao',
         'visualizar_usuario', 'cadastrar_usuario', 'editar_usuario', 'alterar_situacao_usuario',
         'excluir_usuario', 'gerenciar_permissoes_usuario', 'solicitar_troca_senha',
-        'enviar_email_autenticacao', 'exportar_dados', 'restaurar_perfil', 'restaurar_permissao',
-        'restaurar_usuario', 'configura_env', 'visualizar_historico',
+        'enviar_email_autenticacao', 'exportar_perfil', 'exportar_permissao', 'exportar_usuario', 'restaurar_perfil', 'restaurar_permissao',
+        'restaurar_usuario', 'visualizar_ambiente', 'configura_env', 'visualizar_historico',
     ];
 
     public function test_administrator_is_the_first_profile(): void
@@ -49,8 +49,8 @@ class AdminPanelSeederTest extends TestCase
         $this->seed(AdminPanelSeeder::class);
 
         $this->assertEqualsCanonicalizing(self::CODES, Permission::pluck('code')->all());
-        $this->assertSame(22, Permission::where('is_system', true)->count());
-        $this->assertSame('Cadastrar Usuários', Permission::firstWhere('code', 'cadastrar_usuario')->title);
+        $this->assertSame(25, Permission::where('is_system', true)->count());
+        $this->assertSame('Criar Usuários', Permission::firstWhere('code', 'cadastrar_usuario')->title);
     }
 
     public function test_repeating_neither_duplicates_nor_undoes_changes(): void
@@ -63,7 +63,7 @@ class AdminPanelSeederTest extends TestCase
         $this->seed(AdminPanelSeeder::class);
 
         $this->assertSame(2, Profile::count());
-        $this->assertSame(22, Permission::count());
+        $this->assertSame(25, Permission::count());
         $this->assertSame('Master', Profile::administrator()->name);
         $this->assertSame('Título novo', Permission::firstWhere('code', 'editar_perfil')->title);
     }
@@ -72,14 +72,14 @@ class AdminPanelSeederTest extends TestCase
     {
         $this->seed(AdminPanelSeeder::class);
 
-        Permission::firstWhere('code', 'exportar_dados')->delete();
+        Permission::firstWhere('code', 'exportar_usuario')->delete();
         DB::table('permissions')->where('code', 'editar_perfil')->delete();
 
         $this->seed(AdminPanelSeeder::class);
 
         $this->assertTrue(Permission::where('code', 'editar_perfil')->exists());
-        $this->assertFalse(Permission::where('code', 'exportar_dados')->exists());
-        $this->assertSame(1, Permission::onlyTrashed()->where('code', 'exportar_dados')->count());
+        $this->assertFalse(Permission::where('code', 'exportar_usuario')->exists());
+        $this->assertSame(1, Permission::onlyTrashed()->where('code', 'exportar_usuario')->count());
     }
 
     public function test_repeating_three_times_changes_no_data(): void

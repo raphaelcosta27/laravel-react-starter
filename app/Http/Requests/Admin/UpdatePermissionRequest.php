@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Support\Permissions\Modules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePermissionRequest extends FormRequest
 {
@@ -18,6 +20,7 @@ class UpdatePermissionRequest extends FormRequest
         return [
             'title' => ['sometimes', 'required', 'string', 'max:150'],
             'description' => ['sometimes', 'required', 'string', 'max:255'],
+            'module' => ['sometimes', 'nullable', Rule::in(Modules::keys())],
         ];
     }
 }

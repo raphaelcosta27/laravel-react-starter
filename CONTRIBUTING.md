@@ -16,7 +16,9 @@ Uma funcionalidade só está pronta quando:
 - as novas opções estão em `.env.example` e em `lang/pt_BR/environment.php`;
 - nenhum valor específico de projeto foi fixado no código;
 - nenhuma entidade é excluída fisicamente;
-- a documentação pública foi atualizada: o README e o documento em `docs/especificacoes/`.
+- a documentação pública foi atualizada: o README e o documento em `docs/especificacoes/`;
+- todo módulo novo traz suas permissões, com Visualizar controlando o acesso. Veja
+  [permissões por módulo](docs/especificacoes/permissoes-por-modulo.md).
 
 ## Testes
 

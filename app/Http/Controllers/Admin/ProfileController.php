@@ -12,13 +12,13 @@ use App\Http\Requests\Admin\UpdateProfileRequest;
 use App\Models\Permission;
 use App\Models\Profile;
 use App\Models\User;
+use App\Support\Permissions\Modules;
 use App\Support\Tables\Definitions\ProfilesTable;
 use App\Support\Tables\Definitions\ProfileUsersTable;
 use App\Support\Tables\TableQuery;
 use Closure;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
@@ -38,7 +38,7 @@ class ProfileController extends Controller
         return $this->listing($request, fn () => [
             'mode' => 'create',
             'record' => null,
-            'permissions' => $this->permissions($request->user()),
+            'modules' => $this->modules($request->user()),
             'selected' => [],
         ]);
     }
@@ -67,7 +67,7 @@ class ProfileController extends Controller
                 ...$profile->only('id', 'name', 'description'),
                 'is_administrator' => $profile->isAdministrator(),
             ],
-            'permissions' => $this->permissions($request->user()),
+            'modules' => $this->modules($request->user()),
             'selected' => $profile->profilePermissions()->pluck('permission_id'),
         ]);
     }
@@ -125,17 +125,17 @@ class ProfileController extends Controller
             ...(new TableQuery(new ProfilesTable($actor), $request->query()))->lazyResponse($actor),
             'abilities' => fn () => [
                 'create' => $actor->can('cadastrar_perfil'),
-                'export' => $actor->can('exportar_dados'),
+                'export' => $actor->can('exportar_perfil'),
             ],
             'form' => $form,
         ]);
     }
 
-    /** @return Collection<int, array<string, mixed>> */
-    private function permissions(User $actor): Collection
+    /** @return array<int, array<string, mixed>> */
+    private function modules(User $actor): array
     {
-        return Permission::orderBy('title')->get()->map(fn (Permission $permission) => [
-            ...$permission->only('id', 'title', 'code'),
+        return Modules::groups(Permission::all(), fn (Permission $permission) => [
+            ...$permission->only('id', 'title', 'code', 'description'),
             'available' => $actor->holdsPermissions([$permission->code]),
         ]);
     }

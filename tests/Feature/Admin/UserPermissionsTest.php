@@ -38,16 +38,16 @@ class UserPermissionsTest extends TestCase
         $this->actingAs(User::factory()->administrator()->create())
             ->get("/admin/users/{$user->id}/permissions")
             ->assertInertia(function (Assert $page) {
-                $page->component('Admin/Users/Permissions')->where('canAdjust', true);
+                $page->component('Admin/Users/Index')->where('form.canAdjust', true);
 
-                $rows = collect($page->toArray()['props']['permissions'])->keyBy('code');
+                $rows = collect($page->toArray()['props']['form']['modules'])->flatMap(fn (array $module) => $module['permissions'])->keyBy('code');
 
-                $state = fn (string $code) => [$rows[$code]['active'], $rows[$code]['origin']];
+                $state = fn (string $code) => [$rows[$code]['assigned'], $rows[$code]['inProfile']];
 
-                $this->assertSame([true, 'profile'], $state('do_perfil'));
-                $this->assertSame([true, 'grant'], $state('concedida'));
-                $this->assertSame([false, 'revoke'], $state('revogada'));
-                $this->assertSame([false, 'none'], $state('fora_do_perfil'));
+                $this->assertSame([true, true], $state('do_perfil'));
+                $this->assertSame([true, false], $state('concedida'));
+                $this->assertSame([false, true], $state('revogada'));
+                $this->assertSame([false, false], $state('fora_do_perfil'));
             });
     }
 

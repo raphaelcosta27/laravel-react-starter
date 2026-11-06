@@ -10,7 +10,7 @@ Instalar pelo navegador e ajustar o ambiente pelo painel, sem editar arquivos.
 - O assistente exige um código de uso único, disponível só a quem acessa o servidor.
 - O primeiro usuário nasce administrador, com e-mail confirmado e sem troca de senha obrigatória.
 - Existindo um usuário, mesmo excluído, o assistente responde 404.
-- A tela de ambiente é de administradores e de quem tem `configura_env`.
+- A tela de ambiente é de administradores e de quem tem `visualizar_ambiente`. Salvar exige também `configura_env`.
 - Segredos nunca chegam ao navegador, ao log ou ao histórico. Em branco, o valor atual é mantido.
 - A chave da aplicação não pode ser alterada pela tela.
 

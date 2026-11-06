@@ -506,5 +506,20 @@
     ":column, ascending": ":column, crescente",
     ":column, descending": ":column, decrescente",
     "Sort by": "Ordenar por",
-    "Default order": "Ordem padrão"
+    "Default order": "Ordem padrão",
+    ":marked of :total": ":marked de :total",
+    "You do not have this permission, so you cannot change it.": "Você não possui esta permissão, por isso não pode alterá-la.",
+    "From the profile": "Do perfil",
+    "Individual": "Individual",
+    "Revoked": "Revogada",
+    "Without View, the other permissions of this module have no effect.": "Sem Visualizar, as demais permissões deste módulo não têm efeito.",
+    "This module is turned off by configuration.": "Este módulo está desligado por configuração.",
+    "User permissions": "Permissões de usuário",
+    "Chooses a user to adjust individual permissions.": "Escolhe um usuário para ajustar as permissões individuais.",
+    "Searching...": "Buscando...",
+    "The search failed. Try again.": "A busca falhou. Tente de novo.",
+    "User": "Usuário",
+    "Module": "Módulo",
+    "The module of a system permission cannot be changed.": "O módulo de uma permissão de sistema não pode ser alterado.",
+    "Other permissions": "Outras"
 }
