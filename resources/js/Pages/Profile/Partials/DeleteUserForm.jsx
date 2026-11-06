@@ -1,6 +1,8 @@
+import FieldIcon from '@/Components/FieldIcon';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { useForm } from '@inertiajs/react';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -80,7 +82,9 @@ export default function DeleteUserForm() {
                         </DialogContentText>
 
                         <TextField
-                            {...fieldProps(form, 'password')}
+                            {...fieldProps(form, 'password', {
+                                adornment: <FieldIcon icon={LockOutlinedIcon} />,
+                            })}
                             id="delete-account-password"
                             inputRef={passwordInput}
                             type="password"

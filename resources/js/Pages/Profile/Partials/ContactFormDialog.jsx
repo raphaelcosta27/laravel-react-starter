@@ -1,9 +1,15 @@
+import FieldIcon from '@/Components/FieldIcon';
 import FormDialog from '@/Components/FormDialog';
 import SelectField from '@/Components/SelectField';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { formatPhone } from '@/lib/phone';
 import { useForm } from '@inertiajs/react';
+import ContactPhoneOutlinedIcon from '@mui/icons-material/ContactPhoneOutlined';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import FamilyRestroomOutlinedIcon from '@mui/icons-material/FamilyRestroomOutlined';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
@@ -76,7 +82,9 @@ export default function ContactFormDialog({
             onClose={onClose}
         >
             <SelectField
-                {...fieldProps(fields, 'type')}
+                {...fieldProps(fields, 'type', {
+                    adornment: <FieldIcon icon={ContactPhoneOutlinedIcon} />,
+                })}
                 size="medium"
                 label={__('Contact type')}
                 required
@@ -93,6 +101,11 @@ export default function ContactFormDialog({
                     htmlInput: isPhone
                         ? { maxLength: 15, inputMode: 'tel' }
                         : { maxLength: 255 },
+                    adornment: (
+                        <FieldIcon
+                            icon={isPhone ? PhoneOutlinedIcon : EmailOutlinedIcon}
+                        />
+                    ),
                 })}
                 type={isPhone ? 'tel' : 'email'}
                 label={isPhone ? __('Phone') : __('Email')}
@@ -113,7 +126,9 @@ export default function ContactFormDialog({
             {fields.data.is_emergency && (
                 <>
                     <SelectField
-                        {...fieldProps(fields, 'relationship')}
+                        {...fieldProps(fields, 'relationship', {
+                            adornment: <FieldIcon icon={FamilyRestroomOutlinedIcon} />,
+                        })}
                         size="medium"
                         label={__('Relationship')}
                         required
@@ -130,6 +145,7 @@ export default function ContactFormDialog({
                         {...fieldProps(fields, 'contact_name', {
                             required: true,
                             htmlInput: { maxLength: 150 },
+                            adornment: <FieldIcon icon={PersonOutlinedIcon} />,
                         })}
                         label={__('Contact name')}
                     />

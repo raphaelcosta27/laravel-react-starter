@@ -10,8 +10,6 @@ import Button from '@mui/material/Button';
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo } from 'react';
 
-const canEdit = (row) => row.can.update;
-const updateRoute = (row) => route('admin.permissions.update', row.id);
 
 export default function Index({ rows, query, tabs, summaries, abilities, form = null }) {
     const __ = useTranslations();
@@ -25,8 +23,6 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     sortable: true,
                     filter: 'text',
                     required: true,
-                    editable: canEdit,
-                    updateRoute,
                 },
             },
             {
@@ -37,7 +33,7 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
             {
                 accessorKey: 'description',
                 header: __('Description'),
-                meta: { filter: 'text', editable: canEdit, updateRoute },
+                meta: { filter: 'text' },
             },
             ...(query.tab === 'trashed'
                 ? [{ accessorKey: 'deleted_at', header: __('Deleted at') }]

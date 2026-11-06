@@ -27,3 +27,4 @@ Guardar nome completo, como a pessoa quer ser chamada, nascimento, gênero, CPF 
 - **Imagem em disco privado:** servida só à própria pessoa, sem depender de `storage:link`.
 - **Trocar a imagem não apaga a anterior:** segue a regra de preservar dados. Projetos sujeitos a pedidos de eliminação precisam tratar esses arquivos.
 - **Um formulário para os nomes:** dois campos de nome em telas diferentes ficariam fora de sincronia.
+- **CPF validado ao digitar:** o CPF concluído e errado fica vermelho na hora e bloqueia o salvar. Pela metade, bloqueia e só avisa ao sair do campo. O servidor segue validando.

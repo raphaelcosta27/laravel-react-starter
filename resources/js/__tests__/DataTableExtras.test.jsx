@@ -205,23 +205,11 @@ describe('recursos completos do DataTable', () => {
         expect(onToggle.mock.calls[0][1]).toBe(false);
     });
 
-    test('coluna editável usa o campo somente quando permitido', () => {
-        table({
-            columns: [
-                {
-                    accessorKey: 'name',
-                    header: 'Nome',
-                    meta: {
-                        editable: (row) => row.id === 1,
-                        updateRoute: (row) => `/x/${row.id}`,
-                    },
-                },
-            ],
-        });
+    test('nenhuma célula de texto vira campo de edição', () => {
+        table();
 
-        expect(screen.getByLabelText('Nome de Ana').tagName).toBe('INPUT');
-        expect(screen.queryByLabelText('Nome de Bia')).toBeNull();
-        expect(screen.getByRole('cell', { name: 'Bia' })).toBeTruthy();
+        expect(screen.getByRole('cell', { name: 'Ana' })).toBeTruthy();
+        expect(screen.queryByRole('textbox', { name: /Ana/ })).toBeNull();
     });
 
     test('totais aparecem no rodapé', () => {

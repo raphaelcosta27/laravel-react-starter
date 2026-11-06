@@ -1,14 +1,22 @@
+import FieldIcon from '@/Components/FieldIcon';
 import PostLink from '@/Components/PostLink';
 import SelectField from '@/Components/SelectField';
-import { formatCpf } from '@/lib/cpf';
+import { formatCpf, isValidCpf } from '@/lib/cpf';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { useForm, usePage } from '@inertiajs/react';
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
+import CakeOutlinedIcon from '@mui/icons-material/CakeOutlined';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import FaceOutlinedIcon from '@mui/icons-material/FaceOutlined';
+import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import WcOutlinedIcon from '@mui/icons-material/WcOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -31,8 +39,34 @@ export default function UpdateProfileInformation({
         email: user.email,
     });
 
+    const [cpfLeft, setCpfLeft] = useState(false);
+
+    const cpfDigits = form.data.cpf.replace(/\D/g, '').length;
+    const cpfBlocked = cpfDigits > 0 && !isValidCpf(form.data.cpf);
+    // Enquanto a pessoa digita, faltar número ainda não é erro.
+    const cpfWarning = cpfBlocked && (cpfDigits === 11 || cpfLeft);
+    const cpfError = cpfWarning ? __('Enter a valid CPF.') : form.errors.cpf;
+
+    const cpfField = fieldProps(form, 'cpf', {
+        required: cpfRequired,
+        htmlInput: { inputMode: 'numeric', maxLength: 14 },
+        adornment: <FieldIcon icon={BadgeOutlinedIcon} />,
+    });
+
+    const changeCpf = (event) => {
+        setCpfLeft(false);
+        form.clearErrors('cpf');
+        form.setData('cpf', formatCpf(event.target.value));
+    };
+
     const submit = (event) => {
         event.preventDefault();
+
+        if (cpfBlocked) {
+            setCpfLeft(true);
+
+            return;
+        }
 
         form.patch(route('profile.update'));
     };
@@ -51,7 +85,10 @@ export default function UpdateProfileInformation({
 
             <Stack component="form" spacing={3} onSubmit={submit}>
                 <TextField
-                    {...fieldProps(form, 'name', { required: true })}
+                    {...fieldProps(form, 'name', {
+                        required: true,
+                        adornment: <FieldIcon icon={PersonOutlinedIcon} />,
+                    })}
                     label={__('Full name')}
                     autoComplete="name"
                     autoFocus
@@ -60,21 +97,25 @@ export default function UpdateProfileInformation({
                 <TextField
                     {...fieldProps(form, 'preferred_name', {
                         htmlInput: { maxLength: 100 },
+                        adornment: <FieldIcon icon={FaceOutlinedIcon} />,
                     })}
                     label={__('How should we call you?')}
                     autoComplete="nickname"
                 />
 
                 <TextField
-                    {...fieldProps(form, 'birth_date')}
+                    {...fieldProps(form, 'birth_date', {
+                        adornment: <FieldIcon icon={CakeOutlinedIcon} />,
+                    })}
                     type="date"
                     label={__('Date of birth')}
                     autoComplete="bday"
-                    slotProps={{ inputLabel: { shrink: true } }}
                 />
 
                 <SelectField
-                    {...fieldProps(form, 'gender')}
+                    {...fieldProps(form, 'gender', {
+                        adornment: <FieldIcon icon={WcOutlinedIcon} />,
+                    })}
                     size="medium"
                     label={__('Gender')}
                 >
@@ -87,19 +128,24 @@ export default function UpdateProfileInformation({
                 </SelectField>
 
                 <TextField
-                    {...fieldProps(form, 'cpf', {
-                        required: cpfRequired,
-                        htmlInput: { inputMode: 'numeric', maxLength: 14 },
-                    })}
+                    {...cpfField}
+                    error={Boolean(cpfError)}
+                    helperText={cpfError}
+                    slotProps={{
+                        ...cpfField.slotProps,
+                        formHelperText: { role: 'alert' },
+                    }}
                     label="CPF"
                     autoComplete="off"
-                    onChange={(event) =>
-                        form.setData('cpf', formatCpf(event.target.value))
-                    }
+                    onChange={changeCpf}
+                    onBlur={() => setCpfLeft(true)}
                 />
 
                 <TextField
-                    {...fieldProps(form, 'email', { required: true })}
+                    {...fieldProps(form, 'email', {
+                        required: true,
+                        adornment: <FieldIcon icon={EmailOutlinedIcon} />,
+                    })}
                     type="email"
                     label={__('Email')}
                     autoComplete="username"
@@ -131,7 +177,7 @@ export default function UpdateProfileInformation({
                     <Button
                         type="submit"
                         variant="contained"
-                        disabled={form.processing}
+                        disabled={form.processing || cpfBlocked}
                     >
                         {__('Save')}
                     </Button>

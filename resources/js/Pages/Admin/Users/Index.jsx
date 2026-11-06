@@ -44,8 +44,6 @@ export default function Index({
                     sortable: true,
                     filter: 'text',
                     required: true,
-                    editable: (row) => row.can.update,
-                    updateRoute: (row) => route('admin.users.update', row.id),
                 },
             },
             {

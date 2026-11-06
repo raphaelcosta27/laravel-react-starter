@@ -1,4 +1,4 @@
-import { formatCpf } from '@/lib/cpf';
+import { formatCpf, isValidCpf } from '@/lib/cpf';
 import Edit from '@/Pages/Profile/Edit';
 import UpdateProfileInformationForm from '@/Pages/Profile/Partials/UpdateProfileInformationForm';
 import { fireEvent, render, screen, within } from '@testing-library/react';
@@ -45,8 +45,80 @@ describe('formatCpf', () => {
     });
 });
 
+describe('isValidCpf', () => {
+    test.each([
+        ['52998224725', true],
+        ['529.982.247-25', true],
+        ['11144477735', true],
+        ['52998224724', false],
+        ['52998224715', false],
+        ['11111111111', false],
+        ['00000000000', false],
+        ['5299822472', false],
+        ['', false],
+        [null, false],
+    ])('"%s" é %s', (value, expected) => {
+        expect(isValidCpf(value)).toBe(expected);
+    });
+});
+
 describe('UpdateProfileInformationForm', () => {
     beforeEach(() => setPageProps({ auth }));
+
+    const save = () => screen.getByRole('button', { name: 'Save' });
+
+    test('CPF concluído e errado avisa na hora e bloqueia o salvar', () => {
+        renderForm();
+
+        const cpf = screen.getByLabelText('CPF');
+
+        fireEvent.change(cpf, { target: { value: '52998224724' } });
+
+        expect(cpf.getAttribute('aria-invalid')).toBe('true');
+        expect(screen.getByRole('alert').textContent).toBe('Enter a valid CPF.');
+        expect(save().disabled).toBe(true);
+    });
+
+    test('corrigir o CPF libera o salvar e tira o aviso', () => {
+        renderForm();
+
+        const cpf = screen.getByLabelText('CPF');
+
+        fireEvent.change(cpf, { target: { value: '52998224724' } });
+        fireEvent.change(cpf, { target: { value: '52998224725' } });
+
+        expect(cpf.getAttribute('aria-invalid')).toBe('false');
+        expect(screen.queryByText('Enter a valid CPF.')).toBeNull();
+        expect(save().disabled).toBe(false);
+    });
+
+    test('CPF pela metade bloqueia, mas só avisa ao sair do campo', () => {
+        renderForm();
+
+        const cpf = screen.getByLabelText('CPF');
+
+        fireEvent.change(cpf, { target: { value: '5299' } });
+
+        expect(cpf.getAttribute('aria-invalid')).toBe('false');
+        expect(save().disabled).toBe(true);
+
+        fireEvent.blur(cpf);
+
+        expect(cpf.getAttribute('aria-invalid')).toBe('true');
+    });
+
+    test('CPF vazio não bloqueia quando não é obrigatório', () => {
+        renderForm();
+
+        const cpf = screen.getByLabelText('CPF');
+
+        fireEvent.change(cpf, { target: { value: '5299' } });
+        fireEvent.change(cpf, { target: { value: '' } });
+        fireEvent.blur(cpf);
+
+        expect(cpf.getAttribute('aria-invalid')).toBe('false');
+        expect(save().disabled).toBe(false);
+    });
 
     test('mostra o nome da conta no nome completo', () => {
         renderForm();

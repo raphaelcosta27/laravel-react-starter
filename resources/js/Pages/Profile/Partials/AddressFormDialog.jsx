@@ -1,9 +1,11 @@
+import FieldIcon from '@/Components/FieldIcon';
 import AddressFields from '@/Components/AddressFields';
 import FormDialog from '@/Components/FormDialog';
 import { formatPostalCode, isBrazil } from '@/lib/address';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { useForm } from '@inertiajs/react';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -96,6 +98,7 @@ export default function AddressFormDialog({
                     {...fieldProps(fields, 'recipient_name', {
                         required: true,
                         htmlInput: { maxLength: 150 },
+                        adornment: <FieldIcon icon={LocalShippingOutlinedIcon} />,
                     })}
                     label={__('Address owner (who will receive)')}
                 />

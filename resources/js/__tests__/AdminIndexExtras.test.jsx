@@ -2,7 +2,7 @@ import PermissionsIndex from '@/Pages/Admin/Permissions/Index';
 import ProfilesIndex from '@/Pages/Admin/Profiles/Index';
 import UsersIndex from '@/Pages/Admin/Users/Index';
 import { router } from '@inertiajs/react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, test } from 'vitest';
 import translations from '../../../lang/pt_BR.json';
 import { setPageProps } from './helpers/inertia';
@@ -99,31 +99,17 @@ describe('recursos da tabela nas telas reais', () => {
         });
     });
 
-    test('edição direta no nome do usuário, conforme o can', () => {
-        const { unmount } = users({ update: true });
+    test.each([
+        ['usuários', () => users({ update: true })],
+        ['perfis', () => profiles({ update: true })],
+        ['permissões', () => permissions({ update: true })],
+    ])('em %s, editar só pelo botão: a tabela não tem campos', (_, open) => {
+        open();
 
-        expect(screen.getByLabelText('Nome de Bia').tagName).toBe('INPUT');
-        expect(screen.queryByLabelText('E-mail de Bia')).toBeNull();
+        const table = within(screen.getByRole('table'));
 
-        unmount();
-        users({});
-
-        expect(screen.queryByLabelText('Nome de Bia')).toBeNull();
-    });
-
-    test('edição direta no nome e na descrição do perfil', () => {
-        profiles({ update: true });
-
-        expect(screen.getByLabelText('Nome de Financeiro')).toBeTruthy();
-        expect(screen.getByLabelText('Descrição de Financeiro')).toBeTruthy();
-    });
-
-    test('edição direta no título e na descrição da permissão', () => {
-        permissions({ update: true });
-
-        expect(screen.getByLabelText('Título de Gerar')).toBeTruthy();
-        expect(screen.getByLabelText('Descrição de Gerar')).toBeTruthy();
-        expect(screen.queryByLabelText('Código de Gerar')).toBeNull();
+        expect(table.queryAllByRole('textbox')).toHaveLength(0);
+        expect(table.getByLabelText(/^Editar/)).toBeTruthy();
     });
 
     test('a situação usa interruptor com confirmação', async () => {

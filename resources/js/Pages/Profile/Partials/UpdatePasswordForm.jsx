@@ -1,7 +1,10 @@
+import FieldIcon from '@/Components/FieldIcon';
 import PasswordStrength from '@/Components/PasswordStrength';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { useForm } from '@inertiajs/react';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import LockResetOutlinedIcon from '@mui/icons-material/LockResetOutlined';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -53,7 +56,9 @@ export default function UpdatePasswordForm() {
 
             <Stack component="form" spacing={3} onSubmit={updatePassword}>
                 <TextField
-                    {...fieldProps(form, 'current_password')}
+                    {...fieldProps(form, 'current_password', {
+                        adornment: <FieldIcon icon={LockOutlinedIcon} />,
+                    })}
                     inputRef={currentPasswordInput}
                     type="password"
                     label={__('Current Password')}
@@ -61,7 +66,9 @@ export default function UpdatePasswordForm() {
                 />
 
                 <TextField
-                    {...fieldProps(form, 'password')}
+                    {...fieldProps(form, 'password', {
+                        adornment: <FieldIcon icon={LockResetOutlinedIcon} />,
+                    })}
                     inputRef={passwordInput}
                     type="password"
                     label={__('New Password')}
@@ -71,7 +78,9 @@ export default function UpdatePasswordForm() {
                 <PasswordStrength value={form.data.password} />
 
                 <TextField
-                    {...fieldProps(form, 'password_confirmation')}
+                    {...fieldProps(form, 'password_confirmation', {
+                        adornment: <FieldIcon icon={LockResetOutlinedIcon} />,
+                    })}
                     type="password"
                     label={__('Confirm Password')}
                     autoComplete="new-password"

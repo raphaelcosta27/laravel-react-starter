@@ -1,3 +1,4 @@
+import FieldIcon from '@/Components/FieldIcon';
 import SelectField from '@/Components/SelectField';
 import {
     BRAZILIAN_STATES,
@@ -7,6 +8,15 @@ import {
 } from '@/lib/address';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
+import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
+import HolidayVillageOutlinedIcon from '@mui/icons-material/HolidayVillageOutlined';
+import LocationCityOutlinedIcon from '@mui/icons-material/LocationCityOutlined';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
+import MarkunreadMailboxOutlinedIcon from '@mui/icons-material/MarkunreadMailboxOutlined';
+import PlaceOutlinedIcon from '@mui/icons-material/PlaceOutlined';
+import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
+import SignpostOutlinedIcon from '@mui/icons-material/SignpostOutlined';
+import TagOutlinedIcon from '@mui/icons-material/TagOutlined';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextField from '@mui/material/TextField';
@@ -136,10 +146,15 @@ export default function AddressFields({ form }) {
         }
     };
 
-    const text = (name, label, { required = false, maxLength, autoComplete }) => {
+    const text = (
+        name,
+        label,
+        { required = false, maxLength, autoComplete, icon },
+    ) => {
         const props = fieldProps(form, name, {
             required,
             htmlInput: { maxLength, autoComplete },
+            adornment: <FieldIcon icon={icon} />,
         });
 
         return <TextField {...props} label={label} />;
@@ -155,6 +170,7 @@ export default function AddressFields({ form }) {
                         autoComplete: 'postal-code',
                         ...(brazil ? { inputMode: 'numeric' } : {}),
                     },
+                    adornment: <FieldIcon icon={MarkunreadMailboxOutlinedIcon} />,
                 })}
                 label={__('Postal code')}
                 onChange={changePostalCode}
@@ -174,12 +190,14 @@ export default function AddressFields({ form }) {
                 required: true,
                 maxLength: 255,
                 autoComplete: 'address-line1',
+                icon: SignpostOutlinedIcon,
             })}
 
             <TextField
                 {...fieldProps(form, 'number', {
                     required: true,
                     htmlInput: { maxLength: 20 },
+                    adornment: <FieldIcon icon={TagOutlinedIcon} />,
                 })}
                 inputRef={numberInput}
                 label={__('Number')}
@@ -206,25 +224,33 @@ export default function AddressFields({ form }) {
             {text('complement', __('Complement'), {
                 maxLength: 100,
                 autoComplete: 'address-line2',
+                icon: ApartmentOutlinedIcon,
             })}
 
-            {text('reference', __('Reference point'), { maxLength: 150 })}
+            {text('reference', __('Reference point'), {
+                maxLength: 150,
+                icon: PlaceOutlinedIcon,
+            })}
 
             {text('neighborhood', __('Neighborhood'), {
                 required: true,
                 maxLength: 100,
                 autoComplete: 'address-level3',
+                icon: HolidayVillageOutlinedIcon,
             })}
 
             {text('city', __('City'), {
                 required: true,
                 maxLength: 100,
                 autoComplete: 'address-level2',
+                icon: LocationCityOutlinedIcon,
             })}
 
             {brazil ? (
                 <SelectField
-                    {...fieldProps(form, 'state')}
+                    {...fieldProps(form, 'state', {
+                        adornment: <FieldIcon icon={MapOutlinedIcon} />,
+                    })}
                     size="medium"
                     label={__('State')}
                     required
@@ -241,6 +267,7 @@ export default function AddressFields({ form }) {
                     required: true,
                     maxLength: 100,
                     autoComplete: 'address-level1',
+                    icon: MapOutlinedIcon,
                 })
             )}
 
@@ -248,6 +275,7 @@ export default function AddressFields({ form }) {
                 {...fieldProps(form, 'country', {
                     required: true,
                     htmlInput: { maxLength: 100, autoComplete: 'country-name' },
+                    adornment: <FieldIcon icon={PublicOutlinedIcon} />,
                 })}
                 label={__('Country')}
                 onChange={changeCountry}

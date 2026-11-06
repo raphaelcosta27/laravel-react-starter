@@ -20,5 +20,8 @@ export function createAppTheme(branding = {}) {
         typography: {
             fontFamily: 'Roboto, Helvetica, Arial, sans-serif',
         },
+        components: {
+            MuiTextField: { defaultProps: { variant: 'standard' } },
+        },
     });
 }

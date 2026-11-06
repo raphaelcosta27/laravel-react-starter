@@ -13,8 +13,6 @@ import Chip from '@mui/material/Chip';
 import { Head, Link, router } from '@inertiajs/react';
 import { useMemo } from 'react';
 
-const canEdit = (row) => row.can.update;
-const updateRoute = (row) => route('admin.profiles.update', row.id);
 
 export default function Index({ rows, query, tabs, summaries, abilities, form = null }) {
     const __ = useTranslations();
@@ -28,14 +26,12 @@ export default function Index({ rows, query, tabs, summaries, abilities, form = 
                     sortable: true,
                     filter: 'text',
                     required: true,
-                    editable: canEdit,
-                    updateRoute,
                 },
             },
             {
                 accessorKey: 'description',
                 header: __('Description'),
-                meta: { filter: 'text', editable: canEdit, updateRoute },
+                meta: { filter: 'text' },
             },
             {
                 accessorKey: 'users_count',

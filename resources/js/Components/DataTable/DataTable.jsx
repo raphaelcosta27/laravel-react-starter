@@ -1,6 +1,5 @@
 import BulkActions from '@/Components/DataTable/BulkActions';
 import ColumnManager from '@/Components/DataTable/ColumnManager';
-import EditableCell from '@/Components/DataTable/EditableCell';
 import ExportMenu from '@/Components/DataTable/ExportMenu';
 import Pagination from '@/Components/DataTable/Pagination';
 import RowActions from '@/Components/DataTable/RowActions';
@@ -8,7 +7,6 @@ import Tabs from '@/Components/DataTable/Tabs';
 import ToggleCell from '@/Components/DataTable/ToggleCell';
 import Toolbar from '@/Components/DataTable/Toolbar';
 import useTablePreferences from '@/Components/DataTable/useTablePreferences';
-import StatusAnnouncer from '@/Components/StatusAnnouncer';
 import { useTranslations } from '@/lib/i18n';
 import { visuallyHidden } from '@/lib/visuallyHidden';
 import { router } from '@inertiajs/react';
@@ -176,7 +174,6 @@ export default function DataTable({
 }) {
     const __ = useTranslations();
     const [busy, setBusy] = useState(false);
-    const [announcement, setAnnouncement] = useState('');
 
     const dataColumnIds = useMemo(() => columns.map(columnId), [columns]);
     const sorting = useMemo(() => parseSort(query.sort), [query.sort]);
@@ -472,21 +469,6 @@ export default function DataTable({
         const { meta } = columnDef;
         const record = cell.row.original;
 
-        if (meta?.editable?.(record)) {
-            return (
-                <EditableCell
-                    value={cell.getValue()}
-                    field={columnDef.accessorKey}
-                    url={meta.updateRoute(record)}
-                    label={__(':column of :name', {
-                        column: columnDef.header,
-                        name: rowLabel(record),
-                    })}
-                    announce={setAnnouncement}
-                />
-            );
-        }
-
         if (meta?.toggle) {
             return (
                 <ToggleCell
@@ -554,7 +536,6 @@ export default function DataTable({
 
             {selectable && <BulkActions actions={bulkActions} rows={selectedRows} />}
 
-            <StatusAnnouncer message={announcement} visuallyHidden />
 
             <TableContainer
                 component={Paper}

@@ -24,3 +24,5 @@ Dar a todas as telas o mesmo visual, com ações discretas e formulários em mod
 
 - **Seletor nativo:** mantém o teclado e o toque do navegador.
 - **Endereço por formulário:** o link pode ser compartilhado e o botão voltar funciona.
+- **Campos na variante standard:** só a linha abaixo do campo, definida uma vez no tema.
+- **Edição só pelo modal:** a tabela não tem campos; alterar um dado exige o botão Editar. O interruptor de situação continua na tabela, com confirmação e permissão próprias.

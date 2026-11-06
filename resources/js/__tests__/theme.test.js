@@ -4,6 +4,12 @@ import { getContrastRatio } from '@mui/material/styles';
 import { describe, expect, test } from 'vitest';
 
 describe('createAppTheme', () => {
+    test('os campos usam a variante standard', () => {
+        expect(
+            createAppTheme().components.MuiTextField.defaultProps.variant,
+        ).toBe('standard');
+    });
+
     test('usa as cores configuradas', () => {
         const theme = createAppTheme({
             primaryColor: '#00695c',

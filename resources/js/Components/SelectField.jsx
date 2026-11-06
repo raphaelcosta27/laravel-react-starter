@@ -8,6 +8,7 @@ export default function SelectField({
     multiple = false,
     required = false,
     autoFocus = false,
+    slotProps = {},
     children,
     ...props
 }) {
@@ -17,6 +18,7 @@ export default function SelectField({
             size="small"
             fullWidth
             slotProps={{
+                ...slotProps,
                 select: { native: true, multiple, required, autoFocus },
                 inputLabel: { shrink: true },
             }}
