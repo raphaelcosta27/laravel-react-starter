@@ -1,0 +1,119 @@
+name: template
+
+x-php: &php
+  build:
+    context: .
+    dockerfile: php/Dockerfile
+  image: template-app:local
+  volumes:
+    - ../:/var/www/html
+  networks:
+    - internal
+  restart: unless-stopped
+
+x-after-app: &after-app
+  depends_on:
+    app:
+      condition: service_healthy
+
+services:
+  # Compila a interface e termina. Sem Node na máquina.
+  assets:
+    image: node:22-alpine
+    working_dir: /var/www/html
+    command: sh -c "[ -f public/build/manifest.json ] || (npm ci && npm run build)"
+    volumes:
+      - ../:/var/www/html
+      - node_modules:/var/www/html/node_modules
+
+  app:
+    <<: *php
+    ports:
+      - "${DOCKER_HTTP_PORT:-8080}:80"
+      - "${DOCKER_HTTPS_PORT:-8443}:443"
+    volumes:
+      - ../:/var/www/html
+      - ./certs:/etc/apache2/certs:ro
+    environment:
+      DOCKER_HTTP_PORT: ${DOCKER_HTTP_PORT:-8080}
+      DOCKER_HTTPS_PORT: ${DOCKER_HTTPS_PORT:-8443}
+      DOCKER_SSL_ENABLED: ${DOCKER_SSL_ENABLED:-false}
+      DOCKER_DB_HOST: ${DOCKER_DB_HOST:-mysql}
+      DOCKER_DB_DATABASE: ${DOCKER_DB_DATABASE:-template}
+      DOCKER_DB_USERNAME: ${DOCKER_DB_USERNAME:-template}
+      DOCKER_DB_PASSWORD: ${DOCKER_DB_PASSWORD:-template}
+    depends_on:
+      assets:
+        condition: service_completed_successfully
+      mysql:
+        condition: service_healthy
+        required: false
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/up"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+
+  scheduler:
+    <<: [*php, *after-app]
+    command: ["php", "artisan", "schedule:work"]
+
+  queue:
+    <<: [*php, *after-app]
+    command: ["php", "artisan", "queue:work", "--tries=3"]
+
+  # Banco interno: docker compose --profile mysql up -d
+  mysql:
+    image: mysql:8.4
+    profiles: [mysql]
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: ${DOCKER_DB_DATABASE:-template}
+      MYSQL_USER: ${DOCKER_DB_USERNAME:-template}
+      MYSQL_PASSWORD: ${DOCKER_DB_PASSWORD:-template}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  # Opcionais: o sistema não usa nenhum dos dois por padrão.
+  redis:
+    image: redis:8.8-alpine
+    profiles: [redis, horizon]
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Exige composer require laravel/horizon e QUEUE_CONNECTION=redis.
+  horizon:
+    <<: *php
+    profiles: [horizon]
+    command: ["php", "artisan", "horizon"]
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+networks:
+  internal:
+
+volumes:
+  mysql_data:
+  redis_data:
+  node_modules:

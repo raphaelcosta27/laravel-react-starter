@@ -1,0 +1,78 @@
+name: Docker
+
+on:
+  push:
+    paths:
+      - 'docker/**'
+      - '.github/workflows/docker.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  environment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: docker
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Subir com o banco interno
+        run: docker compose --profile mysql up -d --build --wait --wait-timeout 420
+
+      - name: Responde pelo Apache e abre o assistente
+        run: |
+          curl -fsS http://localhost:8080/up
+          test "$(curl -s -o /dev/null -w '%{redirect_url}' http://localhost:8080/login)" = "http://localhost:8080/install"
+          curl -fsS http://localhost:8080/install | grep -q 'Install/Index'
+
+      - name: O app alcança o MySQL pelo nome do serviço
+        run: docker compose exec -T -u www-data app php -r 'new PDO("mysql:host=mysql;dbname=template", "template", "template"); echo "ok";'
+
+      - name: Versão e extensões
+        run: |
+          docker compose exec -T app php -v
+          docker compose exec -T -u www-data app composer check-platform-reqs --no-dev
+
+      - name: Suíte de testes dentro do ambiente
+        run: docker compose exec -T -u www-data app php artisan test
+
+      - name: Agendador e fila ativos
+        run: |
+          test "$(docker compose ps -q scheduler | xargs docker inspect -f '{{.State.Running}}')" = "true"
+          test "$(docker compose ps -q queue | xargs docker inspect -f '{{.State.Running}}')" = "true"
+
+      - name: Dados persistem ao derrubar e subir
+        run: |
+          docker compose exec -T mysql sh -c 'mysql -utemplate -ptemplate template -e "create table marker (id int)"'
+          docker compose --profile mysql down
+          docker compose --profile mysql up -d --wait --wait-timeout 300
+          docker compose exec -T mysql sh -c 'mysql -utemplate -ptemplate template -e "select * from marker"'
+
+      - name: HTTPS sem certificado aponta o que falta
+        run: |
+          docker compose down
+          DOCKER_SSL_ENABLED=true docker compose run --rm --no-deps -T app apache2-foreground 2>&1 | grep -q 'falta docker/certs/server.crt'
+
+      - name: HTTPS com certificado
+        run: |
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj '/CN=localhost' -keyout certs/server.key -out certs/server.crt
+          chmod 644 certs/server.key
+          DOCKER_SSL_ENABLED=true docker compose --profile mysql up -d --wait --wait-timeout 300
+          curl -kfsS https://localhost:8443/up
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/login)" = "301"
+
+      - name: Sem o banco interno, o MySQL não sobe
+        run: |
+          docker compose --profile mysql down
+          docker compose up -d --wait --wait-timeout 300
+          test -z "$(docker compose ps -q mysql)"
+
+      - name: Registrar o motivo da falha
+        if: failure()
+        run: |
+          docker compose --profile mysql ps -a
+          docker compose --profile mysql logs --no-color --tail=25 | tail -40 | sed 's/%/%25/g' | while IFS= read -r line; do echo "::error::$line"; done
