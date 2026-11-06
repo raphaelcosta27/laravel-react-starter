@@ -72,8 +72,8 @@ class PasswordChangeRequiredTest extends TestCase
         $this->actingAs($user)
             ->put('/password', [
                 'current_password' => 'password',
-                'password' => 'nova-senha-segura',
-                'password_confirmation' => 'nova-senha-segura',
+                'password' => 'Nova-senha-1',
+                'password_confirmation' => 'Nova-senha-1',
             ])
             ->assertRedirect(route('verification.notice'));
 

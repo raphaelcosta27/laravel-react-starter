@@ -73,7 +73,8 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `REGISTRATION_ENABLED` | `false` | Ativa a tela pública de registro |
 | `TEMPORARY_PASSWORD_EXPIRE` | `60` | Validade da senha temporária e do link, em minutos |
 | `INITIAL_USER_EMAIL` | `admin@example.com` | E-mail do usuário inicial; vazio não cria o usuário |
-| `INITIAL_USER_PASSWORD` | vazio | Senha temporária; vazia gera uma automaticamente |
+| `INITIAL_USER_PASSWORD` | vazio | Senha temporária; vazia gera uma automaticamente. Precisa cumprir os critérios de senha |
+| `PASSWORD_MIN_LENGTH` | `8` | Tamanho mínimo das senhas, de 8 a 72 |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Nome do perfil master, usado somente na criação |
 | `DEFAULT_PROFILE_NAME` | `Usuário` | Nome do perfil padrão, usado somente na criação |
 | `ADMIN_EMAIL_THROTTLE` | `3` | E-mails do painel por usuário de destino, por janela |
@@ -125,6 +126,19 @@ use RecordsChanges, SoftDeletes;
 - `update()`, `delete()` e `restore()` em massa salvam cada registro e ficam no histórico.
 - `insert()`, `upsert()`, `increment()`, `decrement()`, `truncate()`, `DB::table()`, `withoutEvents()` e os métodos
   `Quietly` não passam pelo histórico. Um teste falha se a aplicação ou os seeders os usarem.
+
+## Senhas
+
+Toda senha definida precisa ter ao menos 8 caracteres, uma letra maiúscula, uma minúscula, um número e um
+caractere especial, com limite de 72 caracteres. Espaços contam como caractere especial, e letras acentuadas
+contam como letras. Quem já tem uma senha fora dos critérios continua entrando, e a regra vale na próxima troca.
+
+Os critérios ficam em `App\Support\Auth\PasswordCriteria`. O servidor valida com `Password::defaults()`, e a
+barra `Components/PasswordStrength.jsx` recebe os mesmos padrões pela prop compartilhada `passwordCriteria`:
+
+```jsx
+<PasswordStrength value={form.data.password} />
+```
 
 ## Login
 

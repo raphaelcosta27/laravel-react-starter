@@ -1,3 +1,4 @@
+import PasswordStrength from '@/Components/PasswordStrength';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
@@ -48,6 +49,8 @@ export default function ResetPassword({ token, email }) {
                         autoComplete="new-password"
                         autoFocus
                     />
+
+                    <PasswordStrength value={form.data.password} />
 
                     <TextField
                         {...fieldProps(form, 'password_confirmation')}

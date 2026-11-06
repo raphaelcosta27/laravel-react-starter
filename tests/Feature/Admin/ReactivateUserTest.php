@@ -40,8 +40,8 @@ class ReactivateUserTest extends TestCase
         $this->post('/register', [
             'name' => 'Ana Nova',
             'email' => 'ana@example.com',
-            'password' => 'senha-digitada',
-            'password_confirmation' => 'senha-digitada',
+            'password' => 'Senha-digitada-1',
+            'password_confirmation' => 'Senha-digitada-1',
         ]);
     }
 
@@ -87,8 +87,8 @@ class ReactivateUserTest extends TestCase
         $this->post('/register', [
             'name' => 'Ana Nova',
             'email' => 'ana@example.com',
-            'password' => 'senha-digitada',
-            'password_confirmation' => 'senha-digitada',
+            'password' => 'Senha-digitada-1',
+            'password_confirmation' => 'Senha-digitada-1',
         ])->assertRedirect(route('login'))->assertSessionHas('status');
 
         $this->assertGuest();
@@ -105,7 +105,7 @@ class ReactivateUserTest extends TestCase
 
         $this->register();
 
-        $this->assertFalse(Hash::check('senha-digitada', User::find($user->id)->password));
+        $this->assertFalse(Hash::check('Senha-digitada-1', User::find($user->id)->password));
     }
 
     public function test_individual_adjustments_do_not_come_back(): void
@@ -141,8 +141,8 @@ class ReactivateUserTest extends TestCase
         $this->post('/register', [
             'name' => 'Ana',
             'email' => 'ana@example.com',
-            'password' => 'senha-digitada',
-            'password_confirmation' => 'senha-digitada',
+            'password' => 'Senha-digitada-1',
+            'password_confirmation' => 'Senha-digitada-1',
         ])->assertSessionHasErrors('email');
 
         $this->actingAs(User::factory()->administrator()->create())

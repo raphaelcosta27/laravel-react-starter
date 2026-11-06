@@ -34,9 +34,9 @@ class AppCreateUserTest extends TestCase
     {
         $this->answer($command, 'Name', 'Ana');
         $this->answer($command, 'Email', 'ana@example.com');
-        $this->answer($command, 'Password', 'senha-segura');
+        $this->answer($command, 'Password', 'Senha-segura-1');
 
-        return $this->answer($command, 'Confirm Password', 'senha-segura');
+        return $this->answer($command, 'Confirm Password', 'Senha-segura-1');
     }
 
     public function test_reactivates_a_deleted_account_without_asking_for_a_password(): void
@@ -70,7 +70,7 @@ class AppCreateUserTest extends TestCase
         $user = User::where('email', 'ana@example.com')->firstOrFail();
 
         $this->assertSame('Ana', $user->name);
-        $this->assertTrue(Hash::check('senha-segura', $user->password));
+        $this->assertTrue(Hash::check('Senha-segura-1', $user->password));
         $this->assertTrue($user->email_verified_at->equalTo(now()));
         $this->assertNull($user->temporary_password_expires_at);
     }
@@ -98,8 +98,8 @@ class AppCreateUserTest extends TestCase
         $this->answer($command, 'Name', 'Ana');
         $this->answer($command, 'Email', 'email-invalido');
         $this->answer($command, 'Email', 'ana@example.com');
-        $this->answer($command, 'Password', 'senha-segura');
-        $this->answer($command, 'Confirm Password', 'senha-segura');
+        $this->answer($command, 'Password', 'Senha-segura-1');
+        $this->answer($command, 'Confirm Password', 'Senha-segura-1');
 
         $command->assertSuccessful()->run();
 
@@ -114,8 +114,8 @@ class AppCreateUserTest extends TestCase
         $this->answer($command, 'Name', 'Ana');
         $this->answer($command, 'Email', 'existente@example.com');
         $this->answer($command, 'Email', 'ana@example.com');
-        $this->answer($command, 'Password', 'senha-segura');
-        $this->answer($command, 'Confirm Password', 'senha-segura');
+        $this->answer($command, 'Password', 'Senha-segura-1');
+        $this->answer($command, 'Confirm Password', 'Senha-segura-1');
 
         $command->assertSuccessful()->run();
 
@@ -128,12 +128,12 @@ class AppCreateUserTest extends TestCase
         $this->answer($command, 'Name', 'Ana');
         $this->answer($command, 'Email', 'ana@example.com');
         $this->answer($command, 'Password', 'curta');
-        $this->answer($command, 'Password', 'senha-segura');
-        $this->answer($command, 'Confirm Password', 'senha-segura');
+        $this->answer($command, 'Password', 'Senha-segura-1');
+        $this->answer($command, 'Confirm Password', 'Senha-segura-1');
 
         $command->assertSuccessful()->run();
 
-        $this->assertTrue(Hash::check('senha-segura', User::first()->password));
+        $this->assertTrue(Hash::check('Senha-segura-1', User::first()->password));
     }
 
     public function test_asks_both_passwords_again_when_they_differ(): void
@@ -141,14 +141,14 @@ class AppCreateUserTest extends TestCase
         $command = $this->command();
         $this->answer($command, 'Name', 'Ana');
         $this->answer($command, 'Email', 'ana@example.com');
-        $this->answer($command, 'Password', 'senha-segura');
+        $this->answer($command, 'Password', 'Senha-segura-1');
         $this->answer($command, 'Confirm Password', 'senha-diferente');
-        $this->answer($command, 'Password', 'outra-senha-segura');
-        $this->answer($command, 'Confirm Password', 'outra-senha-segura');
+        $this->answer($command, 'Password', 'Outra-senha-1');
+        $this->answer($command, 'Confirm Password', 'Outra-senha-1');
 
         $command->expectsOutputToContain(__('The passwords do not match.'))->assertSuccessful()->run();
 
-        $this->assertTrue(Hash::check('outra-senha-segura', User::first()->password));
+        $this->assertTrue(Hash::check('Outra-senha-1', User::first()->password));
     }
 
     public function test_fails_without_interaction(): void

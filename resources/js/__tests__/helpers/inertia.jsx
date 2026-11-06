@@ -1,11 +1,13 @@
 import { forwardRef, useState } from 'react';
 import { vi } from 'vitest';
+import fixture from '../../../../tests/fixtures/password-criteria.json';
 
 const defaults = () => ({
     appName: 'Aplicação de Teste',
     branding: { logo: '/images/logo.svg' },
     auth: { user: null },
     translations: {},
+    passwordCriteria: fixture.criteria,
 });
 
 let pageProps = defaults();

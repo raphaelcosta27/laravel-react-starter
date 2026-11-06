@@ -34,7 +34,7 @@ class FirstAdministratorTest extends TestCase
 
     public function test_first_user_created_by_verified_becomes_administrator(): void
     {
-        $user = $this->createUser()->verified('Ana', 'ana@example.com', 'senha-segura');
+        $user = $this->createUser()->verified('Ana', 'ana@example.com', 'Senha-segura-1');
 
         $this->assertTrue($user->fresh()->isAdministrator());
     }
@@ -84,8 +84,8 @@ class FirstAdministratorTest extends TestCase
         $this->post('/register', [
             'name' => 'Ana',
             'email' => 'ana@example.com',
-            'password' => 'senha-segura',
-            'password_confirmation' => 'senha-segura',
+            'password' => 'Senha-segura-1',
+            'password_confirmation' => 'Senha-segura-1',
         ]);
 
         $this->assertTrue(User::firstWhere('email', 'ana@example.com')->isAdministrator());

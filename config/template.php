@@ -50,6 +50,13 @@ return [
     ],
 
     /*
+    | Senhas. O tamanho mínimo pode subir, mas nunca fica abaixo de 8.
+    */
+    'password' => [
+        'min_length' => (int) env('PASSWORD_MIN_LENGTH', 8),
+    ],
+
+    /*
     | Usuário criado por "php artisan app:setup".
     */
     'initial_user' => [

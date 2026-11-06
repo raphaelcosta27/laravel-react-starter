@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Auth\PasswordCriteria;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -39,6 +40,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'auth' => $this->auth($request),
             'flash' => $request->hasSession() ? $request->session()->get('flash') : null,
+            'passwordCriteria' => fn () => PasswordCriteria::all(),
             'translations' => app('translator')->getLoader()->load(app()->getLocale(), '*', '*'),
         ];
     }

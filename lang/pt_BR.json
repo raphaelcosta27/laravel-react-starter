@@ -291,5 +291,20 @@
     "Back to login": "Voltar ao login",
     "The verification service is unavailable. Try again later.": "O serviço de verificação está indisponível. Tente novamente mais tarde.",
     "The human verification failed. Try again.": "A verificação humana falhou. Tente novamente.",
-    "Complete the human verification.": "Conclua a verificação humana."
+    "Complete the human verification.": "Conclua a verificação humana.",
+    "At least :count characters": "Ao menos :count caracteres",
+    "One uppercase letter": "Uma letra maiúscula",
+    "One lowercase letter": "Uma letra minúscula",
+    "One number": "Um número",
+    "One special character": "Um caractere especial",
+    "The password must have: :missing.": "A senha precisa ter: :missing.",
+    "Password strength": "Força da senha",
+    "Password strength: :level": "Força da senha: :level",
+    "Password strength: :level. :met of :total criteria met.": "Força da senha: :level. :met de :total critérios cumpridos.",
+    "Not informed": "Não informada",
+    "Weak": "Fraca",
+    "Medium": "Média",
+    "Strong": "Forte",
+    "Met": "Cumprido",
+    "Initial user not created: review INITIAL_USER_PASSWORD in .env. :reason": "Usuário inicial não criado: revise INITIAL_USER_PASSWORD no .env. :reason"
 }

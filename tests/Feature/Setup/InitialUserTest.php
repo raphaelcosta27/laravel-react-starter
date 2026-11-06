@@ -31,7 +31,7 @@ class InitialUserTest extends TestCase
         config([
             'template.initial_user.name' => 'Administrador',
             'template.initial_user.email' => 'admin@example.com',
-            'template.initial_user.password' => 'senha-inicial',
+            'template.initial_user.password' => 'Senha-inicial-1',
         ]);
     }
 
@@ -48,10 +48,22 @@ class InitialUserTest extends TestCase
 
         $user = User::firstWhere('email', 'admin@example.com');
 
-        $this->assertTrue(Hash::check('senha-inicial', $user->password));
+        $this->assertTrue(Hash::check('Senha-inicial-1', $user->password));
         $this->assertTrue($user->must_change_password);
 
         Notification::assertSentTo($user, WelcomeUser::class);
+    }
+
+    public function test_refuses_a_weak_initial_password_without_creating_the_user(): void
+    {
+        config(['template.initial_user.password' => 'fraca']);
+
+        $this->artisan('app:setup')
+            ->expectsOutputToContain('INITIAL_USER_PASSWORD')
+            ->assertFailed();
+
+        $this->assertDatabaseMissing('users', ['email' => 'admin@example.com']);
+        Notification::assertNothingSent();
     }
 
     public function test_repeating_keeps_the_user_and_password(): void
@@ -59,7 +71,7 @@ class InitialUserTest extends TestCase
         $this->artisan('app:setup')->assertSuccessful();
         $password = User::first()->password;
 
-        config(['template.initial_user.password' => 'outra-senha']);
+        config(['template.initial_user.password' => 'Outra-senha-1']);
 
         $this->artisan('app:setup')->assertSuccessful();
 

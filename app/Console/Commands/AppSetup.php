@@ -7,6 +7,8 @@ use App\Models\User;
 use Database\Seeders\AdminPanelSeeder;
 use Illuminate\Console\Command;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 use Throwable;
 
 class AppSetup extends Command
@@ -44,30 +46,42 @@ class AppSetup extends Command
 
         $this->info(__('Database ready.'));
 
-        $this->createInitialUser($createUser);
-
-        return self::SUCCESS;
+        return $this->createInitialUser($createUser);
     }
 
-    private function createInitialUser(CreateUser $createUser): void
+    private function createInitialUser(CreateUser $createUser): int
     {
         ['name' => $name, 'email' => $email, 'password' => $password] = config('template.initial_user');
 
         if (empty($email)) {
             $this->warn(__('Initial user not created: set INITIAL_USER_EMAIL in .env.'));
 
-            return;
+            return self::SUCCESS;
         }
 
         if (User::withTrashed()->where('email', $email)->exists()) {
             $this->info(__('Initial user already exists and was kept.'));
 
-            return;
+            return self::SUCCESS;
+        }
+
+        if (filled($password)) {
+            $validator = Validator::make(['password' => $password], ['password' => [Password::defaults()]]);
+
+            if ($validator->fails()) {
+                $this->error(__('Initial user not created: review INITIAL_USER_PASSWORD in .env. :reason', [
+                    'reason' => $validator->errors()->first('password'),
+                ]));
+
+                return self::FAILURE;
+            }
         }
 
         $createUser->handle($name, $email, $password ?: null);
 
         $this->info(__('Initial user created. Check the email sent to :email.', ['email' => $email]));
+
+        return self::SUCCESS;
     }
 
     private function isConnectionFailure(Throwable $e): bool

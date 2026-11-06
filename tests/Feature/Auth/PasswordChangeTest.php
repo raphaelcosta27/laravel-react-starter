@@ -24,14 +24,14 @@ class PasswordChangeTest extends TestCase
 
         $this->change($user, [
             'current_password' => 'password',
-            'password' => 'nova-senha-segura',
-            'password_confirmation' => 'nova-senha-segura',
+            'password' => 'Nova-senha-1',
+            'password_confirmation' => 'Nova-senha-1',
         ])->assertSessionHasNoErrors()->assertRedirect(route('dashboard'));
 
         $user->refresh();
 
         $this->assertFalse($user->must_change_password);
-        $this->assertTrue(Hash::check('nova-senha-segura', $user->password));
+        $this->assertTrue(Hash::check('Nova-senha-1', $user->password));
     }
 
     #[DataProvider('invalidData')]
@@ -49,12 +49,12 @@ class PasswordChangeTest extends TestCase
         return [
             'senha atual errada' => [[
                 'current_password' => 'errada',
-                'password' => 'nova-senha-segura',
-                'password_confirmation' => 'nova-senha-segura',
+                'password' => 'Nova-senha-1',
+                'password_confirmation' => 'Nova-senha-1',
             ], 'current_password'],
             'sem confirmação' => [[
                 'current_password' => 'password',
-                'password' => 'nova-senha-segura',
+                'password' => 'Nova-senha-1',
                 'password_confirmation' => 'diferente',
             ], 'password'],
             'igual à atual' => [[
@@ -77,8 +77,8 @@ class PasswordChangeTest extends TestCase
 
         $this->change($user, [
             'current_password' => 'password',
-            'password' => 'nova-senha-segura',
-            'password_confirmation' => 'nova-senha-segura',
+            'password' => 'Nova-senha-1',
+            'password_confirmation' => 'Nova-senha-1',
         ]);
 
         $this->get('/dashboard')->assertOk();
@@ -99,8 +99,8 @@ class PasswordChangeTest extends TestCase
 
         $this->actingAs($user)->from('/profile')->put('/password', [
             'current_password' => 'password',
-            'password' => 'nova-senha-segura',
-            'password_confirmation' => 'nova-senha-segura',
+            'password' => 'Nova-senha-1',
+            'password_confirmation' => 'Nova-senha-1',
         ])->assertRedirect('/profile');
     }
 }

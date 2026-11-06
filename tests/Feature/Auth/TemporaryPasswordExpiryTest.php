@@ -90,8 +90,8 @@ class TemporaryPasswordExpiryTest extends TestCase
 
         $this->actingAs($user)->put('/password', [
             'current_password' => 'senha-temporaria',
-            'password' => 'nova-senha-segura',
-            'password_confirmation' => 'nova-senha-segura',
+            'password' => 'Nova-senha-1',
+            'password_confirmation' => 'Nova-senha-1',
         ])->assertSessionHasNoErrors();
 
         $this->assertNull($user->fresh()->temporary_password_expires_at);
@@ -104,8 +104,8 @@ class TemporaryPasswordExpiryTest extends TestCase
         $this->post('/reset-password', [
             'token' => Password::createToken($user),
             'email' => $user->email,
-            'password' => 'nova-senha-segura',
-            'password_confirmation' => 'nova-senha-segura',
+            'password' => 'Nova-senha-1',
+            'password_confirmation' => 'Nova-senha-1',
         ])->assertSessionHasNoErrors();
 
         $this->assertNull($user->fresh()->temporary_password_expires_at);

@@ -1,4 +1,5 @@
 import PostLink from '@/Components/PostLink';
+import PasswordStrength from '@/Components/PasswordStrength';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
@@ -51,6 +52,8 @@ export default function ChangePassword() {
                         label={__('New Password')}
                         autoComplete="new-password"
                     />
+
+                    <PasswordStrength value={form.data.password} />
 
                     <TextField
                         {...fieldProps(form, 'password_confirmation')}

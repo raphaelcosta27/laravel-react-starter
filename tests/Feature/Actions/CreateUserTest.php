@@ -58,14 +58,14 @@ class CreateUserTest extends TestCase
     {
         Notification::fake();
 
-        $user = $this->create('senha-escolhida', temporary: false);
+        $user = $this->create('Senha-escolhida-1', temporary: false);
 
         $this->assertNull($user->temporary_password_expires_at);
         $this->assertTrue($user->must_change_password);
 
         Notification::assertSentTo($user, WelcomeUser::class, function (WelcomeUser $notification) use ($user) {
             return $notification->temporaryPassword === null
-                && ! str_contains(implode(' ', $notification->toMail($user)->introLines), 'senha-escolhida');
+                && ! str_contains(implode(' ', $notification->toMail($user)->introLines), 'Senha-escolhida-1');
         });
     }
 
@@ -74,12 +74,12 @@ class CreateUserTest extends TestCase
         Notification::fake();
         $this->freezeSecond();
 
-        $user = app(CreateUser::class)->verified('Ana', 'ana@example.com', 'senha-escolhida');
+        $user = app(CreateUser::class)->verified('Ana', 'ana@example.com', 'Senha-escolhida-1');
 
         $this->assertTrue($user->fresh()->email_verified_at->equalTo(now()));
         $this->assertTrue($user->fresh()->must_change_password);
         $this->assertNull($user->temporary_password_expires_at);
-        $this->assertTrue(Hash::check('senha-escolhida', $user->password));
+        $this->assertTrue(Hash::check('Senha-escolhida-1', $user->password));
 
         Notification::assertNothingSent();
     }

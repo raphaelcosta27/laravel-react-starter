@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\User;
+use App\Rules\StrongPassword;
+use App\Support\Auth\PasswordCriteria;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -28,7 +30,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        Password::defaults(fn () => Password::min(8));
+        // O tamanho mínimo é um critério de StrongPassword, para sair na mesma mensagem.
+        Password::defaults(fn () => Password::min(1)->max(PasswordCriteria::MAXIMUM_LENGTH)->rules([new StrongPassword]));
 
         $this->configurePermissions();
         $this->configureEmailLimits();

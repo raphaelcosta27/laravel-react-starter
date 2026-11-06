@@ -78,6 +78,7 @@ Everything that varies between projects lives in `.env`. The main options:
 | `REGISTRATION_ENABLED` | `false` | Enables the public registration screen |
 | `TEMPORARY_PASSWORD_EXPIRE` | `60` | Validity of the temporary password and link, in minutes |
 | `INITIAL_USER_EMAIL` | `admin@example.com` | Initial user's email; empty skips creating the user |
+| `PASSWORD_MIN_LENGTH` | `8` | Minimum password length, from 8 to 72 |
 | `INITIAL_USER_PASSWORD` | empty | Temporary password; empty generates one automatically |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Name of the master profile, used only on creation |
 | `DEFAULT_PROFILE_NAME` | `Usuário` | Name of the default profile, used only on creation |
@@ -129,6 +130,19 @@ use RecordsChanges, SoftDeletes;
 - Mass `update()`, `delete()` and `restore()` save each row, so they are recorded row by row.
 - `insert()`, `upsert()`, `increment()`, `decrement()`, `truncate()`, `DB::table()`, `withoutEvents()` and the
   `Quietly` methods skip the history. A test fails if the application or the seeders use them.
+
+## Passwords
+
+Every password must have at least 8 characters, an uppercase letter, a lowercase letter, a number and a special
+character, up to 72 characters. Spaces count as special characters, and accented letters count as letters. People
+with an older password keep logging in, and the rule applies the next time they set one.
+
+The criteria live in `App\Support\Auth\PasswordCriteria`. The server validates with `Password::defaults()`, and the
+`Components/PasswordStrength.jsx` bar receives the same patterns through the shared `passwordCriteria` prop:
+
+```jsx
+<PasswordStrength value={form.data.password} />
+```
 
 ## Login
 

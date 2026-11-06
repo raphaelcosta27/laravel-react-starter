@@ -4,7 +4,7 @@ namespace App\Actions;
 
 use App\Models\User;
 use App\Notifications\WelcomeUser;
-use Illuminate\Support\Str;
+use App\Support\Auth\PasswordCriteria;
 use Throwable;
 
 class IssueTemporaryPassword
@@ -15,7 +15,7 @@ class IssueTemporaryPassword
      */
     public function handle(User $user, ?string $password = null): bool
     {
-        $password ??= Str::password(12, symbols: false);
+        $password ??= PasswordCriteria::generate();
 
         $user->forceFill([
             'password' => $password,

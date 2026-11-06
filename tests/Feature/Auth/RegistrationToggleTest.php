@@ -16,8 +16,8 @@ class RegistrationToggleTest extends TestCase
     private array $data = [
         'name' => 'Ana',
         'email' => 'ana@example.com',
-        'password' => 'senha-escolhida',
-        'password_confirmation' => 'senha-escolhida',
+        'password' => 'Senha-escolhida-1',
+        'password_confirmation' => 'Senha-escolhida-1',
     ];
 
     public function test_registration_is_unavailable_by_default(): void

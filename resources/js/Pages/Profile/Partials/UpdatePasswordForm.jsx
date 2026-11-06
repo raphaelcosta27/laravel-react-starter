@@ -1,3 +1,4 @@
+import PasswordStrength from '@/Components/PasswordStrength';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
 import { useForm } from '@inertiajs/react';
@@ -66,6 +67,8 @@ export default function UpdatePasswordForm() {
                     label={__('New Password')}
                     autoComplete="new-password"
                 />
+
+                <PasswordStrength value={form.data.password} />
 
                 <TextField
                     {...fieldProps(form, 'password_confirmation')}
