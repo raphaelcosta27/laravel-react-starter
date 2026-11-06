@@ -5,6 +5,17 @@
 Base para novos projetos com Laravel 13, React 19, Inertia 2 e MySQL. Já inclui autenticação, confirmação
 da conta por e-mail, troca obrigatória de senha no primeiro acesso e testes automatizados.
 
+## Docker
+
+Com o Docker instalado, não é preciso PHP, Apache ou Node na máquina:
+
+```bash
+cd docker
+docker compose --profile mysql up -d --build
+```
+
+O sistema abre em `http://localhost:8080`. Opções, HTTPS e problemas comuns estão em [docker/README.md](docker/README.md).
+
 ## Pré-requisitos
 
 - PHP 8.3 ou superior, com `pdo_mysql`, `pdo_sqlite` e `zip`
@@ -254,7 +265,7 @@ fica no log do dia. Se o envio de e-mail estiver fora do ar, use `LOGIN_TWO_FACT
 
 ## Painel de administrador
 
-O painel gerencia perfis, permissões e usuários. A preparação cria o perfil master, o perfil padrão e as 20
+O painel gerencia perfis, permissões e usuários. A preparação cria o perfil master, o perfil padrão e as 21
 permissões do painel, e o primeiro usuário criado no sistema vira administrador.
 
 **Verificar uma permissão.** A permissão é identificada pelo código, e a mesma verificação vale em todo lugar:

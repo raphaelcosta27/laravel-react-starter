@@ -9,6 +9,17 @@ A base for new projects with Laravel 13, React 19, Inertia 2 and MySQL. It inclu
 confirmation by email, a mandatory password change on first access, and automated tests. The interface ships
 in Brazilian Portuguese.
 
+## Docker
+
+With Docker installed, PHP, Apache and Node are not needed on the machine:
+
+```bash
+cd docker
+docker compose --profile mysql up -d --build
+```
+
+The system opens at `http://localhost:8080`. Options, HTTPS and common problems are in [docker/README.md](docker/README.md).
+
 ## Requirements
 
 - PHP 8.3 or later, with `pdo_mysql`, `pdo_sqlite` and `zip`
@@ -259,7 +270,7 @@ is in the log of the day. If email delivery is down, use `LOGIN_TWO_FACTOR_ENABL
 ## Admin panel
 
 The panel manages profiles, permissions and users. Setup creates the master profile, the default profile and
-the 20 panel permissions, and the first user created in the system becomes an administrator.
+the 21 panel permissions, and the first user created in the system becomes an administrator.
 
 **Checking a permission.** A permission is identified by its code, and the same check works everywhere:
 
