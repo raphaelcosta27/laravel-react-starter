@@ -77,7 +77,8 @@ jobs:
           {
             docker compose --profile mysql ps -a --format '{{.Service}} {{.State}} {{.Status}}'
             docker compose --profile mysql logs --no-color --tail=12 assets
-            docker compose --profile mysql logs --no-color --tail=25 app
+            docker compose --profile mysql logs --no-color --tail=8 app
+            tail -n 15 ../storage/logs/*.log
           } 2>&1 | cut -c1-170 | tail -45 > /tmp/motivo.txt
           cat /tmp/motivo.txt
           echo "::error::$(sed 's/%/%25/g' /tmp/motivo.txt | awk '{printf "%s%%0A", $0}')"

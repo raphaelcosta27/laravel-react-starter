@@ -36,6 +36,11 @@ if [ ! -f vendor/autoload.php ]; then
     runuser -u www-data -- composer install --no-interaction --prefer-dist
 fi
 
+# O teste de saúde passa pelas rotas web, que não funcionam sem a chave.
+if grep -qE '^APP_KEY=\s*$' .env; then
+    runuser -u www-data -- php artisan key:generate --force --no-interaction
+fi
+
 if [ "${DOCKER_SSL_ENABLED:-false}" = "true" ]; then
     for file in server.crt server.key; do
         if [ ! -f "/etc/apache2/certs/$file" ]; then

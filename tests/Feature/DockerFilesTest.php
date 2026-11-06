@@ -106,6 +106,14 @@ class DockerFilesTest extends TestCase
         $this->assertStringContainsString('.env', $ignored);
     }
 
+    public function test_the_application_key_exists_before_the_health_check(): void
+    {
+        $entrypoint = (string) file_get_contents(base_path('docker/php/entrypoint.sh'));
+
+        $this->assertStringContainsString('artisan key:generate', $entrypoint);
+        $this->assertLessThan(strpos($entrypoint, 'exec "$@"'), strpos($entrypoint, 'artisan key:generate'));
+    }
+
     public function test_the_shell_script_uses_unix_line_endings(): void
     {
         $this->assertStringNotContainsString("\r", (string) file_get_contents(base_path('docker/php/entrypoint.sh')));
