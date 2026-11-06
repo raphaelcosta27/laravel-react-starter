@@ -84,6 +84,9 @@ Everything that varies between projects lives in `.env`. The main options:
 | `PROFILE_AVATAR_MAX_KB` | `2048` | Maximum profile picture size, in KB. PHP's `upload_max_filesize` also applies |
 | `PROFILE_AVATAR_DISK` | `local` | Disk for profile pictures |
 | `PROFILE_RELATIONSHIPS` | `Mother,Father,...,Other relationship` | Relationships of emergency contacts, translated by `lang/pt_BR.json` |
+| `NOTIFICATIONS_ENABLED` | `true` | Turns the bell and notification routes on |
+| `NOTIFICATIONS_POLL_SECONDS` | `60` | Bell refresh interval |
+| `NOTIFICATIONS_PER_PAGE` | `20` | Notifications per panel page |
 | `ADDRESS_DEFAULT_COUNTRY` | `Brasil` | Country prefilled in addresses |
 | `ADDRESS_POSTAL_CODE_URLS` | ViaCEP and BrasilAPI | Postal code services, tried in order. `{cep}` is replaced by the digits |
 | `INITIAL_USER_PASSWORD` | empty | Temporary password; empty generates one automatically |
@@ -188,6 +191,18 @@ To use it in another form, render `Components/AddressFields.jsx` with a `useForm
 The postal code search goes through the server at `GET /postal-code/{cep}`, sends only the postal code and is limited to
 30 lookups per minute. If it fails, the person is told and fills in by hand. With a country other than Brazil, the search,
 mask and state list are turned off.
+
+## Notifications
+
+In the top bar, the bell shows the person's new notifications. Opening the side panel marks the displayed ones as seen, and
+the X hides one with a soft delete. To send, make one call, to a user or a collection:
+
+```php
+ScreenNotifications::send($profile->users, 'Title', 'Text', 'success', '/dashboard');
+```
+
+Types are `info`, `success`, `warning` and `error`. The link is optional and accepts an internal path or an http(s) address.
+Content is always shown as text. The count updates on navigation and every `NOTIFICATIONS_POLL_SECONDS`.
 
 ## Login
 

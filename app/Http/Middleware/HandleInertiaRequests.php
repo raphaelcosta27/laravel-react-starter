@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Support\Auth\PasswordCriteria;
+use App\Support\ScreenNotifications;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -39,6 +40,7 @@ class HandleInertiaRequests extends Middleware
                 'secondaryColor' => $this->color(config('template.branding.secondary_color')),
             ],
             'auth' => $this->auth($request),
+            'notifications' => fn () => $this->notifications($request),
             'flash' => $request->hasSession() ? $request->session()->get('flash') : null,
             'passwordCriteria' => fn () => PasswordCriteria::all(),
             'translations' => app('translator')->getLoader()->load(app()->getLocale(), '*', '*'),
@@ -62,6 +64,25 @@ class HandleInertiaRequests extends Middleware
             'avatarUrl' => rescue(fn () => $user?->avatarUrl(), null, false),
             'isAdministrator' => $isAdministrator,
             'permissions' => $isAdministrator ? [] : rescue(fn () => $user?->effectivePermissions() ?? [], [], false),
+        ];
+    }
+
+    /**
+     * Desligadas ou sem login, a tela não mostra o sino.
+     *
+     * @return array{unread: int, pollSeconds: int}|null
+     */
+    private function notifications(Request $request): ?array
+    {
+        $user = rescue(fn () => $request->user(), null, false);
+
+        if ($user === null || ! config('template.notifications.enabled')) {
+            return null;
+        }
+
+        return [
+            'unread' => rescue(fn () => ScreenNotifications::unread($user), 0, false),
+            'pollSeconds' => (int) config('template.notifications.poll_seconds'),
         ];
     }
 

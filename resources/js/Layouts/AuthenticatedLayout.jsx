@@ -1,4 +1,5 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import NotificationBell from '@/Components/NotificationBell';
 import PostLink from '@/Components/PostLink';
 import StatusAnnouncer from '@/Components/StatusAnnouncer';
 import UserAvatar from '@/Components/UserAvatar';
@@ -99,12 +100,11 @@ export default function AuthenticatedLayout({ title, children }) {
                         ))}
                     </Box>
 
-                    <Box
-                        sx={{
-                            display: { xs: 'none', sm: 'block' },
-                            marginInlineStart: 'auto',
-                        }}
-                    >
+                    <Box sx={{ marginInlineStart: 'auto' }}>
+                        <NotificationBell />
+                    </Box>
+
+                    <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                         <Button
                             id={accountId}
                             color="inherit"

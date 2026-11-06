@@ -6,6 +6,8 @@ use App\Http\Controllers\ProfileAddressController;
 use App\Http\Controllers\ProfileAvatarController;
 use App\Http\Controllers\ProfileContactController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ScreenNotificationController;
+use App\Http\Middleware\EnsureNotificationsEnabled;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -29,6 +31,13 @@ Route::middleware('account.ready')->group(function () {
     Route::patch('/profile/addresses/{address}', [ProfileAddressController::class, 'update'])->whereNumber('address')->name('profile.addresses.update');
     Route::delete('/profile/addresses/{address}', [ProfileAddressController::class, 'destroy'])->whereNumber('address')->name('profile.addresses.destroy');
     Route::get('/postal-code/{postalCode}', PostalCodeController::class)->where('postalCode', '[0-9]{8}')->middleware('throttle:30,1')->name('postal-code.show');
+});
+
+Route::middleware(['account.ready', EnsureNotificationsEnabled::class])->prefix('notifications')->group(function () {
+    Route::get('/', [ScreenNotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/unread', [ScreenNotificationController::class, 'unread'])->name('notifications.unread');
+    Route::post('/seen', [ScreenNotificationController::class, 'seen'])->name('notifications.seen');
+    Route::delete('/{notification}', [ScreenNotificationController::class, 'destroy'])->whereNumber('notification')->name('notifications.destroy');
 });
 
 require __DIR__.'/admin.php';

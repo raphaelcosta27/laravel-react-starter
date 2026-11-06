@@ -80,6 +80,9 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `PROFILE_AVATAR_MAX_KB` | `2048` | Tamanho máximo da imagem de perfil, em KB. Respeite também o `upload_max_filesize` do PHP |
 | `PROFILE_AVATAR_DISK` | `local` | Disco das imagens de perfil |
 | `PROFILE_RELATIONSHIPS` | `Mother,Father,...,Other relationship` | Parentescos dos contatos de emergência, traduzidos por `lang/pt_BR.json` |
+| `NOTIFICATIONS_ENABLED` | `true` | Liga o sino e as rotas de notificação |
+| `NOTIFICATIONS_POLL_SECONDS` | `60` | Intervalo de atualização do sino |
+| `NOTIFICATIONS_PER_PAGE` | `20` | Notificações por página da barra |
 | `ADDRESS_DEFAULT_COUNTRY` | `Brasil` | País já preenchido nos endereços |
 | `ADDRESS_POSTAL_CODE_URLS` | ViaCEP e BrasilAPI | Serviços de CEP, tentados em ordem. `{cep}` é trocado pelos dígitos |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Nome do perfil master, usado somente na criação |
@@ -184,6 +187,18 @@ Para usar em outro formulário, renderize `Components/AddressFields.jsx` com um 
 A busca de CEP passa pelo servidor, em `GET /postal-code/{cep}`, envia só o CEP e é limitada a 30 consultas por minuto.
 Se ela falhar, a pessoa é avisada e preenche à mão. Com país diferente de Brasil, busca, máscara e lista de estados
 ficam desligadas.
+
+## Notificações
+
+Na barra superior, o sino mostra as notificações novas da pessoa. Abrir a barra lateral marca as exibidas como vistas, e o X
+oculta com exclusão lógica. Para enviar, use uma chamada, a um usuário ou a uma coleção:
+
+```php
+ScreenNotifications::send($profile->users, 'Título', 'Texto', 'success', '/dashboard');
+```
+
+Os tipos são `info`, `success`, `warning` e `error`. O link é opcional e aceita caminho interno ou endereço http(s).
+O conteúdo é sempre exibido como texto. A contagem é atualizada ao navegar e a cada `NOTIFICATIONS_POLL_SECONDS`.
 
 ## Login
 

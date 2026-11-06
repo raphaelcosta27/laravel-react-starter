@@ -404,5 +404,22 @@
     "Postal code not found. Fill in the address manually.": "CEP não encontrado. Preencha o endereço manualmente.",
     "The postal code search is unavailable. Fill in the address manually.": "A busca de CEP está indisponível. Preencha o endereço manualmente.",
     "Postal code not found.": "CEP não encontrado.",
-    "The postal code search is unavailable.": "A busca de CEP está indisponível."
+    "The postal code search is unavailable.": "A busca de CEP está indisponível.",
+    "Notifications": "Notificações",
+    "Notifications: :count new": "Notificações: :count novas",
+    "Notifications: none new": "Notificações: nenhuma nova",
+    "Notifications: 1 new": "Notificações: 1 nova",
+    "Close notifications": "Fechar notificações",
+    "You have no notifications.": "Você não tem notificações.",
+    "The notifications could not be loaded. Try again.": "Não foi possível carregar as notificações. Tente de novo.",
+    "Loading notifications": "Carregando notificações",
+    "Load more": "Carregar mais",
+    "Hide notification": "Ocultar notificação",
+    "Remove this notification from your list.": "Tira esta notificação da sua lista.",
+    "New": "Nova",
+    "Open": "Abrir",
+    "Information": "Informação",
+    "Success": "Sucesso",
+    "Warning": "Atenção",
+    "Error": "Erro"
 }

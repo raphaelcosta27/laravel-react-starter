@@ -69,6 +69,15 @@ return [
     ],
 
     /*
+    | Notificações em tela. O sino consulta o servidor a cada poll_seconds.
+    */
+    'notifications' => [
+        'enabled' => (bool) env('NOTIFICATIONS_ENABLED', true),
+        'poll_seconds' => (int) env('NOTIFICATIONS_POLL_SECONDS', 60),
+        'per_page' => (int) env('NOTIFICATIONS_PER_PAGE', 20),
+    ],
+
+    /*
     | Endereços. {cep} é trocado pelos dígitos; os serviços são tentados em ordem.
     */
     'address' => [
