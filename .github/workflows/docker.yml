@@ -27,7 +27,8 @@ jobs:
         run: |
           curl -fsS http://localhost:8080/up
           test "$(curl -s -o /dev/null -w '%{redirect_url}' http://localhost:8080/login)" = "http://localhost:8080/install"
-          curl -fsS http://localhost:8080/install | grep -q 'Install/Index'
+          curl -fsS -o /tmp/install.html http://localhost:8080/install
+          grep -Eq 'Install.?/Index' /tmp/install.html
 
       - name: O app alcança o MySQL pelo nome do serviço
         run: docker compose exec -T -u www-data app php -r 'new PDO("mysql:host=mysql;dbname=template", "template", "template"); echo "ok";'
