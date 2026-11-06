@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 
 export default function UserFormDialog({ form }) {
     const __ = useTranslations();
-    const { record, profileOptions, canChangeProfile } = form;
+    const { record, profileOptions, canChangeProfile, canChangeEmail } = form;
     const editing = form.mode === 'edit';
 
     const fields = useForm({
@@ -50,6 +50,13 @@ export default function UserFormDialog({ form }) {
                 })}
                 type="email"
                 label={__('Email')}
+                disabled={!canChangeEmail}
+                helperText={
+                    fields.errors.email ??
+                    (canChangeEmail
+                        ? undefined
+                        : __('Only administrators can change the email of an account.'))
+                }
             />
 
             <SelectField

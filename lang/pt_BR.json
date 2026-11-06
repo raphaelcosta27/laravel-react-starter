@@ -124,6 +124,7 @@
     "Is not empty": "Não está vazio",
     "Lists the users of this profile.": "Lista os usuários deste perfil.",
     "Log in": "Entrar",
+    "Only administrators can change the email of an account.": "Somente administradores alteram o e-mail de uma conta.",
     "Log Out": "Sair",
     "Login: :email": "Login: :email",
     "Lowercase letters without accents, numbers and underscores, starting with a letter.": "Letras minúsculas sem acento, números e sublinhado, começando por letra.",

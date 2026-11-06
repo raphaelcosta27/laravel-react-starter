@@ -15,6 +15,7 @@ const creating = {
     record: null,
     profileOptions,
     canChangeProfile: true,
+    canChangeEmail: true,
 };
 
 const editing = {
@@ -22,6 +23,7 @@ const editing = {
     record: { id: 5, name: 'Bia', email: 'bia@example.com', profile_id: 2 },
     profileOptions,
     canChangeProfile: false,
+    canChangeEmail: false,
 };
 
 describe('formulário de usuário', () => {
@@ -49,6 +51,21 @@ describe('formulário de usuário', () => {
 
         expect(screen.getByRole('dialog', { name: 'Editar usuário' })).toBeTruthy();
         expect(screen.getByLabelText(/^Perfil/).disabled).toBe(true);
+    });
+
+    test('quem não pode trocar o e-mail vê o campo desativado, com o motivo', () => {
+        render(<UserFormDialog form={editing} />);
+
+        expect(screen.getByLabelText(/^E-mail/).disabled).toBe(true);
+        expect(
+            screen.getByText('Somente administradores alteram o e-mail de uma conta.'),
+        ).toBeTruthy();
+    });
+
+    test('quem pode trocar o e-mail vê o campo liberado', () => {
+        render(<UserFormDialog form={{ ...editing, canChangeEmail: true }} />);
+
+        expect(screen.getByLabelText(/^E-mail/).disabled).toBe(false);
     });
 
     test('exibe erros por campo', () => {

@@ -24,6 +24,12 @@ class UserPolicy
         return $actor->can('editar_usuario') && ! $target->isAdministrator();
     }
 
+    /** Trocar o e-mail abre caminho para assumir a conta: administradores decidem em Gate::before. */
+    public function changeEmail(User $actor, User $target): bool
+    {
+        return false;
+    }
+
     public function changeProfile(User $actor, User $target, Profile $profile): bool
     {
         return ! $profile->isAdministrator()

@@ -156,6 +156,9 @@ const can = useCan();
 verificação, e um código inexistente nega acesso aos demais. Regras que valem também para administradores ficam
 nas Actions, pois `Gate::before` ignora as policies para eles.
 
+**Alterar e-mail.** No painel, somente administradores alteram o e-mail de uma conta, mesmo com `editar_usuario`:
+com o e-mail, a recuperação de senha daria acesso à conta. Cada pessoa altera o próprio e-mail em seu perfil.
+
 **Conceder permissões.** Quem não é administrador só concede o que possui, seja por ajuste individual, pelas
 permissões de um perfil, pelo cadastro de um usuário ou pela troca de perfil. Conta o que passaria a valer: manter
 o que já existe e revogar continuam liberados. As telas deixam indisponível o que não pode ser concedido.

@@ -42,6 +42,7 @@ class UserController extends Controller
             'record' => null,
             'profileOptions' => $this->profileOptions($request->user()),
             'canChangeProfile' => true,
+            'canChangeEmail' => true,
         ]);
     }
 
@@ -67,12 +68,19 @@ class UserController extends Controller
             'record' => $user->only('id', 'name', 'email', 'profile_id'),
             'profileOptions' => $this->profileOptions($actor, $user),
             'canChangeProfile' => $actor->isAdministrator() || $actor->id !== $user->id,
+            'canChangeEmail' => $actor->can('changeEmail', $user),
         ]);
     }
 
     public function update(UpdateUserRequest $request, User $user, UpdateUser $updateUser): RedirectResponse
     {
         Gate::authorize('update', $user);
+
+        $email = $request->validated('email');
+
+        if ($email !== null && $email !== $user->email) {
+            Gate::authorize('changeEmail', $user);
+        }
 
         $profileId = $request->validated('profile_id');
 

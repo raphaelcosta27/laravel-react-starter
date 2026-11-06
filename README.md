@@ -160,6 +160,9 @@ const can = useCan();
 check, and a code that does not exist denies everyone else. Rules that also bind administrators belong in
 Actions, because `Gate::before` skips policies for them.
 
+**Changing an email.** In the panel, only administrators change an account's email, even with `editar_usuario`:
+with the email, password recovery would give access to the account. Each person changes their own email in their profile.
+
 **Granting permissions.** Non-administrators only grant what they hold, whether through an individual adjustment,
 a profile's permissions, a new user or a profile change. What counts is what would become effective: keeping what
 already exists and revoking stay allowed. Screens disable what cannot be granted.
