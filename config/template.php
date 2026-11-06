@@ -69,6 +69,14 @@ return [
     ],
 
     /*
+    | Endereços. {cep} é trocado pelos dígitos; os serviços são tentados em ordem.
+    */
+    'address' => [
+        'default_country' => env('ADDRESS_DEFAULT_COUNTRY', 'Brasil'),
+        'postal_code_urls' => array_filter(array_map('trim', explode(',', (string) env('ADDRESS_POSTAL_CODE_URLS', 'https://viacep.com.br/ws/{cep}/json/,https://brasilapi.com.br/api/cep/v1/{cep}')))),
+    ],
+
+    /*
     | Usuário criado por "php artisan app:setup".
     */
     'initial_user' => [

@@ -84,6 +84,8 @@ Everything that varies between projects lives in `.env`. The main options:
 | `PROFILE_AVATAR_MAX_KB` | `2048` | Maximum profile picture size, in KB. PHP's `upload_max_filesize` also applies |
 | `PROFILE_AVATAR_DISK` | `local` | Disk for profile pictures |
 | `PROFILE_RELATIONSHIPS` | `Mother,Father,...,Other relationship` | Relationships of emergency contacts, translated by `lang/pt_BR.json` |
+| `ADDRESS_DEFAULT_COUNTRY` | `Brasil` | Country prefilled in addresses |
+| `ADDRESS_POSTAL_CODE_URLS` | ViaCEP and BrasilAPI | Postal code services, tried in order. `{cep}` is replaced by the digits |
 | `INITIAL_USER_PASSWORD` | empty | Temporary password; empty generates one automatically |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Name of the master profile, used only on creation |
 | `DEFAULT_PROFILE_NAME` | `Usuário` | Name of the default profile, used only on creation |
@@ -172,6 +174,20 @@ mobile formats, and emails in lowercase. The same value cannot repeat among a pe
 Phones can be marked as WhatsApp. Any contact can be an emergency contact, which then requires a relationship and a name.
 An email contact does not change the login email. A contact of another person answers 404, even to administrators:
 the panel has no contact lookup. Deletion is logical, and contacts stay with the account when it is deleted and restored.
+
+## Addresses
+
+On the profile page, each person manages their own addresses in `user_enderecos` (model `App\Models\UserAddress`,
+relation `$user->addresses`). The first one becomes the main address, and the database keeps a single one per person.
+Deleting the main address while others exist asks for the next one. The delivery option requires the recipient name.
+
+To use it in another form, render `Components/AddressFields.jsx` with a `useForm` holding `postal_code`, `street`,
+`number`, `complement`, `reference`, `neighborhood`, `city`, `state` and `country`, and apply
+`App\Http\Requests\Concerns\ValidatesAddress` to the Request. The component knows nothing about users.
+
+The postal code search goes through the server at `GET /postal-code/{cep}`, sends only the postal code and is limited to
+30 lookups per minute. If it fails, the person is told and fills in by hand. With a country other than Brazil, the search,
+mask and state list are turned off.
 
 ## Login
 

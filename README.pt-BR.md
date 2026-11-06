@@ -80,6 +80,8 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `PROFILE_AVATAR_MAX_KB` | `2048` | Tamanho máximo da imagem de perfil, em KB. Respeite também o `upload_max_filesize` do PHP |
 | `PROFILE_AVATAR_DISK` | `local` | Disco das imagens de perfil |
 | `PROFILE_RELATIONSHIPS` | `Mother,Father,...,Other relationship` | Parentescos dos contatos de emergência, traduzidos por `lang/pt_BR.json` |
+| `ADDRESS_DEFAULT_COUNTRY` | `Brasil` | País já preenchido nos endereços |
+| `ADDRESS_POSTAL_CODE_URLS` | ViaCEP e BrasilAPI | Serviços de CEP, tentados em ordem. `{cep}` é trocado pelos dígitos |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Nome do perfil master, usado somente na criação |
 | `DEFAULT_PROFILE_NAME` | `Usuário` | Nome do perfil padrão, usado somente na criação |
 | `ADMIN_EMAIL_THROTTLE` | `3` | E-mails do painel por usuário de destino, por janela |
@@ -168,6 +170,20 @@ Telefones podem ser marcados como WhatsApp. Qualquer contato pode ser de emergê
 O contato de e-mail não muda o e-mail de login. Contato de outra pessoa responde 404, mesmo para administradores:
 não há consulta de contatos pelo painel. A exclusão é lógica, e os contatos continuam ligados à conta quando ela é
 excluída e restaurada.
+
+## Endereços
+
+Na página de perfil, cada pessoa cuida dos próprios endereços em `user_enderecos` (modelo `App\Models\UserAddress`,
+relação `$user->addresses`). O primeiro vira o principal, e o banco garante um só por pessoa. Excluir o principal com
+outros cadastrados pede a escolha do próximo. A opção de entrega exige o nome de quem recebe.
+
+Para usar em outro formulário, renderize `Components/AddressFields.jsx` com um `useForm` que tenha `postal_code`,
+`street`, `number`, `complement`, `reference`, `neighborhood`, `city`, `state` e `country`, e aplique
+`App\Http\Requests\Concerns\ValidatesAddress` na Request. O componente não conhece usuários.
+
+A busca de CEP passa pelo servidor, em `GET /postal-code/{cep}`, envia só o CEP e é limitada a 30 consultas por minuto.
+Se ela falhar, a pessoa é avisada e preenche à mão. Com país diferente de Brasil, busca, máscara e lista de estados
+ficam desligadas.
 
 ## Login
 

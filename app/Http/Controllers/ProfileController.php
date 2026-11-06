@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Admin\DeleteUser;
 use App\Actions\UpdateProfile;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\UserAddress;
 use App\Models\UserContact;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
@@ -37,6 +38,12 @@ class ProfileController extends Controller
                 ->values(),
             'cpfRequired' => (bool) config('template.profile.cpf_required'),
             'avatarMaxKb' => (int) config('template.profile.avatar_max_kb'),
+            'addresses' => $request->user()->addresses()->orderByDesc('is_main')->orderBy('id')->get()
+                ->map(fn (UserAddress $address) => $address->only([
+                    'id', 'postal_code', 'street', 'number', 'complement', 'reference', 'neighborhood', 'city',
+                    'state', 'country', 'is_main', 'is_billing', 'is_delivery', 'recipient_name',
+                ])),
+            'defaultCountry' => config('template.address.default_country'),
             'contacts' => $request->user()->contacts()->orderBy('id')->get()
                 ->map(fn (UserContact $contact) => [
                     'id' => $contact->id,
