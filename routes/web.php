@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\InstallController;
 use App\Http\Controllers\PostalCodeController;
 use App\Http\Controllers\ProfileAddressController;
 use App\Http\Controllers\ProfileAvatarController;
@@ -39,6 +40,16 @@ Route::middleware(['account.ready', EnsureNotificationsEnabled::class])->prefix(
     Route::post('/seen', [ScreenNotificationController::class, 'seen'])->name('notifications.seen');
     Route::delete('/{notification}', [ScreenNotificationController::class, 'destroy'])->whereNumber('notification')->name('notifications.destroy');
 });
+
+Route::middleware('install.pending')->prefix('install')->name('install.')->group(function () {
+    Route::get('/', [InstallController::class, 'show'])->name('show');
+    Route::post('/unlock', [InstallController::class, 'unlock'])->middleware('throttle:5,1')->name('unlock');
+    Route::post('/environment', [InstallController::class, 'environment'])->name('environment');
+    Route::post('/database', [InstallController::class, 'database'])->name('database');
+    Route::post('/user', [InstallController::class, 'user'])->name('user');
+});
+
+Route::get('/install/finish/{token}', [InstallController::class, 'finish'])->name('install.finish');
 
 require __DIR__.'/admin.php';
 require __DIR__.'/auth.php';

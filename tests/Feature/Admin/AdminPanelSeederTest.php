@@ -21,7 +21,7 @@ class AdminPanelSeederTest extends TestCase
         'visualizar_usuario', 'cadastrar_usuario', 'editar_usuario', 'alterar_situacao_usuario',
         'excluir_usuario', 'gerenciar_permissoes_usuario', 'solicitar_troca_senha',
         'enviar_email_autenticacao', 'exportar_dados', 'restaurar_perfil', 'restaurar_permissao',
-        'restaurar_usuario',
+        'restaurar_usuario', 'configura_env',
     ];
 
     public function test_administrator_is_the_first_profile(): void
@@ -49,7 +49,7 @@ class AdminPanelSeederTest extends TestCase
         $this->seed(AdminPanelSeeder::class);
 
         $this->assertEqualsCanonicalizing(self::CODES, Permission::pluck('code')->all());
-        $this->assertSame(20, Permission::where('is_system', true)->count());
+        $this->assertSame(21, Permission::where('is_system', true)->count());
         $this->assertSame('Cadastrar Usuários', Permission::firstWhere('code', 'cadastrar_usuario')->title);
     }
 
@@ -63,7 +63,7 @@ class AdminPanelSeederTest extends TestCase
         $this->seed(AdminPanelSeeder::class);
 
         $this->assertSame(2, Profile::count());
-        $this->assertSame(20, Permission::count());
+        $this->assertSame(21, Permission::count());
         $this->assertSame('Master', Profile::administrator()->name);
         $this->assertSame('Título novo', Permission::firstWhere('code', 'editar_perfil')->title);
     }

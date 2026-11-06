@@ -38,7 +38,7 @@ class AdminSecurityTest extends TestCase
 
         $routes = $this->panelRoutes();
 
-        $this->assertCount(31, $routes);
+        $this->assertCount(33, $routes);
 
         foreach ($routes as $route) {
             $method = collect($route->methods())->reject(fn (string $verb) => $verb === 'HEAD')->first();

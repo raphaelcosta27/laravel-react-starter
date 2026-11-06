@@ -19,6 +19,8 @@ class PermissionCoverageTest extends TestCase
     private const SIGNED_FILE = 'Arquivo por URL assinada pelo framework.';
 
     /** Funções sem permissão e o motivo de cada uma. */
+    private const INSTALLATION = 'Assistente protegido pelo código de instalação e fechado depois de concluído.';
+
     private const ROUTE_EXCEPTIONS = [
         'GET /' => 'Página pública.',
         'GET up' => 'Verificação de saúde, sem dados.',
@@ -48,6 +50,12 @@ class PermissionCoverageTest extends TestCase
         'POST profile/contacts' => self::OWN_ACCOUNT,
         'PATCH profile/contacts/{contact}' => self::OWN_ACCOUNT,
         'DELETE profile/contacts/{contact}' => self::OWN_ACCOUNT,
+        'GET install' => self::INSTALLATION,
+        'POST install/unlock' => self::INSTALLATION,
+        'POST install/environment' => self::INSTALLATION,
+        'POST install/database' => self::INSTALLATION,
+        'POST install/user' => self::INSTALLATION,
+        'GET install/finish/{token}' => self::INSTALLATION,
         'GET notifications' => self::OWN_ACCOUNT,
         'GET notifications/unread' => self::OWN_ACCOUNT,
         'POST notifications/seen' => self::OWN_ACCOUNT,
@@ -69,6 +77,7 @@ class PermissionCoverageTest extends TestCase
     private const COMMAND_EXCEPTIONS = [
         'app:clean-logs' => 'Rotina agendada de limpeza de logs.',
         'app:create-user' => 'Usado por quem opera o servidor.',
+        'app:install-code' => 'Usado por quem opera o servidor.',
         'app:setup' => 'Usado por quem opera o servidor.',
     ];
 

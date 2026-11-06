@@ -87,6 +87,8 @@ Everything that varies between projects lives in `.env`. The main options:
 | `NOTIFICATIONS_ENABLED` | `true` | Turns the bell and notification routes on |
 | `NOTIFICATIONS_POLL_SECONDS` | `60` | Bell refresh interval |
 | `NOTIFICATIONS_PER_PAGE` | `20` | Notifications per panel page |
+| `INSTALL_ENABLED` | `true` | Turns the installation wizard on while there are no users |
+| `ENVIRONMENT_EDITOR_ENABLED` | `true` | Allows saving the panel environment page |
 | `ADDRESS_DEFAULT_COUNTRY` | `Brasil` | Country prefilled in addresses |
 | `ADDRESS_POSTAL_CODE_URLS` | ViaCEP and BrasilAPI | Postal code services, tried in order. `{cep}` is replaced by the digits |
 | `INITIAL_USER_PASSWORD` | empty | Temporary password; empty generates one automatically |
@@ -203,6 +205,28 @@ ScreenNotifications::send($profile->users, 'Title', 'Text', 'success', '/dashboa
 
 Types are `info`, `success`, `warning` and `error`. The link is optional and accepts an internal path or an http(s) address.
 Content is always shown as text. The count updates on navigation and every `NOTIFICATIONS_POLL_SECONDS`.
+
+## Browser installation
+
+While there are no users, every request goes to `/install`, which works even without `.env`, key or database. The wizard
+asks for the installation code, found in `storage/app/private/system/install-code.txt` and in the log. If it is lost,
+`php artisan app:install-code` generates another. Next come the parameters, with a connection test, the database setup
+and the first user, who becomes an administrator and enters authenticated. Once finished, the address answers 404. Public
+registration stays closed until then, and `php artisan app:setup` remains an alternative.
+
+## Environment in the panel
+
+At `/admin/environment`, administrators and profiles with `configura_env` edit `.env` by group. Secrets never reach the
+browser: left blank, the current value is kept. Variables outside `.env.example` are treated as secrets. `APP_KEY` cannot
+be changed there. On save, the previous copy goes to `storage/app/private/system/.env.backup`, config, cache and routes
+are cleared, and the history records who changed what, with secrets masked. A `DB_*` change is accepted only if the new
+connection answers. In production, use `ENVIRONMENT_EDITOR_ENABLED=false` to make the page read only.
+
+On an existing installation, run the command below to create the `configura_env` permission:
+
+```bash
+php artisan db:seed --class=AdminPanelSeeder
+```
 
 ## Login
 

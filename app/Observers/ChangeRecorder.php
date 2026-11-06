@@ -78,6 +78,26 @@ class ChangeRecorder
         $masked = [...config('template.history.masked_fields'), ...$model->getHidden()];
         $changes = array_diff_key($changes, array_flip(array_filter($ignored)));
 
+        $this->write($model->getConnectionName(), $model->getTable(), (string) $model->getKey(), $operation, $changes, $masked);
+    }
+
+    /**
+     * O arquivo de ambiente não é um modelo, mas o que muda nele também é registrado.
+     *
+     * @param  array<string, array{mixed, mixed}>  $changes
+     * @param  array<int, string>  $masked
+     */
+    public function environment(array $changes, array $masked): void
+    {
+        $this->write(null, 'env', '.env', ChangeHistory::UPDATED, $changes, $masked);
+    }
+
+    /**
+     * @param  array<string, array{mixed, mixed}>  $changes
+     * @param  array<int, string>  $masked
+     */
+    private function write(?string $connection, string $table, string $recordId, string $operation, array $changes, array $masked): void
+    {
         if ($changes === []) {
             return;
         }
@@ -93,8 +113,8 @@ class ChangeRecorder
             $items[] = [
                 'operation_id' => $operationId,
                 'operation' => $operation,
-                'table_name' => $model->getTable(),
-                'record_id' => (string) $model->getKey(),
+                'table_name' => $table,
+                'record_id' => $recordId,
                 'field' => $field,
                 'old_value' => $this->format($old, $sensitive),
                 'new_value' => $this->format($new, $sensitive),
@@ -104,7 +124,7 @@ class ChangeRecorder
             ];
         }
 
-        ChangeHistory::on($model->getConnectionName())->insert($items);
+        ChangeHistory::on($connection)->insert($items);
     }
 
     private function format(mixed $value, bool $sensitive): ?string

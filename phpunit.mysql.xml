@@ -17,6 +17,7 @@
     </testsuites>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="INSTALL_ENABLED" value="false"/>
         <env name="APP_KEY" value="base64:In8ewd/ZHyOf41ipxf79IdzDOe9DL6oAb1FAWbayDkE="/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_STORE" value="array"/>

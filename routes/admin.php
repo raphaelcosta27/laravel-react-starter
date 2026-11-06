@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\EnvironmentController;
 use App\Http\Controllers\Admin\ExportController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -9,6 +10,14 @@ use App\Http\Controllers\Admin\UserPermissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('account.ready')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('environment', [EnvironmentController::class, 'index'])
+        ->middleware('can:configura_env')
+        ->name('environment.index');
+
+    Route::patch('environment', [EnvironmentController::class, 'update'])
+        ->middleware('can:configura_env')
+        ->name('environment.update');
+
     Route::get('profiles', [ProfileController::class, 'index'])
         ->middleware('can:visualizar_perfil')
         ->name('profiles.index');

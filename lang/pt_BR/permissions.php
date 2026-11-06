@@ -20,5 +20,6 @@ return [
     'exportar_dados' => ['title' => 'Exportar Dados', 'description' => 'Permissão permite exportar os dados das listagens.'],
     'restaurar_perfil' => ['title' => 'Restaurar Perfis', 'description' => 'Permissão permite consultar e restaurar perfis excluídos.'],
     'restaurar_permissao' => ['title' => 'Restaurar Permissões', 'description' => 'Permissão permite consultar e restaurar permissões excluídas.'],
+    'configura_env' => ['title' => 'Configurar Ambiente', 'description' => 'Permissão de confiança elevada: permite alterar o arquivo de ambiente, inclusive banco de dados e envio de e-mail.'],
     'restaurar_usuario' => ['title' => 'Restaurar Usuários', 'description' => 'Permissão permite consultar e restaurar usuários excluídos.'],
 ];

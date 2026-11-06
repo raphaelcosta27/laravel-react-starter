@@ -64,7 +64,7 @@ class AppSetupTest extends TestCase
 
         $this->artisan('app:setup')->assertSuccessful();
 
-        $this->assertSame(20, Permission::count());
+        $this->assertSame(21, Permission::count());
         $this->assertTrue(User::firstWhere('email', 'admin@example.com')->isAdministrator());
     }
 

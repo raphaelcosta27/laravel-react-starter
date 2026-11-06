@@ -69,6 +69,16 @@ return [
     ],
 
     /*
+    | Assistente de instalação e tela do ambiente. A pasta guarda o código, o
+    | marcador e a cópia anterior do arquivo, fora da área pública.
+    */
+    'install' => [
+        'enabled' => (bool) env('INSTALL_ENABLED', true),
+        'editor_enabled' => (bool) env('ENVIRONMENT_EDITOR_ENABLED', true),
+        'directory' => storage_path('app/private/system'),
+    ],
+
+    /*
     | Notificações em tela. O sino consulta o servidor a cada poll_seconds.
     */
     'notifications' => [

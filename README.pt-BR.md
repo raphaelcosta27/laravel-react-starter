@@ -83,6 +83,8 @@ Tudo o que varia por projeto fica no `.env`. As principais opções:
 | `NOTIFICATIONS_ENABLED` | `true` | Liga o sino e as rotas de notificação |
 | `NOTIFICATIONS_POLL_SECONDS` | `60` | Intervalo de atualização do sino |
 | `NOTIFICATIONS_PER_PAGE` | `20` | Notificações por página da barra |
+| `INSTALL_ENABLED` | `true` | Liga o assistente de instalação enquanto não há usuários |
+| `ENVIRONMENT_EDITOR_ENABLED` | `true` | Permite salvar a tela de ambiente do painel |
 | `ADDRESS_DEFAULT_COUNTRY` | `Brasil` | País já preenchido nos endereços |
 | `ADDRESS_POSTAL_CODE_URLS` | ViaCEP e BrasilAPI | Serviços de CEP, tentados em ordem. `{cep}` é trocado pelos dígitos |
 | `ADMIN_PROFILE_NAME` | `Administrador` | Nome do perfil master, usado somente na criação |
@@ -199,6 +201,28 @@ ScreenNotifications::send($profile->users, 'Título', 'Texto', 'success', '/dash
 
 Os tipos são `info`, `success`, `warning` e `error`. O link é opcional e aceita caminho interno ou endereço http(s).
 O conteúdo é sempre exibido como texto. A contagem é atualizada ao navegar e a cada `NOTIFICATIONS_POLL_SECONDS`.
+
+## Instalação pelo navegador
+
+Enquanto não há usuários, todo acesso vai para `/install`, que funciona mesmo sem `.env`, chave ou banco. O assistente pede
+o código de instalação, em `storage/app/private/system/install-code.txt` e no log. Se ele se perder, `php artisan
+app:install-code` gera outro. Depois vêm os parâmetros, com teste de conexão, a preparação do banco e o primeiro usuário,
+que nasce administrador e entra já autenticado. Concluído, o endereço responde 404. O cadastro público fica fechado até
+ali, e `php artisan app:setup` continua como alternativa.
+
+## Ambiente pelo painel
+
+Em `/admin/environment`, administradores e perfis com `configura_env` editam o `.env` por grupos. Segredos nunca chegam
+ao navegador: em branco, o valor atual é mantido. Variáveis fora de `.env.example` são tratadas como segredo. `APP_KEY`
+não é alterada por ali. Ao salvar, a cópia anterior fica em `storage/app/private/system/.env.backup`, config, cache e
+rotas são limpos, e o histórico guarda quem mudou o quê, com segredos mascarados. Mudança em `DB_*` só é aceita se a nova
+conexão responder. Em produção, use `ENVIRONMENT_EDITOR_ENABLED=false` para deixar a tela só para leitura.
+
+Em uma instalação já existente, rode o comando abaixo para criar a permissão `configura_env`:
+
+```bash
+php artisan db:seed --class=AdminPanelSeeder
+```
 
 ## Login
 
