@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
+use App\Rules\ValidTurnstile;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -30,47 +32,46 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            ...(config('services.turnstile.enabled') ? ['captcha' => ['required', 'string', new ValidTurnstile]] : []),
         ];
     }
 
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return ['captcha.required' => __('Complete the human verification.')];
+    }
+
     /**
-     * Attempt to authenticate the request's credentials.
+     * Confere as credenciais sem abrir sessão. Quem autentica é o controller,
+     * depois da verificação em duas etapas quando ela está ligada.
      *
      * @throws ValidationException
      */
-    public function authenticate(): void
+    public function authenticate(): User
     {
         $this->ensureIsNotRateLimited();
 
-        $refusal = 'auth.failed';
+        $credentials = $this->only('email', 'password');
 
-        $authenticated = Auth::attemptWhen(
-            $this->only('email', 'password'),
-            function ($user) use (&$refusal) {
-                if (! $user->is_active) {
-                    $refusal = 'auth.inactive';
+        /** @var User|null $user */
+        $user = Auth::validate($credentials) ? Auth::getLastAttempted() : null;
 
-                    return false;
-                }
+        $refusal = $user === null ? 'auth.failed' : $user->loginRefusal();
 
-                if ($user->temporaryPasswordExpired()) {
-                    $refusal = 'auth.temporary_password_expired';
-
-                    return false;
-                }
-
-                return true;
-            },
-            $this->boolean('remember'),
-        );
-
-        if (! $authenticated) {
+        if ($refusal !== null) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages(['email' => trans($refusal)]);
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        if (config('hashing.rehash_on_login', true)) {
+            Auth::getProvider()->rehashPasswordIfRequired($user, $credentials);
+        }
+
+        return $user;
     }
 
     /**

@@ -1,4 +1,5 @@
 import TextLink from '@/Components/TextLink';
+import TurnstileWidget from '@/Components/TurnstileWidget';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { fieldProps } from '@/lib/form';
 import { useTranslations } from '@/lib/i18n';
@@ -6,23 +7,33 @@ import { Head, useForm } from '@inertiajs/react';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
+import FormHelperText from '@mui/material/FormHelperText';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 
-export default function Login({ status, canResetPassword, canRegister }) {
+export default function Login({
+    status,
+    canResetPassword,
+    canRegister,
+    captchaSiteKey,
+}) {
     const __ = useTranslations();
+    const [captchaReset, setCaptchaReset] = useState(0);
     const form = useForm({
         email: '',
         password: '',
         remember: false,
+        captcha: '',
     });
 
     const submit = (event) => {
         event.preventDefault();
 
         form.post(route('login'), {
+            onError: () => setCaptchaReset((current) => current + 1),
             onFinish: () => form.reset('password'),
         });
     };
@@ -70,6 +81,20 @@ export default function Login({ status, canResetPassword, canRegister }) {
                             />
                         }
                     />
+
+                    {captchaSiteKey && (
+                        <TurnstileWidget
+                            siteKey={captchaSiteKey}
+                            resetKey={captchaReset}
+                            onChange={(token) => form.setData('captcha', token)}
+                        />
+                    )}
+
+                    {form.errors.captcha && (
+                        <FormHelperText error role="alert">
+                            {form.errors.captcha}
+                        </FormHelperText>
+                    )}
 
                     <Stack
                         direction="row"

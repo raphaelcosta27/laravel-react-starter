@@ -29,7 +29,8 @@ Por padrão, os e-mails não são enviados: eles ficam no arquivo de log do dia,
 
 1. Abra o log e copie a senha temporária e o link do e-mail de boas-vindas de `admin@example.com`.
 2. Abra o link e entre com a senha temporária.
-3. Defina uma nova senha.
+3. Informe o código de verificação, que também fica no log.
+4. Defina uma nova senha.
 
 A senha temporária e o link valem por 1 hora. Depois disso, use **Solicitar nova autenticação** na tela de
 login para receber uma nova senha e um novo link.
@@ -124,6 +125,26 @@ use RecordsChanges, SoftDeletes;
 - `update()`, `delete()` e `restore()` em massa salvam cada registro e ficam no histórico.
 - `insert()`, `upsert()`, `increment()`, `decrement()`, `truncate()`, `DB::table()`, `withoutEvents()` e os métodos
   `Quietly` não passam pelo histórico. Um teste falha se a aplicação ou os seeders os usarem.
+
+## Login
+
+Depois da senha, a pessoa recebe um código de 6 dígitos no e-mail da conta. Com `MAIL_MAILER=log`, o código
+fica no log do dia. Se o envio de e-mail estiver fora do ar, use `LOGIN_TWO_FACTOR_ENABLED=false`.
+
+| Variável | Padrão | Uso |
+|----------|--------|-----|
+| `LOGIN_TWO_FACTOR_ENABLED` | `true` | Exige o código depois da senha |
+| `LOGIN_CODE_EXPIRE` | `15` | Validade do código, em minutos |
+| `LOGIN_CODE_ATTEMPTS` | `5` | Tentativas erradas por código |
+| `LOGIN_CODE_SEND_LIMIT` | `5` | Códigos por usuário a cada período de validade, somando login e reenvio |
+| `TURNSTILE_ENABLED` | `false` | Exige o captcha do Cloudflare Turnstile na tela de login |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | vazias | Chaves do Turnstile |
+
+- O código fica no cache, protegido por hash. Limpar o cache encerra os logins pendentes, e a pessoa recomeça.
+- Use um cache compartilhado se a aplicação rodar em mais de um servidor.
+- Ligado sem as duas chaves, o captcha recusa todo login.
+- O "Lembrar de mim" evita novos logins enquanto o cookie valer, e portanto também o código.
+- O cadastro pela tela pública entra direto, sem código: ele confirma o e-mail depois, pelo link enviado.
 
 ## Regras de contas
 

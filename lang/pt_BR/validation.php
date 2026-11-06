@@ -24,6 +24,7 @@ return [
     'unique' => 'Este :attribute já está em uso.',
 
     'attributes' => [
+        'code' => 'código',
         'current_password' => 'senha atual',
         'email' => 'e-mail',
         'name' => 'nome',

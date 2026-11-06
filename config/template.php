@@ -13,6 +13,17 @@ return [
     'temporary_password_expire' => (int) env('TEMPORARY_PASSWORD_EXPIRE', 60),
 
     /*
+    | Verificação em duas etapas do login. Validade em minutos. O limite de
+    | códigos conta login e reenvio, por usuário, a cada período de validade.
+    */
+    'login' => [
+        'two_factor_enabled' => (bool) env('LOGIN_TWO_FACTOR_ENABLED', true),
+        'code_expire' => (int) env('LOGIN_CODE_EXPIRE', 15),
+        'code_attempts' => (int) env('LOGIN_CODE_ATTEMPTS', 5),
+        'code_send_limit' => (int) env('LOGIN_CODE_SEND_LIMIT', 5),
+    ],
+
+    /*
     | Identidade visual da aplicação.
     */
     'branding' => [

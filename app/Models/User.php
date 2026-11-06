@@ -65,6 +65,16 @@ class User extends Authenticatable implements MustVerifyEmail
     /**
      * Indica se a senha atual é temporária e já passou da validade.
      */
+    /** Chave de tradução do motivo que impede o login, se houver. */
+    public function loginRefusal(): ?string
+    {
+        return match (true) {
+            ! $this->is_active => 'auth.inactive',
+            $this->temporaryPasswordExpired() => 'auth.temporary_password_expired',
+            default => null,
+        };
+    }
+
     public function temporaryPasswordExpired(): bool
     {
         return $this->temporary_password_expires_at?->isPast() ?? false;

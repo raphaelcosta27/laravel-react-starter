@@ -33,7 +33,8 @@ By default, emails are not sent. They are written to the log file of the day, su
 
 1. Open the log and copy the temporary password and the link from the welcome email for `admin@example.com`.
 2. Open the link and sign in with the temporary password.
-3. Set a new password.
+3. Enter the verification code, which is also in the log.
+4. Set a new password.
 
 The temporary password and the link are valid for 1 hour. After that, use **Solicitar nova autenticação** on
 the login screen to receive a new password and a new link.
@@ -128,6 +129,26 @@ use RecordsChanges, SoftDeletes;
 - Mass `update()`, `delete()` and `restore()` save each row, so they are recorded row by row.
 - `insert()`, `upsert()`, `increment()`, `decrement()`, `truncate()`, `DB::table()`, `withoutEvents()` and the
   `Quietly` methods skip the history. A test fails if the application or the seeders use them.
+
+## Login
+
+After the password, the person receives a 6-digit code at the account's email. With `MAIL_MAILER=log`, the code
+is in the log of the day. If email delivery is down, use `LOGIN_TWO_FACTOR_ENABLED=false`.
+
+| Variable | Default | Use |
+|----------|---------|-----|
+| `LOGIN_TWO_FACTOR_ENABLED` | `true` | Requires the code after the password |
+| `LOGIN_CODE_EXPIRE` | `15` | Code validity, in minutes |
+| `LOGIN_CODE_ATTEMPTS` | `5` | Wrong attempts per code |
+| `LOGIN_CODE_SEND_LIMIT` | `5` | Codes per user in each validity period, counting login and resend |
+| `TURNSTILE_ENABLED` | `false` | Requires the Cloudflare Turnstile captcha on the login screen |
+| `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | empty | Turnstile keys |
+
+- The code is kept in the cache, protected by a hash. Clearing the cache ends pending logins, and the person starts over.
+- Use a shared cache if the application runs on more than one server.
+- Turned on without both keys, the captcha refuses every login.
+- "Remember me" avoids new logins while the cookie lasts, and therefore the code too.
+- Public registration signs in directly, with no code: the email is confirmed afterwards through the link sent.
 
 ## Account rules
 

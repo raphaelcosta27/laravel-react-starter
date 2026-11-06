@@ -29,6 +29,10 @@ return Application::configure(basePath: dirname(__DIR__))
             AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->hasSession() && $request->session()->has('login.pending')
+            ? route('login.code')
+            : route('login'));
+
         $middleware->alias([
             'account.active' => EnsureUserIsActive::class,
             'password.changed' => EnsurePasswordChanged::class,
