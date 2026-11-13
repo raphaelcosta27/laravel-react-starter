@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\User;
 use App\Support\Auth\PasswordCriteria;
+use App\Support\Permissions\PackageModules;
 use App\Support\ScreenNotifications;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -46,6 +47,7 @@ class HandleInertiaRequests extends Middleware
             'notifications' => fn () => $this->notifications($request),
             'flash' => $request->hasSession() ? $request->session()->get('flash') : null,
             'passwordCriteria' => fn () => PasswordCriteria::all(),
+            'packageNavigation' => fn () => PackageModules::menus(),
             'translations' => app('translator')->getLoader()->load(app()->getLocale(), '*', '*'),
         ];
     }

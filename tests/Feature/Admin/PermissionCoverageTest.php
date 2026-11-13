@@ -4,10 +4,12 @@ namespace Tests\Feature\Admin;
 
 use App\Policies\ProfilePolicy;
 use App\Policies\UserPolicy;
+use App\Support\Permissions\PackageModules;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Tests\Support\FakePackageModule;
 use Tests\TestCase;
 
 class PermissionCoverageTest extends TestCase
@@ -109,6 +111,16 @@ class PermissionCoverageTest extends TestCase
             ->all();
     }
 
+    /**
+     * Códigos que a preparação do painel cria: os do arquivo de idioma e os dos pacotes.
+     *
+     * @return array<string, mixed>
+     */
+    private function catalog(): array
+    {
+        return [...trans('permissions', [], 'pt_BR'), ...PackageModules::permissions()];
+    }
+
     /** @return array<int, string> */
     private function unknownCodes(string $source): array
     {
@@ -120,7 +132,7 @@ class PermissionCoverageTest extends TestCase
             ->filter()
             ->unique()
             ->reject(fn (string $code) => in_array($code, $abilities, true))
-            ->reject(fn (string $code) => array_key_exists($code, trans('permissions', [], 'pt_BR')))
+            ->reject(fn (string $code) => array_key_exists($code, $this->catalog()))
             ->values()
             ->all();
     }
@@ -159,7 +171,16 @@ class PermissionCoverageTest extends TestCase
         $codes = collect(Route::getRoutes()->getRoutes())->flatMap(fn (RoutingRoute $route) => $this->requiredCodes($route));
 
         $this->assertNotEmpty($codes);
-        $this->assertSame([], array_values(array_diff($codes->unique()->all(), array_keys(trans('permissions', [], 'pt_BR')))));
+        $this->assertSame([], array_values(array_diff($codes->unique()->all(), array_keys($this->catalog()))));
+    }
+
+    public function test_package_routes_may_use_the_package_codes(): void
+    {
+        FakePackageModule::register();
+        Route::get('admin/fake', fn () => 'ok')->middleware(['account.ready', 'can:visualizar_fake']);
+
+        $this->test_routes_only_use_codes_from_the_seeder();
+        $this->assertSame([], $this->unknownCodes("->middleware('can:visualizar_fake'); permission: 'publicar_fake'"));
     }
 
     public function test_the_source_code_only_uses_codes_from_the_seeder(): void

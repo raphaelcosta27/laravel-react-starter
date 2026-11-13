@@ -7,6 +7,7 @@ use App\Models\ProfilePermission;
 use App\Models\User;
 use App\Models\UserPermission;
 use App\Support\Permissions\Modules;
+use App\Support\Permissions\PackageModules;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -51,7 +52,8 @@ class ReorganizePermissions
     }
 
     /**
-     * Procura também em registros excluídos, para não duplicar.
+     * Procura também em registros excluídos, para não duplicar. Os textos dos
+     * pacotes só valem na criação, como os do arquivo de idioma.
      *
      * @return array<int, string>
      */
@@ -59,7 +61,7 @@ class ReorganizePermissions
     {
         $created = [];
 
-        foreach (trans('permissions', [], 'pt_BR') as $code => $texts) {
+        foreach ([...trans('permissions', [], 'pt_BR'), ...PackageModules::permissions()] as $code => $texts) {
             if (Permission::withTrashed()->where('code', $code)->exists()) {
                 continue;
             }

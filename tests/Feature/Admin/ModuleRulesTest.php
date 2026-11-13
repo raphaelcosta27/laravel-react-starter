@@ -3,7 +3,9 @@
 namespace Tests\Feature\Admin;
 
 use App\Support\Permissions\Modules;
+use App\Support\Permissions\PackageModules;
 use Illuminate\Support\Facades\File;
+use Tests\Support\FakePackageModule;
 use Tests\TestCase;
 
 /**
@@ -92,16 +94,39 @@ class ModuleRulesTest extends TestCase
         return $matches[1];
     }
 
+    /**
+     * Junta o que está nos arquivos do projeto ao que os pacotes declaram.
+     * Pacotes não precisam de menu, e o ícone deles já é validado no registro.
+     */
+    private function systemProblems(): array
+    {
+        return $this->problems(
+            Modules::all(),
+            [...array_keys(trans('permissions', [], 'pt_BR')), ...array_keys(PackageModules::permissions())],
+            [...$this->menuPermissions(), ...array_column(PackageModules::menus(), 'permission')],
+            [...$this->menuIcons(), ...array_fill_keys(array_keys(PackageModules::all()), true)],
+        );
+    }
+
     public function test_the_system_follows_the_module_rules(): void
     {
         $this->assertNotEmpty($this->menuPermissions());
 
-        $this->assertSame([], $this->problems(
-            Modules::all(),
-            array_keys(trans('permissions', [], 'pt_BR')),
-            $this->menuPermissions(),
-            $this->menuIcons(),
-        ));
+        $this->assertSame([], $this->systemProblems());
+    }
+
+    public function test_a_package_module_follows_the_module_rules(): void
+    {
+        FakePackageModule::register();
+        PackageModules::register('menuless_module', [
+            'label' => 'Menuless',
+            'view' => 'ver_sem_menu',
+            'without_records' => true,
+            'basic' => ['ver_sem_menu'],
+            'permissions' => ['ver_sem_menu' => ['title' => 'Ver', 'description' => 'Permite ver.']],
+        ]);
+
+        $this->assertSame([], $this->systemProblems());
     }
 
     public function test_a_module_without_icon_is_pointed_out(): void

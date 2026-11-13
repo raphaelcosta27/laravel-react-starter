@@ -6,8 +6,9 @@ use App\Models\Permission;
 use Illuminate\Support\Collection;
 
 /**
- * Áreas do sistema, declaradas em `template.modules`. Sem Visualizar, as demais
- * permissões de um módulo ficam guardadas, mas não têm efeito.
+ * Áreas do sistema, declaradas em `template.modules` e, depois delas, pelos
+ * pacotes (PackageModules). Sem Visualizar, as demais permissões de um módulo
+ * ficam guardadas, mas não têm efeito.
  */
 class Modules
 {
@@ -16,7 +17,7 @@ class Modules
     /** @return array<string, array<string, mixed>> */
     public static function all(): array
     {
-        return config('template.modules', []);
+        return [...config('template.modules', []), ...PackageModules::all()];
     }
 
     /** @return array<int, string> */

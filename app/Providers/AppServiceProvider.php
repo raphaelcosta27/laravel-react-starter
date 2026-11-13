@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\User;
 use App\Rules\StrongPassword;
 use App\Support\Auth\PasswordCriteria;
+use App\Support\Permissions\PackageModules;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(PackageModules::class);
     }
 
     /**
