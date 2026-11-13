@@ -29,6 +29,60 @@ Todo módulo novo traz suas permissões, e os testes apontam o que faltar. Veja
 php artisan db:seed --class=AdminPanelSeeder
 ```
 
+## Módulo em pacote Composer
+
+Um pacote traz o módulo inteiro sem editar arquivos do projeto. Veja
+[módulos de pacotes](../especificacoes/modulos-de-pacotes.md).
+
+1. No `boot()` do ServiceProvider do pacote, registre o módulo:
+
+   ```php
+   use App\Support\Permissions\PackageModules;
+
+   PackageModules::register('settings', [
+       'label' => 'Settings',
+       'view' => 'gerenciar_configuracoes_sistema',
+       'without_records' => true,
+       'basic' => ['gerenciar_configuracoes_sistema'],
+       'specific' => [],
+       'enabled_by' => null,
+       'permissions' => [
+           'gerenciar_configuracoes_sistema' => [
+               'title' => 'Gerenciar Configurações de Sistema',
+               'description' => 'Permissão permite consultar e alterar as configurações do sistema.',
+           ],
+       ],
+       'menu' => [
+           'label' => 'Settings',
+           'route' => 'admin.settings',
+           'index' => 'admin.settings.index',
+           'icon' => 'settings',
+           'group' => 'config',
+       ],
+   ]);
+   ```
+
+   `label`, `view`, `basic` e o texto de cada código são obrigatórios. `menu` é opcional e, quando vem, precisa de
+   `label`, `route`, `index` e `icon`. `group` aceita `'config'` ou nada.
+2. Registre as rotas com `loadRoutesFrom()`, no padrão de `routes/admin.php`: middleware `web`, `auth` e
+   `account.ready`, prefixo `admin`, nome `admin.` e `can:<código>` em cada rota.
+3. Renderize as telas com o nome do pacote: `Inertia::render('laravel-settings::Admin/Index')` abre
+   `vendor/raphaelcosta27/laravel-settings/resources/js/Pages/Admin/Index.jsx`, dentro do layout.
+   As telas podem importar `@/…`, `@mui/*` e `@inertiajs/react`. O pacote não deve ter `node_modules` próprio.
+4. Escolha o ícone entre `settings`, `article`, `tune`, `palette`, `campaign`, `category`, `description` e
+   `extension`. Nome desconhecido usa `extension`. Para oferecer outro, acrescente-o em
+   `resources/js/navigationIcons.js`.
+5. Se o rótulo precisar de tradução, use `loadJsonTranslationsFrom()` no pacote.
+6. Instale o pacote e rode o comando abaixo, que cria as permissões dele sem alterar as existentes.
+
+```bash
+php artisan db:seed --class=AdminPanelSeeder
+```
+
+Nos testes do pacote, confira a tela com `->component('laravel-settings::Admin/Index', false)`: o segundo argumento
+evita procurar o arquivo em `resources/js/Pages`. Se os pacotes forem de outro fornecedor, troque `PACKAGE_VENDOR` e o
+glob em `resources/js/pages.js`.
+
 ## Nova listagem
 
 Use `resources/js/Components/DataTable` com uma definição em `app/Support/Tables/Definitions`. Veja o

@@ -309,6 +309,10 @@ o que já existe e revogar continuam liberados. As telas deixam indisponível o 
 proteja a rota com `can:`. O seeder cria somente as permissões faltantes. `PermissionCoverageTest` falha se uma
 rota ficar sem permissão e fora da lista de exceções, ou se um código usado não constar no seeder.
 
+**Módulo em pacote Composer.** Um pacote declara módulo, permissões e item de menu com `PackageModules::register()`
+no próprio ServiceProvider, e traz rotas e telas, sem editar arquivos do projeto. Veja
+[módulos de pacotes](docs/especificacoes/modulos-de-pacotes.md).
+
 **Exclusão de dados.** Nada é apagado de fato. Toda entidade usa exclusão lógica, inclusive vínculos, e um teste
 falha se `forceDelete`, `detach`, `sync` ou `truncate` aparecer em `app/` ou `database/`.
 

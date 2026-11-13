@@ -314,6 +314,10 @@ already exists and revoking stay allowed. Screens disable what cannot be granted
 the route with `can:`. The seeder only creates missing permissions. `PermissionCoverageTest` fails if a route has
 no permission and is not a listed exception, or if a code in use is missing from the seeder.
 
+**Module in a Composer package.** A package declares its module, permissions and menu item with
+`PackageModules::register()` in its own ServiceProvider, and brings its routes and pages, without editing project
+files. See [package modules](docs/especificacoes/modulos-de-pacotes.md).
+
 **Deleting data.** Nothing is physically deleted. Every entity uses soft deletes, including links, and a test
 fails if `forceDelete`, `detach`, `sync` or `truncate` appears in `app/` or `database/`.
 

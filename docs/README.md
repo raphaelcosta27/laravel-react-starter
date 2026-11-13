@@ -22,6 +22,7 @@ Cada documento traz objetivo, regras, comportamentos, configuração e decisões
 - [Histórico de alterações](especificacoes/historico-alteracoes.md)
 - [Cobertura de permissões](especificacoes/cobertura-permissoes.md)
 - [Permissões por módulo](especificacoes/permissoes-por-modulo.md)
+- [Módulos de pacotes](especificacoes/modulos-de-pacotes.md)
 - [Verificação do login](especificacoes/login-verificacao.md)
 - [Força da senha](especificacoes/forca-senha.md)
 - [Dados pessoais](especificacoes/dados-pessoais.md)

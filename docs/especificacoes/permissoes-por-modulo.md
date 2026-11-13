@@ -6,7 +6,8 @@ Organizar as permissões pelas áreas do sistema, para que a tela mostre só o q
 
 ## Regras
 
-- Toda permissão pertence a um módulo: Painel, Perfis, Permissões, Usuários ou Ambiente, ou a outro criado pelo projeto.
+- Toda permissão pertence a um módulo: Painel, Perfis, Permissões, Usuários ou Ambiente, ou a outro criado pelo projeto
+  ou trazido por um pacote.
 - **Todo módulo novo traz suas permissões.** Módulo com registros tem Visualizar, Criar, Editar e Excluir, além das específicas.
 - Módulo sem registros só tem as permissões que liberam algo. O Ambiente tem Visualizar e Editar.
 - Visualizar exibe o menu e a listagem, e nada mais. As demais permissões liberam botões e ações.
@@ -29,6 +30,9 @@ Organizar as permissões pelas áreas do sistema, para que a tela mostre só o q
 Os módulos ficam em `template.modules`, com `label`, `view`, `basic`, `specific`, `without_records` e `enabled_by`, e o
 menu fica em `resources/js/navigation.js`. O
 passo a passo está em [estender o template](../guias/estender-template.md#novo-módulo).
+
+Um pacote Composer também pode trazer um módulo, com as mesmas regras, sem editar esses arquivos. Veja
+[módulos de pacotes](modulos-de-pacotes.md).
 
 ## Decisões
 
