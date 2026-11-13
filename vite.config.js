@@ -10,4 +10,10 @@ export default defineConfig({
         }),
         react(),
     ],
+    resolve: {
+        // Pacotes instalados pelo Composer com repositório "path" ficam em
+        // vendor/ como link. Mantendo o caminho do link, as páginas deles
+        // usam o node_modules e as bibliotecas deste projeto.
+        preserveSymlinks: true,
+    },
 });
